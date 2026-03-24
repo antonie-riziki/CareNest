@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Care Nest - Settings</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-low": "#f1f4f6",
+                        "surface": "#f7fafc",
+                        "tertiary-container": "#003d38",
+                        "primary-container": "#1a365d",
+                        "primary": "#002045",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#181c1e",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-primary-container": "#86a0cd",
+                        "on-surface-variant": "#43474e",
+                        "background": "#f7fafc",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-container": "#a2eded",
+                        "tertiary": "#002522",
+                        "surface-dim": "#d7dadc",
+                        "secondary": "#13696a",
+                        "secondary-fixed": "#a5eff0",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-high": "#e5e9eb",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container": "#ebeef0",
+                        "primary-fixed-dim": "#adc7f7",
+                        "tertiary-fixed": "#79f7ea",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-primary": "#ffffff",
+                        "outline": "#74777f",
+                        "on-primary-fixed": "#001b3c",
+                        "on-background": "#181c1e",
+                        "surface-bright": "#f7fafc",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#5adace",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-tertiary-container": "#1eb1a5",
+                        "outline-variant": "#c4c6cf",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "inverse-primary": "#adc7f7",
+                        "on-secondary-container": "#1a6d6e",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#455f88",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-secondary-fixed": "#002020",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .kenyan-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+
+        .glass-surface {
+            background: rgba(247, 250, 252, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface min-h-screen pb-32">
+    <!-- TopAppBar -->
+    <header class="flex items-center w-full px-6 h-16 sticky top-0 z-50 bg-[#f7fafc] dark:bg-slate-900 shadow-none">
+        <div class="flex items-center gap-4">
+            <button
+                class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#e5e9eb] dark:hover:bg-slate-700 transition-colors active:scale-95 duration-200">
+                <span class="material-symbols-outlined text-[#002045] dark:text-blue-100">arrow_back</span>
+            </button>
+            <h1 class="font-['Manrope'] font-bold text-xl tracking-tight text-[#002045] dark:text-blue-100">Settings
+            </h1>
+        </div>
+    </header>
+    <main class="max-w-3xl mx-auto px-6 pt-8 space-y-12">
+        <!-- Availability Toggle (Hero Card) -->
+        <section class="kenyan-gradient p-8 rounded-lg shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="font-headline font-extrabold text-2xl text-on-primary tracking-tight">Work Availability
+                    </h2>
+                    <p class="text-on-primary-container mt-1 text-sm font-medium">Switch online to receive new job
+                        invitations</p>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 p-2 rounded-full border border-white/10">
+                    <span class="text-on-primary font-bold px-4 py-2 bg-secondary rounded-full">Online</span>
+                    <button
+                        class="w-14 h-8 bg-surface-container-highest/20 rounded-full relative flex items-center px-1">
+                        <div class="w-6 h-6 bg-secondary-container rounded-full shadow-lg translate-x-6"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Personal Info Section -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary"
+                    style="font-variation-settings: 'FILL' 1;">person</span>
+                <h3 class="font-headline font-bold text-xl text-primary">Personal Info</h3>
+            </div>
+            <div class="bg-surface-container-lowest rounded-lg p-6 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-2">
+                        <label
+                            class="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Full
+                            Name</label>
+                        <div class="flex items-center justify-between group">
+                            <span class="text-lg font-medium text-on-surface">Wanjiku Kamau</span>
+                            <button class="text-secondary hover:opacity-70 transition-opacity"><span
+                                    class="material-symbols-outlined">edit</span></button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Phone
+                            Number</label>
+                        <div class="flex items-center justify-between group">
+                            <span class="text-lg font-medium text-on-surface">+254 701 234 567</span>
+                            <button class="text-secondary hover:opacity-70 transition-opacity"><span
+                                    class="material-symbols-outlined">edit</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2 pt-4 border-t border-surface-container-high/50">
+                    <label
+                        class="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">Primary
+                        Location</label>
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-outline">location_on</span>
+                            <span class="text-lg font-medium text-on-surface">Kilimani, Nairobi</span>
+                        </div>
+                        <button class="text-secondary hover:opacity-70 transition-opacity"><span
+                                class="material-symbols-outlined">map</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid: Account & Preferences -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Account & Security -->
+            <section class="space-y-6">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary"
+                        style="font-variation-settings: 'FILL' 1;">security</span>
+                    <h3 class="font-headline font-bold text-xl text-primary">Security</h3>
+                </div>
+                <div class="bg-surface-container-lowest rounded-lg p-6 space-y-4">
+                    <button
+                        class="w-full flex items-center justify-between p-3 rounded-DEFAULT hover:bg-surface-container-low transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-outline">lock</span>
+                            <span class="font-medium">Change Password</span>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+                    </button>
+                    <button
+                        class="w-full flex items-center justify-between p-3 rounded-DEFAULT hover:bg-surface-container-low transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-outline">vibration</span>
+                            <span class="font-medium">2-Factor Auth</span>
+                        </div>
+                        <span
+                            class="font-label text-[10px] bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full font-bold">ACTIVE</span>
+                    </button>
+                    <button
+                        class="w-full flex items-center justify-between p-3 rounded-DEFAULT hover:bg-surface-container-low transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-outline">link</span>
+                            <span class="font-medium">Connected Accounts</span>
+                        </div>
+                        <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                    </button>
+                </div>
+            </section>
+            <!-- Preferences -->
+            <section class="space-y-6">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary"
+                        style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+                    <h3 class="font-headline font-bold text-xl text-primary">Preferences</h3>
+                </div>
+                <div class="bg-surface-container-low rounded-lg p-6 space-y-4">
+                    <div class="flex items-center justify-between p-3">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-outline">language</span>
+                            <span class="font-medium">Language</span>
+                        </div>
+                        <span class="text-secondary font-bold">English</span>
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        <p
+                            class="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-3">
+                            Notifications</p>
+                        <div class="flex items-center justify-between px-3">
+                            <span class="text-sm">Push Notifications</span>
+                            <div class="w-10 h-5 bg-secondary rounded-full flex items-center justify-end px-1">
+                                <div class="w-3 h-3 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between px-3">
+                            <span class="text-sm">SMS Alerts</span>
+                            <div class="w-10 h-5 bg-outline-variant rounded-full flex items-center justify-start px-1">
+                                <div class="w-3 h-3 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Privacy Section -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary"
+                    style="font-variation-settings: 'FILL' 1;">visibility</span>
+                <h3 class="font-headline font-bold text-xl text-primary">Privacy</h3>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant/15 rounded-lg overflow-hidden">
+                <div
+                    class="p-6 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer">
+                    <div class="space-y-1">
+                        <p class="font-bold text-on-surface">Profile Visibility</p>
+                        <p class="text-sm text-on-surface-variant">Control who can find you in search results</p>
+                    </div>
+                    <span class="material-symbols-outlined text-secondary">verified_user</span>
+                </div>
+                <div
+                    class="p-6 border-t border-outline-variant/15 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer">
+                    <div class="space-y-1">
+                        <p class="font-bold text-on-surface">Ratings &amp; Reviews</p>
+                        <p class="text-sm text-on-surface-variant">Show your performance badges on public profile</p>
+                    </div>
+                    <div class="w-10 h-5 bg-secondary rounded-full flex items-center justify-end px-1">
+                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Support & Legal -->
+        <section class="space-y-6">
+            <h3 class="font-headline font-bold text-xl text-primary px-1">Support &amp; Legal</h3>
+            <div class="space-y-2">
+                <a class="flex items-center gap-4 p-4 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-outline">help</span>
+                    <span class="font-medium flex-1">Help Center</span>
+                    <span class="material-symbols-outlined text-outline-variant">open_in_new</span>
+                </a>
+                <a class="flex items-center gap-4 p-4 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-outline">description</span>
+                    <span class="font-medium flex-1">Terms of Service</span>
+                    <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                </a>
+                <a class="flex items-center gap-4 p-4 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-outline">policy</span>
+                    <span class="font-medium flex-1">Privacy Policy</span>
+                    <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                </a>
+                <a class="flex items-center gap-4 p-4 rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-outline">info</span>
+                    <span class="font-medium flex-1">About CareNest</span>
+                    <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                </a>
+            </div>
+        </section>
+        <!-- Logout Button -->
+        <div class="pt-8 flex flex-col items-center gap-4">
+            <button
+                class="w-full md:w-auto px-12 py-4 bg-error-container text-on-error-container font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-95 duration-150">
+                <span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+            <p class="text-xs text-on-surface-variant font-medium">CareNest Version 2.4.0 (2024)</p>
+        </div>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_-10px_30px_rgba(24,28,30,0.04)] rounded-t-[2rem]">
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity active:scale-90 duration-150"
+            href="#">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-['Inter'] text-[10px] font-medium tracking-wide uppercase mt-1">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity active:scale-90 duration-150"
+            href="#">
+            <span class="material-symbols-outlined">work</span>
+            <span class="font-['Inter'] text-[10px] font-medium tracking-wide uppercase mt-1">Jobs</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity active:scale-90 duration-150"
+            href="#">
+            <span class="material-symbols-outlined">mail</span>
+            <span class="font-['Inter'] text-[10px] font-medium tracking-wide uppercase mt-1">Inbox</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-[#a2eded] dark:bg-[#13696a] text-[#13696a] dark:text-white rounded-[3rem] px-5 py-2 hover:opacity-80 transition-opacity active:scale-90 duration-150"
+            href="#">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-['Inter'] text-[10px] font-medium tracking-wide uppercase mt-1">Profile</span>
+        </a>
+    </nav>
+</body>
+
+</html>

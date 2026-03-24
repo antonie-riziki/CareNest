@@ -24,34 +24,41 @@ from apps.jobs.views import *
 from apps.contracts.views import *
 from apps.profiles.views import *
 from apps.wallet.views import *
+from apps.courses.views import *
+from apps.acc_settings.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     # Core
-    path("", index),
-    path("role-selection/", role_selection),
+    path("", index, name="home"),
+    path("role-selection/", role_selection, name="role-selection"),
     # Accounts
-    path("worker-signup/", worker_signup),
-    path("worker-signin/", worker_signin),
-    path("employer-signup/", employer_signup),
-    path("employer-signin/", employer_signin),
+    path("worker-signup/", worker_signup, name="worker-signup"),
+    path("worker-signin/", worker_signin, name="worker-signin"),
+    path("employer-signup/", employer_signup, name="employer-signup"),
+    path("employer-signin/", employer_signin, name="employer-signin"),
     # Profiles
-    path("worker-profile/", worker_profile),
-    path("employer-profile/", employer_profile),
+    path("worker-profile/", worker_profile, name="worker-profile"),
+    path("employer-profile/", employer_profile, name="employer-profile"),
     # Dashboard
-    path("worker-dashboard/", worker_dashboard),
-    path("employer-dashboard/", employer_dashboard),
+    path("worker-dashboard/", worker_dashboard, name="worker-dashboard"),
+    path("employer-dashboard/", employer_dashboard, name="employer-dashboard"),
     # Jobs
-    path("worker-jobs/", worker_jobs),
-    path("employer-jobs/", employer_jobs),
-    path("worker-job-details/", worker_job_details),
-    path("employer-job-details/", employer_job_details),
+    path("worker-jobs/", worker_jobs, name="worker-jobs"),
+    path("employer-jobs/", employer_jobs, name="employer-jobs"),
+    path("worker-job-details/", worker_job_details, name="worker-job-details"),
+    path("employer-job-details/", employer_job_details, name="employer-job-details"),
     # Contracts
-    path("worker-contracts/", worker_contracts),
-    path("employer-contracts/", employer_contracts),
+    path("worker-contracts/", worker_contracts, name="worker-contracts"),
+    path("employer-contracts/", employer_contracts, name="employer-contracts"),
     # Wallet
-    path("worker-wallet/", worker_wallet),
-    path("employer-wallet/", employer_wallet),
+    path("worker-wallet/", worker_wallet, name="worker-wallet"),
+    path("employer-wallet/", employer_wallet, name="employer-wallet"),
+    # Courses
+    path("worker-courses/", worker_courses, name="worker-courses"),
+    # Account Settings
+    path("worker-settings/", worker_settings, name="worker-settings"),
+    path("employer-settings/", employer_settings, name="employer-settings"),
     # API
     path("api/accounts/", include("apps.accounts.urls")),
     path("api/profiles/", include("apps.profiles.urls")),
