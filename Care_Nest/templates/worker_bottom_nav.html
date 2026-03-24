@@ -1,0 +1,55 @@
+<nav
+    class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 dark:bg-[#121814]/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 pb-5 pt-3 px-4 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+    <div class="flex items-center justify-between w-full max-w-lg mx-auto overflow-x-auto no-scrollbar gap-1">
+
+        <!-- Dashboard -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-primary dark:text-secondary group flex-shrink-0"
+            href="{% url 'worker-dashboard' %}">
+            <span class="material-icons-round text-[22px]">home</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Home</span>
+        </a>
+
+        <!-- Soil test & analysis -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-jobs' %}">
+            <span class="material-icons-round text-[22px]">work</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Jobs</span>
+        </a>
+
+        <!-- Crop calendar -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-contract' %}">
+            <span class="material-icons-round text-[22px]">contract</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Contracts</span>
+        </a>
+
+        <!-- Farming guide -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-wallet' %}">
+            <span class="material-icons-round text-[22px]">wallet</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Wallet</span>
+        </a>
+
+        <!-- Land mapping -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-courses' %}">
+            <span class="material-icons-round text-[22px]">school</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Courses</span>
+        </a>
+
+        <!-- Market intelligence -->
+        <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-profile' %}">
+            <span class="material-icons-round text-[22px]">person</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Profile</span>
+        </a>
+
+        <!-- Credit score -->
+        <!-- <a class="flex flex-col items-center gap-1 min-w-[54px] text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-secondary transition-colors flex-shrink-0"
+            href="{% url 'worker-settings' %}">
+            <span class="material-icons-round text-[22px]">settings</span>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Settings</span>
+        </a> -->
+
+    </div>
+</nav>

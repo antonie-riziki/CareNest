@@ -20,6 +20,10 @@ from django.urls import path, include
 from apps.core.views import *
 from apps.accounts.views import *
 from apps.dashboard.views import *
+from apps.jobs.views import *
+from apps.contracts.views import *
+from apps.profiles.views import *
+from apps.wallet.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,9 +35,21 @@ urlpatterns = [
     path("worker-signin/", worker_signin),
     path("employer-signup/", employer_signup),
     path("employer-signin/", employer_signin),
+    # Profiles
+    path("worker-profile/", worker_profile),
+    path("employer-profile/", employer_profile),
     # Dashboard
     path("worker-dashboard/", worker_dashboard),
     path("employer-dashboard/", employer_dashboard),
+    # Jobs
+    path("worker-jobs/", worker_jobs),
+    path("employer-jobs/", employer_jobs),
+    # Contracts
+    path("worker-contracts/", worker_contracts),
+    path("employer-contracts/", employer_contracts),
+    # Wallet
+    path("worker-wallet/", worker_wallet),
+    path("employer-wallet/", employer_wallet),
     # API
     path("api/accounts/", include("apps.accounts.urls")),
     path("api/profiles/", include("apps.profiles.urls")),
