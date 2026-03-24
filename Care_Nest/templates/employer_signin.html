@@ -5,13 +5,10 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Care Nest - Sign In</title>
+    <title>Care Nest - Employer Sign In</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -85,56 +82,39 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        .coastal-gradient {
+        .employer-gradient {
             background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
-        }
-
-        .glass-effect {
-            background: rgba(247, 250, 252, 0.7);
-            backdrop-filter: blur(20px);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
         }
     </style>
 </head>
 
 <body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
-    <!-- TopAppBar suppressed for Transactional focus as per shell visibility rule -->
+
     <main class="flex-grow flex items-center justify-center px-6 py-12 lg:py-24">
         <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-            <!-- Left Side: Editorial Branding & Visual -->
+            <!-- Left Side -->
             <div
-                class="hidden lg:flex flex-col justify-between coastal-gradient rounded-lg p-12 text-on-primary overflow-hidden relative">
+                class="hidden lg:flex flex-col justify-between employer-gradient rounded-lg p-12 text-on-primary overflow-hidden relative">
                 <div class="relative z-10">
-                    <!-- <span
-                        class="label-md font-label uppercase tracking-widest text-secondary-container opacity-80 mb-4 block">Care Nest
-                        Professional</span> -->
                     <h1 class="font-headline font-extrabold text-5xl tracking-tighter leading-tight mb-6">
-                        Empowering Kenya's<br />Domestic Workforce.
+                        Secure Trusted Help<br />for Your Home.
                     </h1>
                     <p class="font-body text-primary-fixed-dim text-lg max-w-md leading-relaxed">
-                        Join a community of trusted professionals. Access premium opportunities and manage your career
-                        with the clarity of the coastal horizon.
+                        Access premium domestic services and manage your household with ease. Professional care, verified and secure.
                     </p>
                 </div>
                 <div
                     class="relative z-10 mt-12 bg-surface-container-lowest/10 backdrop-blur-md rounded-lg p-6 border border-white/10">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-highest">
-                            <img alt="Profile" class="w-full h-full object-cover"
-                                data-alt="close-up portrait of a smiling African woman professional in a clean uniform, soft natural morning light"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO-BeTHvTfquDjQ-MEoWSjaskAJkMH7uhvfHfPuBPDMTyL-w2yT0kJ3fiU1r9CnF7bIEd3sKzaRt4y1dRmxrSthtg9fosZ3Cvg5QYvD9BfOxxNRuq8CLbUoGKxPhdkI0SZwSYKhAsatLXpwb7gJVsZRAV9ixlSDV7WhVyKoOgv7652Zx-yW4b74YrZoD8iBxHX6NBjluscL9piabwGjHZIAtjjFbu3dqdx_ma_-tlzsRTIQcGCod0bSAXFIcu0eQTq7cBJHd2FQ_Vq" />
+                            <span class="material-symbols-outlined text-4xl text-white flex items-center justify-center h-full">person</span>
                         </div>
                         <div>
-                            <p class="font-bold text-white">Zuhura M.</p>
-                            <p class="text-sm text-secondary-container">5-Star Housekeeper</p>
+                            <p class="font-bold text-white">Trust & Quality</p>
+                            <p class="text-sm text-secondary-container">Care Nest Excellence</p>
                         </div>
                     </div>
                 </div>
-                <!-- Abstract Coastal Pattern Background -->
                 <div class="absolute bottom-0 right-0 w-full h-full opacity-20 pointer-events-none">
                     <div
                         class="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] rounded-full bg-secondary blur-[120px]">
@@ -146,15 +126,11 @@
                 <div
                     class="bg-surface-container-lowest p-8 lg:p-12 rounded-lg shadow-[0_20px_40px_rgba(24,28,30,0.04)]">
                     <div class="mb-10">
-                        <div class="lg:hidden mb-6">
-                            <!-- <span
-                                class="font-headline font-extrabold text-2xl tracking-tighter text-primary">Care Nest</span> -->
-                        </div>
-                        <h2 class="font-headline font-bold text-3xl text-on-surface tracking-tight mb-2">Welcome Back
+                        <h2 class="font-headline font-bold text-3xl text-on-surface tracking-tight mb-2">Employer Login
                         </h2>
-                        <p class="text-on-surface-variant">Sign in to access your dashboard and new requests.</p>
+                        <p class="text-on-surface-variant">Sign in to manage your household and workers.</p>
                     </div>
-                    <form action="{% url 'worker-signin' %}" method="POST" class="space-y-6">
+                    <form action="{% url 'employer-signin' %}" method="POST" class="space-y-6">
                         {% csrf_token %}
                         <!-- Phone/Email Field -->
                         <div class="space-y-2">
@@ -196,7 +172,7 @@
                         </div>
                         <!-- Sign In Button -->
                         <button
-                            class="w-full coastal-gradient text-white font-headline font-bold py-5 rounded-xl shadow-lg active:scale-95 transition-all duration-200 mt-4"
+                            class="w-full employer-gradient text-white font-headline font-bold py-5 rounded-xl shadow-lg active:scale-95 transition-all duration-200 mt-4"
                             type="submit">
                             Sign In
                         </button>
@@ -221,7 +197,7 @@
                         </button>
                         <button
                             class="flex items-center justify-center gap-3 py-4 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors text-on-surface font-semibold text-sm">
-                            <img alt="Google" class="w-5 h-5"
+                            <img alt="Facebook" class="w-5 h-5"
                                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/960px-2021_Facebook_icon.svg.png?_=20220821121039" />
                             Facebook
                         </button>
@@ -237,8 +213,6 @@
             </div>
         </div>
     </main>
-    <!-- Suppressed BottomNavBar for Transactional Login Flow as per shell visibility rule -->
-    <!-- Secondary Contextual Footer -->
     <footer class="py-8 px-6 border-t border-outline-variant/10">
         <div
             class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-label uppercase tracking-widest text-outline">

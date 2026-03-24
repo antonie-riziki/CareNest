@@ -5,13 +5,10 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Care Nest - Join the Nest</title>
+    <title>Care Nest - Join as an Employer</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -89,42 +86,25 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
 </head>
 
 <body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
 
     <main class="flex-grow flex flex-col md:flex-row items-stretch overflow-hidden">
-        <!-- Back to Home Button -->
-        <!-- <div class="w-full max-w-md mb-6">
-            <a href="/"
-                class="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
-                <span class="material-icons-round text-lg">home</span>
-                Back to Home
-            </a>
-        </div> -->
         <!-- Visual Anchor (Side Panel for Desktop) -->
         <div class="hidden md:flex md:w-1/2 kenyan-gradient relative items-center justify-center p-12 overflow-hidden">
-            <div class="absolute inset-0 opacity-20"
-                data-alt="close up of high quality woven fabric texture with subtle blue and teal threads catching the light">
-            </div>
+            <div class="absolute inset-0 opacity-20"></div>
             <div class="relative z-10 max-w-md">
-                <h2 class="font-headline font-extrabold text-white text-5xl tracking-tight mb-6">Empowering the pillars
-                    of home.</h2>
-                <p class="text-on-primary-container text-lg leading-relaxed">Join a community of professional domestic
-                    workers and find opportunities that respect your skills and dedication.</p>
+                <h2 class="font-headline font-extrabold text-white text-5xl tracking-tight mb-6">Find trusted help for your home.</h2>
+                <p class="text-on-primary-container text-lg leading-relaxed">Join Care Nest to connect with professional domestic workers and manage agreements with secure escrow payments.</p>
                 <div class="mt-12 flex gap-4">
                     <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
                         <span class="material-symbols-outlined text-secondary-container mb-2">verified_user</span>
-                        <p class="text-white font-medium">Verified Profiles</p>
+                        <p class="text-white font-medium">Verified Workers</p>
                     </div>
                     <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
-                        <span class="material-symbols-outlined text-secondary-container mb-2">payments</span>
-                        <p class="text-white font-medium">Secure Payments</p>
+                        <span class="material-symbols-outlined text-secondary-container mb-2">security</span>
+                        <p class="text-white font-medium">Secure Escrow</p>
                     </div>
                 </div>
             </div>
@@ -134,12 +114,10 @@
             <div
                 class="w-full max-w-md bg-surface-container-lowest rounded-lg p-8 md:p-10 shadow-[0_20px_40px_rgba(24,28,30,0.06)]">
                 <div class="mb-10">
-                    <h2 class="font-headline font-extrabold text-primary text-3xl tracking-tight mb-2">Join the Nest
-                    </h2>
-                    <p class="text-on-surface-variant text-sm">Start your journey as a professional domestic partner
-                        today.</p>
+                    <h2 class="font-headline font-extrabold text-primary text-3xl tracking-tight mb-2">Join as Employer</h2>
+                    <p class="text-on-surface-variant text-sm">Start finding the best domestic help for your household today.</p>
                 </div>
-                <form class="space-y-6" method="POST" action="{% url 'worker-signup' %}">
+                <form class="space-y-6" method="POST" action="{% url 'employer-signup' %}">
                     {% csrf_token %}
                     <!-- Full Name -->
                     <div class="space-y-2">
@@ -219,12 +197,11 @@
                 <p class="mt-8 text-center text-sm text-on-surface-variant">
                     Already a member?
                     <a class="text-secondary font-bold hover:underline decoration-secondary/30 underline-offset-4"
-                        href="{% url 'worker-signin' %}">Sign In</a>
+                        href="{% url 'employer-signin' %}">Sign In</a>
                 </p>
             </div>
         </div>
     </main>
-    <!-- Decorative Bottom Wave (Mobile focus) -->
     <div class="md:hidden w-full h-2 kenyan-gradient"></div>
 </body>
 

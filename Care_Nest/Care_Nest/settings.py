@@ -49,8 +49,7 @@ INSTALLED_APPS = [
     "apps.core",
 ]
 
-AUTH_USER_MODEL = 'accounts.User'
-
+AUTH_USER_MODEL = "accounts.User"
 
 
 REST_FRAMEWORK = {

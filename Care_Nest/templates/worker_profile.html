@@ -99,7 +99,10 @@
     <!-- TopAppBar -->
     <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
         <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">
+                <img src="https://img.freepik.com/free-vector/cleaner-with-cleaning-products-housekeeping-service_18591-52060.jpg"
+                    alt="Care Nest Logo" class="w-10 h-10">
+            </span>
             <h1 class="text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter font-headline">
                 Care Nest</h1>
         </div>
@@ -247,11 +250,11 @@
             </div>
         </section>
         <!-- Logout Action -->
-        <button
+        <a href="{% url 'worker-logout' %}"
             class="w-full py-4 text-error font-bold flex items-center justify-center gap-2 hover:bg-error-container/20 rounded-xl transition-colors mb-12">
             <span class="material-symbols-outlined" data-icon="logout">logout</span>
             Sign Out
-        </button>
+        </a>
     </main>
     <!-- BottomNavBar -->
     {% include 'worker_bottom_nav.html' %}

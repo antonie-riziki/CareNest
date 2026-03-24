@@ -10,15 +10,35 @@ sms = africastalking.SMS
 
 
 # User New Account Welcome Notification
-def account_activation_message(phone_number):
+def worker_account_activation_message(phone_number):
 
-    recipients = [f"{str(phone_number)}"]
+    recipients = [f"+{str(phone_number)}"]
 
     # Set your message
     message = f"Welcome to Care Nest! A safe and trusted space for domestic work. Find jobs, grow, and get paid securely"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
+
+    try:
+        response = sms.send(message, recipients, sender)
+
+        print(response)
+
+    except Exception as e:
+        print(f"Houston, we have a problem: {e}")
+
+
+# Employer New Account Welcome Notification
+def employer_account_activation_message(phone_number):
+
+    recipients = [f"{str(phone_number)}"]
+
+    # Set your message
+    message = f"Welcome to Care Nest! Access premium domestic services and manage your household with ease. Professional care, verified and secure"
+
+    # Set your shortCode or senderId
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
@@ -38,7 +58,7 @@ def daily_listing_notification(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
@@ -50,7 +70,7 @@ def daily_listing_notification(phone_number, message_context):
 
 
 # Job New Listing Notification
-def account_activation_message(phone_number, message_context):
+def job_new_listing_notification(phone_number, message_context):
 
     recipients = [f"{str(phone_number)}"]
 
@@ -58,7 +78,7 @@ def account_activation_message(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
@@ -78,7 +98,7 @@ def job_application_notification(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
@@ -98,7 +118,7 @@ def courses_notification(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
@@ -118,7 +138,7 @@ def payment_transactions_notification(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
