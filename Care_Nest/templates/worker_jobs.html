@@ -11,9 +11,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -98,6 +97,12 @@
         .kenyan-gradient {
             background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
         }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
     </style>
     <style>
         body {
@@ -126,29 +131,34 @@
         <!-- Search & Map Interaction Layer -->
         <div class="relative h-[397px] w-full overflow-hidden">
             <!-- Map Background -->
-            <div class="absolute inset-0 z-0">
-                <img class="w-full h-full object-cover"
-                    data-alt="Modern detailed satellite and street map view of Nairobi city suburbs including Kilimani and Westlands with subtle digital overlays"
-                    data-location="Nairobi"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP7LdqD0XuMbWmA-0PdbDt2yARuxQDAZEojEJwYn0ZuxN0oUoqSYefdYVrB139gzG6pDYoLQnel22H_usuZEdoNnmkoxzCOnXX1tRf4Vn409F-az0ppATo9FT4AXjs0QvF65A_xD7uIUKCFKmG0LsBZeBQoZjfaRSSClreo4ZJJS9X61JaGiZ3_afqkwFaIFlTBlVHvxpqhC3zxmgLu0DmhIVcaUlaPTLQEOrsyABab3wveU4uGW2H52ItaQ-eDn-vl6IgHLeUEGx9" />
-                <!-- Custom Pins (Teal Accents) -->
-                <!-- Kilimani Pin -->
-                <div class="absolute top-[30%] left-[45%] flex flex-col items-center">
-                    <div class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg mb-1">KES
-                        1,500</div>
-                    <div class="w-4 h-4 bg-secondary border-2 border-white rounded-full"></div>
-                </div>
-                <!-- Westlands Pin -->
-                <div class="absolute top-[20%] right-[30%] flex flex-col items-center">
-                    <div class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg mb-1">KES
-                        2,200</div>
-                    <div class="w-4 h-4 bg-secondary border-2 border-white rounded-full"></div>
-                </div>
-                <!-- Lavington Pin -->
-                <div class="absolute bottom-[25%] left-[35%] flex flex-col items-center">
-                    <div class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg mb-1">KES
-                        1,800</div>
-                    <div class="w-4 h-4 bg-secondary border-2 border-white rounded-full"></div>
+            <!-- Map Container -->
+            <div id="map"></div>
+
+            <!-- Location Status Pill -->
+            <div
+                class="absolute bottom-4 left-6 z-10 flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg border border-outline-variant/10">
+                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <span id="location-status" class="text-[10px] font-bold text-primary uppercase tracking-wider">Detecting
+                    Location...</span>
+            </div>
+
+            <!-- Map Layer Toggle/Center FAB -->
+            <div class="absolute bottom-4 right-6 z-10 flex flex-col gap-2">
+                <button onclick="centerOnLocation()"
+                    class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-[20px]">my_location</span>
+                </button>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loading-overlay"
+                class="absolute inset-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-center z-50">
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4">
+                    </div>
+                    <p class="text-lg font-semibold">Loading map...</p>
+                    <p class="text-sm text-slate-500">Fetching your location</p>
                 </div>
             </div>
             <!-- Floating Search Bar -->
@@ -160,7 +170,19 @@
                         placeholder="Job Type or Location" type="text" />
                     <span class="material-symbols-outlined text-secondary" data-icon="tune">tune</span>
                 </div>
+                <!-- Radius Slider -->
+                <div
+                    class="mt-4 bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-4 shadow-lg border border-outline-variant/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-primary uppercase">Search Radius</span>
+                        <span class="text-xs font-bold text-secondary"><span id="radius-value">5</span> km</span>
+                    </div>
+                    <input type="range" min="1" max="20" value="5"
+                        class="w-full h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-secondary"
+                        oninput="updateRadius(this.value)">
+                </div>
             </div>
+        </div>
         </div>
         <!-- Job Discovery Section -->
         <div class="relative -mt-8 bg-surface rounded-t-lg px-6 pt-8 pb-4">
@@ -169,6 +191,16 @@
                     <p class="font-label text-xs uppercase tracking-widest text-secondary font-semibold mb-1">Nearby
                         opportunities</p>
                     <h2 class="font-headline text-2xl font-bold tracking-tight text-primary">Explore Jobs</h2>
+                    <div class="flex gap-4 mt-2">
+                        <div class="flex items-center gap-1.5">
+                            <span id="worker-count" class="text-secondary font-bold text-sm">0</span>
+                            <span class="text-[10px] text-outline uppercase font-medium">Jobs Nearby</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span id="verified-count" class="text-primary font-bold text-sm">0</span>
+                            <span class="text-[10px] text-outline uppercase font-medium">Verified Posters</span>
+                        </div>
+                    </div>
                 </div>
                 <button class="text-secondary text-sm font-semibold flex items-center gap-1">
                     View list <span class="material-symbols-outlined text-sm"
@@ -307,8 +339,9 @@
     </main>
     <!-- Detailed Job View Overlay (Simulated Popup Hidden Initially/Interaction Ready) -->
     <div class="fixed inset-0 z-[60] bg-primary/20 backdrop-blur-md flex items-end justify-center hidden"
-        id="job-overlay">
-        <div class="bg-surface-container-lowest w-full max-w-2xl rounded-t-lg p-8 shadow-2xl">
+        id="job-overlay" onclick="closeJobOverlay()">
+        <div class="bg-surface-container-lowest w-full max-w-2xl rounded-t-lg p-8 shadow-2xl"
+            onclick="event.stopPropagation()">
             <div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-8"></div>
             <div class="flex justify-between items-start mb-6">
                 <div>
@@ -322,7 +355,8 @@
                         </span>
                     </div>
                 </div>
-                <button class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                <button onclick="closeJobOverlay()"
+                    class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
                     <span class="material-symbols-outlined" data-icon="close">close</span>
                 </button>
             </div>
@@ -342,15 +376,272 @@
                     Tasks include floor mopping, kitchen surface cleaning, and dusting. Tools and detergents are
                     provided by the client.</p>
             </div>
-            <button
-                class="kenyan-gradient text-white w-full py-5 rounded-xl font-headline font-bold text-lg shadow-lg active:scale-95 transition-transform">Apply
-                for this Job</button>
+            <a href="{% url 'worker-jobs' %}"
+                class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-primary-container to-secondary text-white rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">Apply
+                for this Job</a>
         </div>
     </div>
     <!-- FAB (Suppressed based on context: not home or dashboard, this is a search/map screen) -->
 
     <!-- BottomNavBar -->
     {% include 'worker_bottom_nav.html' %}
+
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        let map;
+        let userMarker;
+        let radiusCircle;
+        let jobMarkers = [];
+        let userLocation = null;
+        let currentRadius = 5; // Default 5km
+
+        // Dummy jobs data generator
+        function generateDummyJobs(lat, lon, count = 15) {
+            const jobTitles = [
+                'Move-out Deep Clean', 'Garden Maintenance', 'Professional Cooking', 'Elderly Care Support',
+                'Laundry & Ironing', 'Baby Sitting', 'Housekeeping', 'Window Cleaning',
+                'Home Nursing', 'Pet Grooming', 'Meal Preparation', 'Floor Polishing',
+                'Carpet Cleaning', 'Weekly Grocery Shopping', 'After-school Tutoring'
+            ];
+
+            const categories = {
+                'Move-out Deep Clean': { cat: 'Housekeeping', icon: 'cleaning_services' },
+                'Garden Maintenance': { cat: 'Gardening', icon: 'garden_cart' },
+                'Professional Cooking': { cat: 'Cooking', icon: 'restaurant' },
+                'Elderly Care Support': { cat: 'Caregiving', icon: 'elderly' },
+                'Laundry & Ironing': { cat: 'Laundry', icon: 'local_laundry_service' },
+                'Baby Sitting': { cat: 'Childcare', icon: 'child_care' },
+                'Housekeeping': { cat: 'Housekeeping', icon: 'home' },
+                'Window Cleaning': { cat: 'Maintenance', icon: 'window' },
+                'Home Nursing': { cat: 'Healthcare', icon: 'medical_services' },
+                'Pet Grooming': { cat: 'Pet Care', icon: 'pets' },
+                'Meal Preparation': { cat: 'Cooking', icon: 'soup_kitchen' },
+                'Floor Polishing': { cat: 'Maintenance', icon: 'format_paint' },
+                'Carpet Cleaning': { cat: 'Cleaning', icon: 'dry_cleaning' },
+                'Weekly Grocery Shopping': { cat: 'Errands', icon: 'shopping_cart' },
+                'After-school Tutoring': { cat: 'Education', icon: 'menu_book' }
+            };
+
+            const jobs = [];
+
+            for (let i = 0; i < count; i++) {
+                const title = jobTitles[i % jobTitles.length];
+                const info = categories[title] || { cat: 'General', icon: 'work' };
+
+                // Generate random location within ~5km radius
+                const offsetLat = (Math.random() - 0.5) * 0.05;
+                const offsetLon = (Math.random() - 0.5) * 0.05;
+
+                jobs.push({
+                    id: i + 1,
+                    title: title,
+                    category: info.cat,
+                    icon: info.icon,
+                    lat: lat + offsetLat,
+                    lon: lon + offsetLon,
+                    pay: Math.floor(Math.random() * 3000) + 1000, // KShs 1000-4000
+                    duration: (Math.floor(Math.random() * 5) + 2) + " hours",
+                    rating: (Math.random() * 1.5 + 3.5).toFixed(1),
+                    total_reviews: Math.floor(Math.random() * 50) + 5,
+                    is_verified: Math.random() > 0.3,
+                    distance: (Math.random() * 5).toFixed(1)
+                });
+            }
+
+            return jobs;
+        }
+
+        // Initialize map
+        function initMap(lat, lon) {
+            map = L.map('map').setView([lat, lon], 13);
+
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add user location marker
+            const userIcon = L.divIcon({
+                html: '<div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full border-4 border-white shadow-lg"><span class="material-symbols-outlined text-white text-sm">person_pin</span></div>',
+                className: 'user-marker',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            userMarker = L.marker([lat, lon], { icon: userIcon })
+                .addTo(map)
+                .bindPopup('<div class="text-center p-2"><strong>You are here</strong></div>');
+
+            // Add radius circle
+            radiusCircle = L.circle([lat, lon], {
+                radius: currentRadius * 1000,
+                color: '#1193d4',
+                fillColor: '#1193d4',
+                fillOpacity: 0.1,
+                weight: 2,
+                dashArray: '5, 5'
+            }).addTo(map);
+
+            // Generate and add job markers
+            const jobs = generateDummyJobs(lat, lon);
+            addJobMarkers(jobs);
+
+            // Update counts
+            document.getElementById('worker-count').textContent = jobs.length;
+            document.getElementById('verified-count').textContent = jobs.filter(j => j.is_verified).length;
+
+            // Hide loading overlay
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Add job markers to map
+        function addJobMarkers(jobs) {
+            jobs.forEach(job => {
+                const jobIcon = L.divIcon({
+                    html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg bg-secondary border-2 border-white">
+                        <span class="material-symbols-outlined text-white text-xs">${job.icon}</span>
+                    </div>`,
+                    className: 'job-marker',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                const marker = L.marker([job.lat, job.lon], { icon: jobIcon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div class="p-3 min-w-[200px]">
+                            <div class="flex items-center gap-2 mb-2">
+                                <strong class="text-base text-primary">${job.title}</strong>
+                                ${job.is_verified ? '<span class="material-symbols-outlined text-secondary text-sm">verified</span>' : ''}
+                            </div>
+                            
+                            <div class="flex items-center gap-2 mb-3 px-2 py-1 bg-surface-container-low rounded-lg w-fit">
+                                <span class="material-symbols-outlined text-secondary text-sm">${job.icon}</span>
+                                <span class="text-xs font-bold text-outline uppercase">${job.category}</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Pay Range</p>
+                                    <p class="font-bold text-secondary">KShs ${job.pay.toLocaleString()}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Duration</p>
+                                    <p class="font-semibold text-primary">${job.duration}</p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="viewJobDetails(${job.id})" class="w-full mt-4 bg-primary text-white py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform shadow-md">
+                                View Job Details
+                            </button>
+                            
+                            <div class="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                                <span class="material-symbols-outlined text-[12px]">location_on</span>
+                                <span>${job.distance} km from your location</span>
+                            </div>
+                        </div>
+                    `);
+
+                jobMarkers.push(marker);
+            });
+        }
+
+        // Center map on user location
+        function centerOnLocation() {
+            if (userLocation && map) {
+                map.setView([userLocation.lat, userLocation.lon], 13);
+            }
+        }
+
+        // Toggle to list view
+        function toggleView() {
+            window.location.href = '/workers/';
+        }
+
+        // Update radius circle
+        function updateRadius(radius) {
+            currentRadius = parseFloat(radius);
+            document.getElementById('radius-value').textContent = currentRadius;
+
+            if (radiusCircle && userLocation) {
+                radiusCircle.setRadius(currentRadius * 1000);
+            }
+        }
+
+        // View job details
+        function viewJobDetails(jobId) {
+            // This would normally open a modal or navigate to a job detail page
+            console.log("Viewing job:", jobId);
+            // Example: show the job overlay if it exists
+            const overlay = document.getElementById('job-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        // Close job overlay
+        function closeJobOverlay() {
+            const overlay = document.getElementById('job-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Get user's current location
+        function getCurrentLocation() {
+            const locationStatus = document.getElementById('location-status');
+
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        userLocation = { lat, lon };
+
+                        // Update location status
+                        locationStatus.textContent = 'Current location';
+
+                        // Initialize map
+                        initMap(lat, lon);
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        locationStatus.textContent = 'Using default location (Nairobi)';
+
+                        // Fallback to Nairobi, Kenya coordinates
+                        const defaultLat = -1.2864;
+                        const defaultLon = 36.8172;
+                        userLocation = { lat: defaultLat, lon: defaultLon };
+
+                        initMap(defaultLat, defaultLon);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                locationStatus.textContent = 'Using default location';
+
+                // Fallback to Nairobi if geolocation not supported
+                const defaultLat = -1.2864;
+                const defaultLon = 36.8172;
+                userLocation = { lat: defaultLat, lon: defaultLon };
+
+                initMap(defaultLat, defaultLon);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', getCurrentLocation);
+    </script>
 
 </body>
 
