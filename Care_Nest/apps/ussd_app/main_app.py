@@ -27,7 +27,7 @@ def ussd():
     # ======================
 
     if text == "":
-        response = "CON Welcome to HomeChain\n"
+        response = "CON Welcome to Care Nest\n"
         response += "Decentralizing Domestic Work\n"
         response += "1. Employer\n"
         response += "2. Worker\n"
@@ -136,7 +136,7 @@ def ussd():
     # ======================
 
     elif text == "4":
-        response = "END HomeChain protects workers & employers.\n"
+        response = "END Care Nest protects workers & employers.\n"
         response += "Escrow payments. Verified agreements.\n"
         response += "Call Support: 0700 000000\n"
 
