@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>KaziNest - Job Details</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#f7fafc",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-primary-container": "#86a0cd",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#79f7ea",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#adc7f7",
+                        "secondary-container": "#a2eded",
+                        "outline": "#74777f",
+                        "on-surface": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#a5eff0",
+                        "primary": "#002045",
+                        "surface-tint": "#455f88",
+                        "surface-bright": "#f7fafc",
+                        "on-secondary-container": "#1a6d6e",
+                        "tertiary-fixed-dim": "#5adace",
+                        "primary-container": "#1a365d",
+                        "on-tertiary-container": "#1eb1a5",
+                        "on-surface-variant": "#43474e",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c6cf",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-background": "#181c1e",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-container": "#ebeef0",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f1f4f6",
+                        "secondary": "#13696a",
+                        "inverse-on-surface": "#eef1f3",
+                        "surface-variant": "#e0e3e5",
+                        "surface": "#f7fafc",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "tertiary-container": "#003d38",
+                        "surface-dim": "#d7dadc",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d6e3ff",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed": "#002020",
+                        "on-primary-fixed": "#001b3c",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "tertiary": "#002522"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-kenyan-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+
+        .ambient-shadow {
+            box-shadow: 0 20px 40px rgba(24, 28, 30, 0.06);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background font-body text-on-background antialiased pb-32">
+    <!-- Top Navigation Bar -->
+    <header class="w-full top-0 sticky z-50 bg-[#f7fafc] dark:bg-slate-900">
+        <div class="flex items-center justify-between px-6 py-4 w-full max-w-7xl mx-auto">
+            <div class="flex items-center gap-4">
+                <button
+                    class="hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full active:scale-95 duration-200">
+                    <span class="material-symbols-outlined text-[#002045] dark:text-blue-400">arrow_back</span>
+                </button>
+                <h1 class="font-['Manrope'] font-bold text-xl tracking-tight text-[#002045] dark:text-blue-400">Job
+                    Details</h1>
+            </div>
+            <button
+                class="hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full active:scale-95 duration-200">
+                <span class="material-symbols-outlined text-slate-500">share</span>
+            </button>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-4 space-y-8">
+        <!-- Hero Section: Visual Anchor -->
+        <section class="relative h-64 md:h-96 w-full rounded-lg overflow-hidden ambient-shadow">
+            <img alt="Modern clean apartment interior" class="w-full h-full object-cover"
+                data-alt="luxury modern apartment living room with sunlight streaming through large windows, white sofa and minimalist decor in Kilimani"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMg8mZPxa8cC2tNDMmmM_wI7RqtJwpToxG8sCRguOV22iTLAZQ-_utHCjI09oR2cSJMmpPG0n0FxvFaYxl_XMaJIzb9vmPhblp5uUdKGpu7KifQ6SUqONaVUjLsyfoHzGSH_QCAB4Um1jKq_Jk84c6rU1iRcqz-bp1BDeSFbWkMM_P-4LM5Y6wiTt2akbvgUQnDSMA-NdZQFtXlZJI9FnHDE14JH_k2S4E5m6UvrTIP6gzLOeWnyWeUHMUPFMeGYjuzbJofFPZgyWn" />
+            <div
+                class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex flex-col justify-end p-6 md:p-10">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span
+                        class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full text-xs font-bold tracking-wider font-label uppercase">Housekeeping</span>
+                    <span
+                        class="bg-primary-fixed text-on-primary-fixed-variant px-4 py-1 rounded-full text-xs font-bold tracking-wider font-label uppercase">Full-Time</span>
+                </div>
+                <h2 class="font-headline font-extrabold text-3xl md:text-5xl text-white leading-tight tracking-tight">
+                    Full-Time Housekeeping in Kilimani</h2>
+            </div>
+        </section>
+        <!-- Primary Info Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left: Main Details -->
+            <div class="md:col-span-2 space-y-8">
+                <!-- Quick Facts Card -->
+                <div
+                    class="bg-surface-container-low rounded-lg p-6 md:p-8 flex flex-wrap justify-between items-center gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-surface-container-lowest p-3 rounded-full ambient-shadow">
+                            <span class="material-symbols-outlined text-secondary text-3xl">payments</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Daily Pay
+                            </p>
+                            <p class="font-headline font-bold text-2xl text-primary">KES 3,500</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-surface-container-lowest p-3 rounded-full ambient-shadow">
+                            <span class="material-symbols-outlined text-secondary text-3xl">location_on</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Location</p>
+                            <p class="font-headline font-bold text-xl text-primary">Kilimani, Nairobi</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-surface-container-lowest p-3 rounded-full ambient-shadow">
+                            <span class="material-symbols-outlined text-secondary text-3xl"
+                                style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Rating</p>
+                            <p class="font-headline font-bold text-xl text-primary">4.8 <span
+                                    class="text-sm font-normal text-on-surface-variant">(15 Reviews)</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Employer Card -->
+                <div
+                    class="bg-surface-container-lowest rounded-lg p-6 ambient-shadow flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img alt="Employer profile" class="w-16 h-16 rounded-full object-cover"
+                            data-alt="portrait of a professional friendly woman with a warm smile in a well-lit office environment"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj-njHA0jR7ZDEvyJ2WvGjeQFS1tXbOipiRCSYPg8dQ9qlT1DQL0W31rEX0DTNQtWke60b-B9ry-RcAFQ_PwclWTJXogGRFM6K0crb1N-t7jSiGs7PMXWIMQcgFSX6eLgUyMLpljLWuZeIsAaM-XJOb0yQr_XtZ8q-97HL-67vrmUb-S5rWwwVNoFtdsM5Rsli4AXdOSfPAQp87T9duuvPluechdqfTaEHvApN_gNnBXHwVcbsn48H7vSh7EMrY74yd7m7VP_4Tcx-" />
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-headline font-bold text-lg text-primary">Sarah Wambui</h3>
+                                <span class="material-symbols-outlined text-teal-600 text-base"
+                                    style="font-variation-settings: 'FILL' 1;">verified</span>
+                            </div>
+                            <p class="text-sm text-on-surface-variant">Employer since 2021 • 5 Star Host</p>
+                        </div>
+                    </div>
+                    <button class="text-secondary font-bold text-sm hover:underline">View Profile</button>
+                </div>
+                <!-- Job Description -->
+                <div class="space-y-4">
+                    <h3 class="font-headline font-bold text-2xl text-primary">Job Description</h3>
+                    <p class="text-on-surface-variant leading-relaxed text-lg">
+                        We are looking for a dedicated and experienced housekeeper for our 4-bedroom home in Kilimani.
+                        The ideal candidate should be meticulous with cleaning, comfortable working independently, and
+                        have a passion for maintaining a beautiful living environment. This is a long-term position
+                        requiring reliability and discretion.
+                    </p>
+                </div>
+                <!-- Requirements Bento Grid -->
+                <div class="space-y-4">
+                    <h3 class="font-headline font-bold text-2xl text-primary">Requirements &amp; Skills</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-surface-container-low p-5 rounded-DEFAULT flex items-center gap-4">
+                            <span class="material-symbols-outlined text-secondary">laundry</span>
+                            <span class="font-semibold text-primary">Laundry &amp; Ironing</span>
+                        </div>
+                        <div class="bg-surface-container-low p-5 rounded-DEFAULT flex items-center gap-4">
+                            <span class="material-symbols-outlined text-secondary">cooking</span>
+                            <span class="font-semibold text-primary">Healthy Cooking</span>
+                        </div>
+                        <div class="bg-surface-container-low p-5 rounded-DEFAULT flex items-center gap-4">
+                            <span class="material-symbols-outlined text-secondary">child_care</span>
+                            <span class="font-semibold text-primary">Childcare Experience</span>
+                        </div>
+                        <div class="bg-surface-container-low p-5 rounded-DEFAULT flex items-center gap-4">
+                            <span class="material-symbols-outlined text-secondary">verified_user</span>
+                            <span class="font-semibold text-primary">Police Clearance Certificate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right: Sidebar/Summary -->
+            <div class="space-y-6">
+                <!-- Location Mini Map -->
+                <div class="bg-surface-container-lowest rounded-lg overflow-hidden ambient-shadow h-64 relative">
+                    <div class="absolute inset-0 bg-slate-200">
+                        <!-- Mock Map Background -->
+                        <div class="w-full h-full opacity-50"
+                            style="background-image: radial-gradient(#13696a 1px, transparent 1px); background-size: 20px 20px;">
+                        </div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <div class="relative">
+                                <span class="material-symbols-outlined text-secondary text-5xl"
+                                    style="font-variation-settings: 'FILL' 1;">location_on</span>
+                                <div
+                                    class="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center animate-ping">
+                                    <div class="w-2 h-2 bg-secondary rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-lg flex items-center justify-between">
+                        <span class="text-sm font-bold text-primary">Kilimani, Nairobi</span>
+                        <button
+                            class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold">Directions</button>
+                    </div>
+                </div>
+                <!-- Timeline / Hours -->
+                <div class="bg-primary-container text-white rounded-lg p-6 space-y-4">
+                    <h4 class="font-headline font-bold text-lg border-b border-white/10 pb-2">Work Schedule</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-primary-container">Mon - Fri</span>
+                            <span class="font-semibold">08:00 AM - 05:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-primary-container">Saturdays</span>
+                            <span class="font-semibold">09:00 AM - 01:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-primary-container">Sundays</span>
+                            <span class="bg-secondary px-2 py-0.5 rounded text-xs">OFF</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Review Snippet -->
+                <div class="bg-surface-container-low rounded-lg p-6 space-y-4">
+                    <div class="flex items-center gap-1 text-teal-600">
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                    </div>
+                    <p class="text-sm italic text-on-surface-variant">"Sarah is a wonderful employer. Clear
+                        communication and timely payments. Highly recommend!"</p>
+                    <p class="text-xs font-bold text-primary">— Mercy J., Former Employee</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Sticky Bottom Apply Button -->
+    <div
+        class="fixed bottom-0 left-0 w-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-t border-outline-variant/15 px-6 py-5 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-6">
+            <div class="hidden sm:block">
+                <p class="text-xs font-label uppercase text-on-surface-variant tracking-wider">Estimated Monthly</p>
+                <p class="font-headline font-extrabold text-2xl text-primary">KES 84,000</p>
+            </div>
+            <button
+                class="flex-1 max-w-md ml-auto bg-kenyan-gradient text-white font-headline font-bold py-4 px-8 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                Apply Now
+                <span class="material-symbols-outlined">send</span>
+            </button>
+        </div>
+    </div>
+    <!-- Hidden Navigation Filter (Suppressed for transactional focus as per guidelines) -->
+</body>
+
+</html>

@@ -44,6 +44,8 @@ urlpatterns = [
     # Jobs
     path("worker-jobs/", worker_jobs),
     path("employer-jobs/", employer_jobs),
+    path("worker-job-details/", worker_job_details),
+    path("employer-job-details/", employer_job_details),
     # Contracts
     path("worker-contracts/", worker_contracts),
     path("employer-contracts/", employer_contracts),
