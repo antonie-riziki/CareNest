@@ -313,37 +313,10 @@
         </section>
     </main>
     <!-- BottomNavBar -->
-    <nav
-        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_-20px_40px_rgba(24,28,30,0.06)] md:hidden">
-        <div
-            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
-            <span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest">Home</span>
-        </div>
-        <div
-            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
-            <span class="material-symbols-outlined mb-1" data-icon="map">map</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest">Jobs</span>
-        </div>
-        <div
-            class="flex flex-col items-center justify-center bg-[#a2eded] dark:bg-teal-900/40 text-[#1a6d6e] dark:text-teal-100 rounded-[3rem] px-5 py-2 transform scale-90 duration-200">
-            <span class="material-symbols-outlined mb-1" data-icon="description">description</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest">Contracts</span>
-        </div>
-        <div
-            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
-            <span class="material-symbols-outlined mb-1"
-                data-icon="account_balance_wallet">account_balance_wallet</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest">Wallet</span>
-        </div>
-        <div
-            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
-            <span class="material-symbols-outlined mb-1" data-icon="person">person</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest">Profile</span>
-        </div>
-    </nav>
+    {% include 'bottom_nav.html' %}
+
     <!-- Desktop Navigation Side Anchors (Visual Only for Layout) -->
-    <div
+    <!-- <div
         class="hidden md:flex fixed left-8 top-1/2 -translate-y-1/2 flex-col gap-8 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
         <span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer p-2"
             data-icon="dashboard">dashboard</span>
@@ -355,7 +328,7 @@
             data-icon="account_balance_wallet">account_balance_wallet</span>
         <span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer p-2"
             data-icon="person">person</span>
-    </div>
+    </div> -->
 </body>
 
 </html>

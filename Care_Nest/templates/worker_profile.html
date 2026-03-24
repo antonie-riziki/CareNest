@@ -254,35 +254,8 @@
         </button>
     </main>
     <!-- BottomNavBar -->
-    <nav
-        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_-20px_40px_rgba(24,28,30,0.06)] rounded-t-[3rem]">
-        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
-            href="#">
-            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Home</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
-            href="#">
-            <span class="material-symbols-outlined" data-icon="map">map</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Jobs</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
-            href="#">
-            <span class="material-symbols-outlined" data-icon="description">description</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Contracts</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
-            href="#">
-            <span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Wallet</span>
-        </a>
-        <a class="flex flex-col items-center justify-center bg-[#a2eded] dark:bg-teal-900/40 text-[#1a6d6e] dark:text-teal-100 rounded-[3rem] px-5 py-2 transform scale-90 duration-200"
-            href="#">
-            <span class="material-symbols-outlined" data-icon="person"
-                style="font-variation-settings: 'FILL' 1;">person</span>
-            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Profile</span>
-        </a>
-    </nav>
+    {% include 'bottom_nav.html' %}
+
 </body>
 
 </html>

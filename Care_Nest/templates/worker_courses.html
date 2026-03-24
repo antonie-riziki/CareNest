@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "surface-dim": "#d7dadc",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#003d38",
+                        "tertiary-fixed": "#79f7ea",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "primary-fixed-dim": "#adc7f7",
+                        "secondary-fixed": "#a5eff0",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary-container": "#86a0cd",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7fafc",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary": "#002045",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed": "#00201d",
+                        "secondary-container": "#a2eded",
+                        "inverse-on-surface": "#eef1f3",
+                        "on-surface": "#181c1e",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001b3c",
+                        "tertiary-fixed-dim": "#5adace",
+                        "on-secondary-container": "#1a6d6e",
+                        "on-background": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary": "#002522",
+                        "background": "#f7fafc",
+                        "surface-container-high": "#e5e9eb",
+                        "secondary": "#13696a",
+                        "primary-container": "#1a365d",
+                        "on-secondary-fixed": "#002020",
+                        "outline-variant": "#c4c6cf",
+                        "on-surface-variant": "#43474e",
+                        "outline": "#74777f",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#1eb1a5",
+                        "surface-container-low": "#f1f4f6"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .signature-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-background selection:bg-secondary-container">
+    <!-- Top Navigation Bar -->
+    <header class="flex justify-between items-center px-6 py-4 w-full sticky top-0 bg-[#f7fafc] dark:bg-slate-900 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
+                <img alt="Profile" class="w-full h-full object-cover"
+                    data-alt="Close up portrait of a smiling professional woman with a warm expression in a brightly lit modern office environment"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfYjwniI29Mdmm6D5sDXYjhJpYCZY7_dHyqsSCe36n_WJJPuXfJn6A6XW3jx6LOxNyReXNfl4oM7tSQYhsKiekCPOzDIEZvyRFPNMmXjTzc2kSTe3AO9kGndQBmd0TgsivwZ8FGh7Fs_NaYzslceevwAfj9_xhRmUyWQvrSr5UZi0N0aMbHF7BCjUDap8ge3I_BN5c7fiaCnrv4601LaWwzEPLKYzpvrLvmwJPSpvbKuBqPeBMxJN__o0UNde6cParVkQxgV9shI9R" />
+            </div>
+            <h1 class="font-headline font-extrabold text-2xl tracking-tighter text-[#002045] dark:text-blue-50">Care
+                Nest
+            </h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="text-slate-500 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            </button>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-6 pb-32">
+        <!-- Hero Section & Search -->
+        <section class="py-8">
+            <div class="mb-8">
+                <h2 class="font-headline text-4xl font-extrabold tracking-tight text-primary mb-2">Upskilling Hub</h2>
+                <p class="text-on-surface-variant max-w-xl">Enhance your professional portfolio with industry-recognized
+                    certifications and specialized training.</p>
+            </div>
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+                </div>
+                <input
+                    class="w-full pl-12 pr-4 py-4 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                    placeholder="Search for skills, safety courses, or culinary arts..." type="text" />
+            </div>
+        </section>
+        <!-- Featured Progress / Bento Grid Start -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Earned Certificates Card -->
+                <div class="md:col-span-2 bg-surface-container-low p-8 rounded-lg relative overflow-hidden group">
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                            <span
+                                class="label-md font-label uppercase tracking-widest text-secondary font-bold text-xs">Your
+                                Progress</span>
+                            <h3 class="font-headline text-2xl font-bold mt-2 text-primary">Earned Certificates</h3>
+                            <p class="text-on-surface-variant mt-2 mb-6">You've completed 3 professional courses this
+                                quarter. Keep going!</p>
+                        </div>
+                        <div class="flex -space-x-4 mb-4">
+                            <div
+                                class="w-16 h-20 bg-surface-container-lowest rounded-lg shadow-sm flex items-center justify-center transform -rotate-6 hover:rotate-0 transition-transform">
+                                <span class="material-symbols-outlined text-secondary text-3xl"
+                                    data-icon="verified">verified</span>
+                            </div>
+                            <div
+                                class="w-16 h-20 bg-surface-container-lowest rounded-lg shadow-sm flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform">
+                                <span class="material-symbols-outlined text-secondary text-3xl"
+                                    data-icon="verified">verified</span>
+                            </div>
+                            <div
+                                class="w-16 h-20 bg-surface-container-lowest rounded-lg shadow-sm flex items-center justify-center transform -rotate-3 hover:rotate-0 transition-transform">
+                                <span class="material-symbols-outlined text-secondary text-3xl"
+                                    data-icon="verified">verified</span>
+                            </div>
+                        </div>
+                        <button
+                            class="w-fit px-6 py-2 bg-secondary text-white rounded-full font-medium hover:opacity-90 transition-opacity">View
+                            All</button>
+                    </div>
+                    <!-- Abstract Background Element -->
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 signature-gradient opacity-10 rounded-full blur-3xl -mr-20 -mt-20">
+                    </div>
+                </div>
+                <!-- Quick Stats / Achievement -->
+                <div
+                    class="bg-primary-container p-8 rounded-lg text-white flex flex-col justify-center items-center text-center">
+                    <div
+                        class="w-20 h-20 rounded-full border-4 border-secondary-container flex items-center justify-center mb-4">
+                        <span class="font-headline text-3xl font-bold">85%</span>
+                    </div>
+                    <h4 class="font-headline text-xl font-bold">Profile Strength</h4>
+                    <p class="text-on-primary-container text-sm mt-2">Add one more certificate to reach Platinum status.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- Professional Courses Section -->
+        <section class="mb-16">
+            <div class="flex justify-between items-end mb-8">
+                <h3 class="font-headline text-3xl font-bold text-primary">Professional Courses</h3>
+                <div class="flex gap-2">
+                    <button
+                        class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary hover:bg-surface-container-highest transition-colors">
+                        <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Course Card 1: Advanced Housekeeping -->
+                <div
+                    class="flex flex-col bg-surface-container-lowest rounded-lg overflow-hidden group shadow-[0_20px_40px_rgba(24,28,30,0.04)] hover:shadow-[0_20px_40px_rgba(24,28,30,0.08)] transition-shadow">
+                    <div class="h-48 overflow-hidden relative">
+                        <img alt="Housekeeping"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="Interior of a luxury hotel room with perfectly made bed and minimalist clean decor, soft natural daylight"
+                            src="https://lodgingmagazine.com/wp-content/uploads/2025/01/BoH-Winter_Housekeeping1.jpg" />
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary">
+                            Advanced</div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h4 class="font-headline text-xl font-bold text-primary mb-2">Advanced Housekeeping</h4>
+                        <p class="text-sm text-on-surface-variant mb-6 line-clamp-2">Master the art of luxury home
+                            management and delicate fabric care.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                                <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                                <span>2 weeks</span>
+                                <span class="mx-1">•</span>
+                                <span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span>
+                                <span>12 Lessons</span>
+                            </div>
+                            <button
+                                class="w-full signature-gradient text-white py-3 rounded-xl font-semibold active:scale-95 transition-transform">Enroll
+                                Now</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course Card 2: Professional Childcare -->
+                <div
+                    class="flex flex-col bg-surface-container-lowest rounded-lg overflow-hidden group shadow-[0_20px_40px_rgba(24,28,30,0.04)]">
+                    <div class="h-48 overflow-hidden relative">
+                        <img alt="Childcare"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A brightly colored playroom with educational toys and soft flooring, warm and inviting atmosphere"
+                            src="https://thebesanamail.com/wp-content/uploads/2025/03/Kenya.Lucy-plays-with-child.Kate-Holt.2016.cropped.jpg" />
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary">
+                            Expert</div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h4 class="font-headline text-xl font-bold text-primary mb-2">Professional Childcare</h4>
+                        <p class="text-sm text-on-surface-variant mb-6 line-clamp-2">Specialized training in early
+                            childhood development and nutrition.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                                <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                                <span>3 weeks</span>
+                                <span class="mx-1">•</span>
+                                <span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span>
+                                <span>18 Lessons</span>
+                            </div>
+                            <button
+                                class="w-full bg-surface-container-high text-primary py-3 rounded-xl font-semibold active:scale-95 transition-transform">Continue
+                                Learning</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course Card 3: International Culinary Skills -->
+                <div
+                    class="flex flex-col bg-surface-container-lowest rounded-lg overflow-hidden group shadow-[0_20px_40px_rgba(24,28,30,0.04)]">
+                    <div class="h-48 overflow-hidden relative">
+                        <img alt="Culinary Skills"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="Chef preparing a gourmet dish in a modern kitchen, focus on fresh ingredients and artistic plating"
+                            src="https://c8.alamy.com/comp/2GW8X7J/african-woman-cooking-traditional-food-at-street-2GW8X7J.jpg" />
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary">
+                            Signature</div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h4 class="font-headline text-xl font-bold text-primary mb-2">International Culinary Skills</h4>
+                        <p class="text-sm text-on-surface-variant mb-6 line-clamp-2">Learn to prepare diverse global
+                            cuisines with professional techniques.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                                <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                                <span>4 weeks</span>
+                                <span class="mx-1">•</span>
+                                <span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span>
+                                <span>24 Lessons</span>
+                            </div>
+                            <button
+                                class="w-full signature-gradient text-white py-3 rounded-xl font-semibold active:scale-95 transition-transform">Enroll
+                                Now</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course Card 4: Home Safety & First Aid -->
+                <div
+                    class="flex flex-col bg-surface-container-lowest rounded-lg overflow-hidden group shadow-[0_20px_40px_rgba(24,28,30,0.04)]">
+                    <div class="h-48 overflow-hidden relative">
+                        <img alt="Home Safety"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="First aid kit on a clean surface with a stethoscope, symbolizing professional medical preparedness"
+                            src="https://caromonthealth.org/media/j4gg5kbz/first-aid_gettyimages-1386276499_website-banner.jpg" />
+                        <div
+                            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary">
+                            Essential</div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h4 class="font-headline text-xl font-bold text-primary mb-2">Home Safety &amp; First Aid</h4>
+                        <p class="text-sm text-on-surface-variant mb-6 line-clamp-2">Crucial skills for handling
+                            emergencies and maintaining safe environments.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                                <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                                <span>1 week</span>
+                                <span class="mx-1">•</span>
+                                <span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span>
+                                <span>8 Lessons</span>
+                            </div>
+                            <button
+                                class="w-full signature-gradient text-white py-3 rounded-xl font-semibold active:scale-95 transition-transform">Enroll
+                                Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Upskilling Paths / Secondary Section -->
+        <section class="mb-12 bg-surface-container rounded-lg p-10 flex flex-col md:flex-row items-center gap-12">
+            <div class="flex-1 order-2 md:order-1">
+                <h3 class="font-headline text-3xl font-bold text-primary mb-4">Join the Blue Economy</h3>
+                <p class="text-on-surface-variant mb-8 leading-relaxed">Our certification program is designed
+                    specifically for domestic professionals seeking higher-tier placements and international
+                    opportunities. Every course completed adds a badge of trust to your Care Nest profile.</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary"
+                            data-icon="verified_user">verified_user</span>
+                        <span class="text-sm font-semibold">Verified Skills</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary"
+                            data-icon="workspace_premium">workspace_premium</span>
+                        <span class="text-sm font-semibold">Global Standards</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary" data-icon="handshake">handshake</span>
+                        <span class="text-sm font-semibold">Job Placement</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary"
+                            data-icon="trending_up">trending_up</span>
+                        <span class="text-sm font-semibold">Career Growth</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 order-1 md:order-2">
+                <div class="relative">
+                    <img alt="Working Professional" class="rounded-lg shadow-xl w-full"
+                        data-alt="Confident professional woman smiling while using a digital tablet in a clean, high-end residential kitchen"
+                        src="https://media.istockphoto.com/id/1560722708/photo/laughing-portrait-and-a-black-woman-with-cleaning-bucket-for-home-service-or-working-on-dirt.jpg?s=612x612&w=0&k=20&c=HjHSUe9ftyVdWTPFIytcxCAw-4NNk3eJIvqsGdfntdk=" />
+                    <div class="absolute -bottom-6 -right-6 bg-secondary-container p-6 rounded-lg shadow-lg">
+                        <p class="font-headline font-bold text-primary">New Path!</p>
+                        <p class="text-xs text-on-secondary-container">Home Management Suite</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Bottom Navigation Bar -->
+    {% include 'bottom_nav.html' %}
+
+    <!-- Desktop Navigation Side Dock (Simplified for layout balance) -->
+    <!-- <div
+        class="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 flex-col gap-6 p-4 bg-surface-container-lowest rounded-full shadow-lg z-40 border border-outline-variant/10">
+        <button class="w-12 h-12 rounded-full flex items-center justify-center text-primary bg-secondary-container">
+            <span class="material-symbols-outlined" data-icon="school">school</span>
+        </button>
+        <button
+            class="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+        </button>
+        <button
+            class="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined" data-icon="verified">verified</span>
+        </button>
+        <button
+            class="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined" data-icon="person">person</span>
+        </button>
+    </div> -->
+</body>
+
+</html>
