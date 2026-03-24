@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
 from django.http import HttpResponse
-from .services import handle_ussd
 
 # Create your views here.
 
@@ -13,14 +12,14 @@ from dotenv import load_dotenv
 
 sys.path.insert(1, "/ussd_response")
 
-from ai_engine import autogenerate_tips_response
-from messaging_engine import send_message
+from .ai_engine import autogenerate_tips_response
+from .messaging_engine import send_message
 
 # app = Flask(__name__)
 
 
 # @app.route("/ussd", methods=["POST"])
-def ussd():
+def handle_ussd():
     # Read the variables sent via POST from our API
     session_id = request.values.get("sessionId", None)
     serviceCode = request.values.get("serviceCode", None)
