@@ -26,6 +26,7 @@ from apps.profiles.views import *
 from apps.wallet.views import *
 from apps.courses.views import *
 from apps.acc_settings.views import *
+from apps.ussd_app.views import ussd_callback
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -66,4 +67,6 @@ urlpatterns = [
     path("api/contracts/", include("apps.contracts.urls")),
     path("api/wallet/", include("apps.wallet.urls")),
     path("api/dashboard/", include("apps.dashboard.urls")),
+    # USSD
+    path("ussd/callback/", ussd_callback, name="ussd_callback"),
 ]
