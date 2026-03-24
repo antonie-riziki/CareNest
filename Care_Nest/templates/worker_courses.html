@@ -106,24 +106,22 @@
 
 <body class="bg-surface font-body text-on-background selection:bg-secondary-container">
     <!-- Top Navigation Bar -->
-    <header class="flex justify-between items-center px-6 py-4 w-full sticky top-0 bg-[#f7fafc] dark:bg-slate-900 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
-                <img alt="Profile" class="w-full h-full object-cover"
-                    data-alt="Close up portrait of a smiling professional woman with a warm expression in a brightly lit modern office environment"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfYjwniI29Mdmm6D5sDXYjhJpYCZY7_dHyqsSCe36n_WJJPuXfJn6A6XW3jx6LOxNyReXNfl4oM7tSQYhsKiekCPOzDIEZvyRFPNMmXjTzc2kSTe3AO9kGndQBmd0TgsivwZ8FGh7Fs_NaYzslceevwAfj9_xhRmUyWQvrSr5UZi0N0aMbHF7BCjUDap8ge3I_BN5c7fiaCnrv4601LaWwzEPLKYzpvrLvmwJPSpvbKuBqPeBMxJN__o0UNde6cParVkQxgV9shI9R" />
-            </div>
-            <h1 class="font-headline font-extrabold text-2xl tracking-tighter text-[#002045] dark:text-blue-50">Care
-                Nest
-            </h1>
+    <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+            <h1
+                class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
+                Care Nest</h1>
         </div>
         <div class="flex items-center gap-4">
-            <button class="text-slate-500 hover:opacity-80 transition-opacity active:scale-95 duration-200">
-                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            <button
+                class="hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:scale-95 duration-150">
+                <span class="material-symbols-outlined text-slate-500 dark:text-slate-400"
+                    data-icon="notifications">notifications</span>
             </button>
         </div>
     </header>
-    <main class="max-w-7xl mx-auto px-6 pb-32">
+    <main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
         <!-- Hero Section & Search -->
         <section class="py-8">
             <div class="mb-8">
@@ -374,7 +372,7 @@
         </section>
     </main>
     <!-- Bottom Navigation Bar -->
-    {% include 'bottom_nav.html' %}
+    {% include 'worker_bottom_nav.html' %}
 
     <!-- Desktop Navigation Side Dock (Simplified for layout balance) -->
     <!-- <div

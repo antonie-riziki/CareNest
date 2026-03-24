@@ -141,11 +141,11 @@
                     <p class="font-label text-xs uppercase tracking-widest text-primary-fixed/60 mb-2">Total Earnings
                         Today</p>
                     <h2 class="text-4xl font-extrabold tracking-tight mb-6">KES 4,250</h2>
-                    <button
+                    <a href="{% url 'worker-wallet' %}"
                         class="bg-surface-container-lowest text-primary font-semibold px-6 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform">
                         <span>View History</span>
                         <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
-                    </button>
+                    </a>
                 </div>
                 <!-- Abstract Accent Overlay -->
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
@@ -169,7 +169,7 @@
                 </div>
                 <button
                     class="w-full bg-secondary text-white font-bold py-4 rounded-xl shadow-lg shadow-secondary/20 active:scale-95 transition-all">
-                    Check In
+                    <a href="{% url 'worker-contracts' %}">Check In</a>
                 </button>
             </div>
         </section>
@@ -177,36 +177,36 @@
         <section>
             <h3 class="text-sm font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4">Quick Actions</h3>
             <div class="grid grid-cols-2 gap-4">
-                <div
+                <a href="{% url 'worker-jobs' %}"
                     class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
                     <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary">
                         <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
                     </div>
                     <span class="font-bold text-sm leading-tight">Find New Jobs</span>
-                </div>
-                <div
+                </a>
+                <a href="{% url 'worker-contracts' %}"
                     class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
                     <div class="w-12 h-12 rounded-full bg-secondary/5 flex items-center justify-center text-secondary">
                         <span class="material-symbols-outlined" data-icon="alarm_on">alarm_on</span>
                     </div>
                     <span class="font-bold text-sm leading-tight">Clock In</span>
-                </div>
-                <div
+                </a>
+                <a href="{% url 'worker-settings' %}"
                     class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
                     <div
                         class="w-12 h-12 rounded-full bg-tertiary-fixed-dim/10 flex items-center justify-center text-tertiary-container">
                         <span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
                     </div>
                     <span class="font-bold text-sm leading-tight">Contact Support</span>
-                </div>
-                <div
+                </a>
+                <a href="{% url 'worker-courses' %}"
                     class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
                     <div
                         class="w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center text-error">
                         <span class="material-symbols-outlined" data-icon="school">school</span>
                     </div>
                     <span class="font-bold text-sm leading-tight">Upskilling</span>
-                </div>
+                </a>
             </div>
         </section>
         <!-- Upskilling Suggestion: Asymmetric Layout -->
@@ -217,12 +217,12 @@
                         data-alt="Close-up of a professional artisan working on copper plumbing pipes with soft focused workshop lighting and metallic textures."
                         src="https://media.istockphoto.com/id/493831355/photo/african-senior-patient-with-female-nurse.jpg?s=612x612&w=0&k=20&c=xAj4v5CmwLlK-H1TI0pDPgdGkAYQ5zIGmkfJQE0suBc=" />
                 </div>
-                <div class="w-2/3 p-6 flex flex-col justify-center gap-2">
+                <a href="{% url 'worker-courses' %}" class="w-2/3 p-6 flex flex-col justify-center gap-2">
                     <p class="text-[10px] font-bold text-secondary uppercase tracking-widest">Recommended Skill</p>
                     <h4 class="font-bold text-lg leading-tight text-primary">Learn Basic Care Giving</h4>
                     <p class="text-xs text-on-surface-variant">Boost your daily earnings by up to 20% with this short
                         course.</p>
-                </div>
+                </a>
             </div>
         </section>
     </main>

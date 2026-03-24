@@ -103,7 +103,7 @@
 
 <body class="bg-surface font-body text-on-surface min-h-screen pb-32">
     <!-- TopAppBar -->
-    <header class="flex items-center w-full px-6 h-16 sticky top-0 z-50 bg-[#f7fafc] dark:bg-slate-900 shadow-none">
+    <!-- <header class="flex items-center w-full px-6 h-16 sticky top-0 z-50 bg-[#f7fafc] dark:bg-slate-900 shadow-none">
         <div class="flex items-center gap-4">
             <button
                 class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#e5e9eb] dark:hover:bg-slate-700 transition-colors active:scale-95 duration-200">
@@ -112,8 +112,23 @@
             <h1 class="font-['Manrope'] font-bold text-xl tracking-tight text-[#002045] dark:text-blue-100">Settings
             </h1>
         </div>
+    </header> -->
+    <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+            <h1
+                class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
+                Care Nest</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <button
+                class="hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:scale-95 duration-150">
+                <span class="material-symbols-outlined text-slate-500 dark:text-slate-400"
+                    data-icon="notifications">notifications</span>
+            </button>
+        </div>
     </header>
-    <main class="max-w-3xl mx-auto px-6 pt-8 space-y-12">
+    <main class="max-w-3xl mx-auto px-6 pt-24 pb-32 space-y-12">
         <!-- Availability Toggle (Hero Card) -->
         <section class="kenyan-gradient p-8 rounded-lg shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
@@ -321,7 +336,7 @@
     </main>
 
     <!-- BottomNavBar -->
-    {% include 'bottom_nav.html' %}
+    {% include 'worker_bottom_nav.html' %}
 
 </body>
 
