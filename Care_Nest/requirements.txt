@@ -1,0 +1,6 @@
+Django
+python-dotenv
+google-generativeai
+africastalking
+Flask
+google-genai
