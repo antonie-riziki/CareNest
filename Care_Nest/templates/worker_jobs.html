@@ -103,6 +103,29 @@
             width: 100%;
             z-index: 1;
         }
+
+        .vertical-slider {
+            -webkit-appearance: none;
+            width: 150px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+            transform: rotate(-90deg);
+            cursor: pointer;
+        }
+
+        .vertical-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #1193d4;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
     </style>
     <style>
         body {
@@ -143,11 +166,31 @@
             </div>
 
             <!-- Map Layer Toggle/Center FAB -->
-            <div class="absolute bottom-4 right-6 z-10 flex flex-col gap-2">
+            <div class="absolute bottom-4 right-6 z-10 flex flex-col gap-3">
+                <!-- Radius Toggle FAB -->
+                <button onclick="toggleRadiusSlider()"
+                    class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-secondary active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-[20px]">radar</span>
+                </button>
+                <!-- Location FAB -->
                 <button onclick="centerOnLocation()"
                     class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
                     <span class="material-symbols-outlined text-[20px]">my_location</span>
                 </button>
+            </div>
+
+            <!-- Vertical Radius Slider Panel -->
+            <div id="radius-panel"
+                class="absolute right-6 top-1/2 -translate-y-1/2 z-10 hidden flex-col items-center gap-4 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-8 rounded-full shadow-xl border border-outline-variant/10 transition-all duration-300 transform translate-x-4 opacity-0">
+                <span class="text-[10px] font-bold text-primary uppercase vertical-text">Range</span>
+                <div class="h-40 flex items-center justify-center w-8">
+                    <input type="range" min="1" max="25" value="5" class="vertical-slider"
+                        oninput="updateRadius(this.value)">
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                    <span id="radius-value-v" class="text-xs font-bold text-secondary">5</span>
+                    <span class="text-[8px] font-bold text-outline">KM</span>
+                </div>
             </div>
 
             <!-- Loading Overlay -->
@@ -169,17 +212,6 @@
                     <input class="bg-transparent border-none focus:ring-0 w-full text-sm font-medium"
                         placeholder="Job Type or Location" type="text" />
                     <span class="material-symbols-outlined text-secondary" data-icon="tune">tune</span>
-                </div>
-                <!-- Radius Slider -->
-                <div
-                    class="mt-4 bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-4 shadow-lg border border-outline-variant/10">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-primary uppercase">Search Radius</span>
-                        <span class="text-xs font-bold text-secondary"><span id="radius-value">5</span> km</span>
-                    </div>
-                    <input type="range" min="1" max="20" value="5"
-                        class="w-full h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-secondary"
-                        oninput="updateRadius(this.value)">
                 </div>
             </div>
         </div>
@@ -566,10 +598,27 @@
         // Update radius circle
         function updateRadius(radius) {
             currentRadius = parseFloat(radius);
-            document.getElementById('radius-value').textContent = currentRadius;
+            const valV = document.getElementById('radius-value-v');
+            if (valV) valV.textContent = currentRadius;
 
             if (radiusCircle && userLocation) {
                 radiusCircle.setRadius(currentRadius * 1000);
+            }
+        }
+
+        // Toggle radius slider panel
+        function toggleRadiusSlider() {
+            const panel = document.getElementById('radius-panel');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('translate-x-4', 'opacity-0');
+                }, 10);
+            } else {
+                panel.classList.add('translate-x-4', 'opacity-0');
+                setTimeout(() => {
+                    panel.classList.add('hidden');
+                }, 300);
             }
         }
 
