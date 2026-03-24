@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Care Nest Mobile Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#002522",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#79f7ea",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-background": "#181c1e",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#43474e",
+                        "secondary": "#13696a",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-container": "#a2eded",
+                        "secondary-fixed": "#a5eff0",
+                        "surface-bright": "#f7fafc",
+                        "outline": "#74777f",
+                        "tertiary-container": "#003d38",
+                        "on-primary-container": "#86a0cd",
+                        "inverse-on-surface": "#eef1f3",
+                        "tertiary-fixed-dim": "#5adace",
+                        "primary-container": "#1a365d",
+                        "surface-tint": "#455f88",
+                        "primary-fixed": "#d6e3ff",
+                        "on-error": "#ffffff",
+                        "background": "#f7fafc",
+                        "surface-container-low": "#f1f4f6",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d7dadc",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#002020",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-container": "#ebeef0",
+                        "outline-variant": "#c4c6cf",
+                        "primary": "#002045",
+                        "on-tertiary-container": "#1eb1a5",
+                        "on-secondary-container": "#1a6d6e",
+                        "surface": "#f7fafc",
+                        "on-secondary-fixed-variant": "#004f50"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-kenyan-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface min-h-screen pb-32">
+    <!-- TopAppBar -->
+    <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+            <span
+                class="text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter font-['Manrope']">Care
+                Nest</span>
+        </div>
+        <div class="relative active:scale-95 duration-150 transition-colors hover:bg-[#f1f4f6] p-2 rounded-full">
+            <span class="material-symbols-outlined text-slate-500" data-icon="notifications">notifications</span>
+            <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-background"></span>
+        </div>
+    </header>
+    <main class="pt-20 px-6 space-y-8">
+        <!-- Welcome & Notification Alert -->
+        <section class="mt-4">
+            <div
+                class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-lg flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined" data-icon="info"
+                        style="font-variation-settings: 'FILL' 1;">info</span>
+                    <p class="font-label text-sm font-medium tracking-tight">You have a new job invitation!</p>
+                </div>
+                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+            </div>
+        </section>
+        <!-- Total Earnings: Large Card -->
+        <section>
+            <div
+                class="bg-kenyan-gradient p-8 rounded-lg text-white shadow-[0_20px_40px_rgba(24,28,30,0.06)] relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="font-label text-xs uppercase tracking-widest text-primary-fixed/60 mb-2">Total Earnings
+                        Today</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight mb-6">KES 4,250</h2>
+                    <button
+                        class="bg-surface-container-lowest text-primary font-semibold px-6 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform">
+                        <span>View History</span>
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                    </button>
+                </div>
+                <!-- Abstract Accent Overlay -->
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+            </div>
+        </section>
+        <!-- Active Job Card -->
+        <section>
+            <div class="bg-surface-container-low p-6 rounded-lg space-y-4">
+                <div class="flex items-center justify-between">
+                    <span
+                        class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Active
+                        Job</span>
+                    <span class="text-on-surface-variant text-xs flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs" data-icon="schedule">schedule</span>
+                        02:45:12
+                    </span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-primary">Housekeeping in Kilimani</h3>
+                    <p class="text-on-surface-variant text-sm mt-1">Status: Arrived at location</p>
+                </div>
+                <button
+                    class="w-full bg-secondary text-white font-bold py-4 rounded-xl shadow-lg shadow-secondary/20 active:scale-95 transition-all">
+                    Check In
+                </button>
+            </div>
+        </section>
+        <!-- Quick Actions: Bento Grid -->
+        <section>
+            <h3 class="text-sm font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div
+                    class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                    </div>
+                    <span class="font-bold text-sm leading-tight">Find New Jobs</span>
+                </div>
+                <div
+                    class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-secondary/5 flex items-center justify-center text-secondary">
+                        <span class="material-symbols-outlined" data-icon="alarm_on">alarm_on</span>
+                    </div>
+                    <span class="font-bold text-sm leading-tight">Clock In</span>
+                </div>
+                <div
+                    class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-full bg-tertiary-fixed-dim/10 flex items-center justify-center text-tertiary-container">
+                        <span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+                    </div>
+                    <span class="font-bold text-sm leading-tight">Contact Support</span>
+                </div>
+                <div
+                    class="bg-surface-container-lowest p-5 rounded-lg flex flex-col gap-3 hover:bg-surface-container transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center text-error">
+                        <span class="material-symbols-outlined" data-icon="school">school</span>
+                    </div>
+                    <span class="font-bold text-sm leading-tight">Upskilling</span>
+                </div>
+            </div>
+        </section>
+        <!-- Upskilling Suggestion: Asymmetric Layout -->
+        <section>
+            <div class="bg-surface-container-highest rounded-lg overflow-hidden flex items-stretch">
+                <div class="w-1/3 min-h-[140px] relative">
+                    <img alt="Handyman learning plumbing" class="absolute inset-0 w-full h-full object-cover"
+                        data-alt="Close-up of a professional artisan working on copper plumbing pipes with soft focused workshop lighting and metallic textures."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGER6jgY7yO41fmIk2EPd6nZuNLRRGt3mD5FShzk12L65qz3BLG0FBy_Djcj0JWlf6ZnkzkmxvwjiJQfe42aw49pazy3g2Q-sWncXA5dt0LbJJ8gNI13T9rLC1QP6hONNmSf-vr5vY7aX3odVrXzGNmav_BbjX0R8GyuznFkEC58bJEHjtRSu3PCehQe9x6PwIyLUT-XdB6nDum98Y2H45vEkDsuBO8WXxSoVRo0pIU4FIRFRuR1Np6eGM03fraYFkJxkqzHbcRi1z" />
+                </div>
+                <div class="w-2/3 p-6 flex flex-col justify-center gap-2">
+                    <p class="text-[10px] font-bold text-secondary uppercase tracking-widest">Recommended Skill</p>
+                    <h4 class="font-bold text-lg leading-tight text-primary">Learn Basic Plumbing</h4>
+                    <p class="text-xs text-on-surface-variant">Boost your daily earnings by up to 20% with this short
+                        course.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_-20px_40px_rgba(24,28,30,0.06)] rounded-t-[3rem]">
+        <!-- Home (Active) -->
+        <div
+            class="flex flex-col items-center justify-center bg-[#a2eded] dark:bg-teal-900/40 text-[#1a6d6e] dark:text-teal-100 rounded-[3rem] px-5 py-2 transform scale-90 duration-200">
+            <span class="material-symbols-outlined" data-icon="dashboard"
+                style="font-variation-settings: 'FILL' 1;">dashboard</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Home</span>
+        </div>
+        <!-- Jobs -->
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined" data-icon="map">map</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Jobs</span>
+        </div>
+        <!-- Contracts -->
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined" data-icon="description">description</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Contracts</span>
+        </div>
+        <!-- Wallet -->
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Wallet</span>
+        </div>
+        <!-- Profile -->
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity">
+            <span class="material-symbols-outlined" data-icon="person">person</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>

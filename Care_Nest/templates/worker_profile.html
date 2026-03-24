@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#002522",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#79f7ea",
+                        "on-primary-fixed": "#001b3c",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-background": "#181c1e",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#43474e",
+                        "secondary": "#13696a",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-container": "#a2eded",
+                        "secondary-fixed": "#a5eff0",
+                        "surface-bright": "#f7fafc",
+                        "outline": "#74777f",
+                        "tertiary-container": "#003d38",
+                        "on-primary-container": "#86a0cd",
+                        "inverse-on-surface": "#eef1f3",
+                        "tertiary-fixed-dim": "#5adace",
+                        "primary-container": "#1a365d",
+                        "surface-tint": "#455f88",
+                        "primary-fixed": "#d6e3ff",
+                        "on-error": "#ffffff",
+                        "background": "#f7fafc",
+                        "surface-container-low": "#f1f4f6",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d7dadc",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#002020",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-container": "#ebeef0",
+                        "outline-variant": "#c4c6cf",
+                        "primary": "#002045",
+                        "on-tertiary-container": "#1eb1a5",
+                        "on-secondary-container": "#1a6d6e",
+                        "surface": "#f7fafc",
+                        "on-secondary-fixed-variant": "#004f50"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-kenyan-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background font-body text-on-background min-h-screen pb-32">
+    <!-- TopAppBar -->
+    <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+            <h1 class="text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter font-headline">
+                Care Nest</h1>
+        </div>
+        <button
+            class="text-slate-500 dark:text-slate-400 hover:bg-[#f1f4f6] p-2 rounded-full transition-colors active:scale-95 duration-150">
+            <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+        </button>
+    </header>
+    <main class="pt-24 px-6 max-w-2xl mx-auto space-y-8">
+        <!-- Profile Header Section -->
+        <section class="relative">
+            <div
+                class="bg-surface-container-lowest rounded-lg p-8 flex flex-col items-center text-center shadow-[0_20px_40px_rgba(24,28,30,0.06)] border border-outline-variant/10">
+                <div class="relative mb-6">
+                    <img alt="Jane Doe" class="w-32 h-32 rounded-full object-cover ring-4 ring-secondary-container"
+                        data-alt="Portrait of a friendly Kenyan woman with a warm smile, professional attire, soft natural outdoor lighting in Nairobi"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOd_1Oq4zKM88e0SnYrzVCCsV9oRhwD7jWXgzXUwutzNapVZUd7surjM9oAHeIRQKJjs2uL7jiIcNK6ezfR1nx6zfT2U2QfmD3boI0ppgcba9XnasbJ7C5KjLUbZwxXhSp4gz3qVPM4orpUWr5om9SdvSJswZF0O-ERysabgvRIZ5UVisUHJSVjK8ZQwcEDR7wn9CjhznCAWQM0dmYHYQ7A2MUYD0bqXRXG80jhzfZ7t73KMBlhTE1VRWOhyQ_UkEVGumWoFNa-0a7" />
+                    <div
+                        class="absolute bottom-1 right-1 bg-secondary text-white p-1 rounded-full border-4 border-surface-container-lowest">
+                        <span class="material-symbols-outlined text-sm block" data-icon="verified"
+                            style="font-variation-settings: 'FILL' 1;">verified</span>
+                    </div>
+                </div>
+                <h2 class="text-3xl font-headline font-extrabold text-primary tracking-tight mb-1">Jane Doe</h2>
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="flex text-[#FFB800]">
+                        <span class="material-symbols-outlined" data-icon="star"
+                            style="font-variation-settings: 'FILL' 1;">star</span>
+                    </div>
+                    <span class="font-bold text-lg">4.9</span>
+                    <span class="text-on-surface-variant text-sm font-medium">(150+ jobs)</span>
+                </div>
+                <!-- Availability Toggle -->
+                <div class="w-full bg-surface-container-low rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary"
+                            data-icon="event_available">event_available</span>
+                        <span class="font-semibold text-primary">Available for New Jobs</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input checked="" class="sr-only peer" type="checkbox" />
+                        <div
+                            class="w-14 h-8 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-secondary">
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+        <!-- Stats Grid (Bento Style) -->
+        <section class="grid grid-cols-2 gap-4">
+            <div
+                class="bg-primary-container rounded-lg p-6 text-on-primary-fixed flex flex-col justify-between aspect-square">
+                <span class="material-symbols-outlined text-on-primary-container text-4xl"
+                    data-icon="work_history">work_history</span>
+                <div>
+                    <div class="text-4xl font-headline font-extrabold tracking-tighter">158</div>
+                    <div class="text-sm font-label uppercase tracking-widest opacity-80">Completed Jobs</div>
+                </div>
+            </div>
+            <div
+                class="bg-secondary-container rounded-lg p-6 text-on-secondary-container flex flex-col justify-between aspect-square">
+                <span class="material-symbols-outlined text-secondary text-4xl" data-icon="payments"
+                    style="font-variation-settings: 'FILL' 1;">payments</span>
+                <div>
+                    <div class="text-4xl font-headline font-extrabold tracking-tighter">98%</div>
+                    <div class="text-sm font-label uppercase tracking-widest opacity-80">Payment Reliability</div>
+                </div>
+            </div>
+        </section>
+        <!-- Skills Section -->
+        <section>
+            <div class="flex justify-between items-end mb-6">
+                <h3 class="text-xl font-headline font-bold text-primary">Core Expertise</h3>
+                <span class="text-secondary font-semibold text-sm cursor-pointer hover:underline">Edit Skills</span>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span
+                    class="px-5 py-2.5 bg-secondary-container text-on-secondary-container rounded-full text-sm font-semibold border border-secondary/10">Ironing</span>
+                <span
+                    class="px-5 py-2.5 bg-secondary-container text-on-secondary-container rounded-full text-sm font-semibold border border-secondary/10">Cooking
+                    (Kenyan Cuisine)</span>
+                <span
+                    class="px-5 py-2.5 bg-secondary-container text-on-secondary-container rounded-full text-sm font-semibold border border-secondary/10">First
+                    Aid</span>
+                <span
+                    class="px-5 py-2.5 bg-surface-container-high text-on-surface-variant rounded-full text-sm font-semibold border border-outline-variant/10 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    Add Skill
+                </span>
+            </div>
+        </section>
+        <!-- Settings List -->
+        <section class="space-y-4">
+            <h3 class="text-xl font-headline font-bold text-primary px-2">Account Settings</h3>
+            <div class="bg-surface-container-low rounded-lg overflow-hidden">
+                <div
+                    class="flex items-center justify-between p-5 hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined" data-icon="person">person</span>
+                        </div>
+                        <span class="font-medium text-on-surface">Personal Info</span>
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant"
+                        data-icon="chevron_right">chevron_right</span>
+                </div>
+                <div
+                    class="flex items-center justify-between p-5 hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        </div>
+                        <span class="font-medium text-on-surface">Preferences</span>
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant"
+                        data-icon="chevron_right">chevron_right</span>
+                </div>
+                <div
+                    class="flex items-center justify-between p-5 hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined"
+                                data-icon="account_balance_wallet">account_balance_wallet</span>
+                        </div>
+                        <span class="font-medium text-on-surface">Payment Settings</span>
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant"
+                        data-icon="chevron_right">chevron_right</span>
+                </div>
+                <div
+                    class="flex items-center justify-between p-5 hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined" data-icon="help">help</span>
+                        </div>
+                        <span class="font-medium text-on-surface">Help Center</span>
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant"
+                        data-icon="chevron_right">chevron_right</span>
+                </div>
+            </div>
+        </section>
+        <!-- Logout Action -->
+        <button
+            class="w-full py-4 text-error font-bold flex items-center justify-center gap-2 hover:bg-error-container/20 rounded-xl transition-colors mb-12">
+            <span class="material-symbols-outlined" data-icon="logout">logout</span>
+            Sign Out
+        </button>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+        class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0_-20px_40px_rgba(24,28,30,0.06)] rounded-t-[3rem]">
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
+            href="#">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
+            href="#">
+            <span class="material-symbols-outlined" data-icon="map">map</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Jobs</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
+            href="#">
+            <span class="material-symbols-outlined" data-icon="description">description</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Contracts</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity"
+            href="#">
+            <span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Wallet</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-[#a2eded] dark:bg-teal-900/40 text-[#1a6d6e] dark:text-teal-100 rounded-[3rem] px-5 py-2 transform scale-90 duration-200"
+            href="#">
+            <span class="material-symbols-outlined" data-icon="person"
+                style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Profile</span>
+        </a>
+    </nav>
+</body>
+
+</html>
