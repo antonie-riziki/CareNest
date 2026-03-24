@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 sys.path.insert(1, "/ussd_response")
 
-from .ai_engine import autogenerate_tips_response
+from .ai_engine import autogenerate_response
 from .messaging_engine import send_message
 
 # app = Flask(__name__)
