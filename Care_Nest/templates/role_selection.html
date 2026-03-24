@@ -234,8 +234,10 @@
         }
 
         function continueToRegister() {
-            if (selectedRole) {
-                window.location.href = `/register/?type=${selectedRole}`;
+            if (selectedRole === 'worker') {
+                window.location.href = `/worker-signup/?type=${selectedRole}`;
+            } else if (selectedRole === 'employer') {
+                window.location.href = `/employer-signup/?type=${selectedRole}`;
             }
         }
     </script>

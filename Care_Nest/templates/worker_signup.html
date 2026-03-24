@@ -139,7 +139,8 @@
                     <p class="text-on-surface-variant text-sm">Start your journey as a professional domestic partner
                         today.</p>
                 </div>
-                <form class="space-y-6">
+                <form class="space-y-6" method="POST" action="{% url 'worker_signup' %}">
+                    {% csrf_token %}
                     <!-- Full Name -->
                     <div class="space-y-2">
                         <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
@@ -147,7 +148,7 @@
                         <div class="relative">
                             <input
                                 class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="full-name" placeholder="Enter your full name" type="text" />
+                                id="full-name" name="full-name" placeholder="Enter your full name" type="text" />
                         </div>
                     </div>
                     <!-- Phone Number -->
@@ -157,7 +158,7 @@
                         <div class="relative">
                             <input
                                 class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="phone" placeholder="e.g. +254 700 000 000" type="number" />
+                                id="phone" name="phone" placeholder="e.g. +254 700 000 000" type="number" />
                         </div>
                     </div>
                     <!-- Email Address -->
@@ -167,7 +168,7 @@
                         <div class="relative">
                             <input
                                 class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="email" placeholder="e.g. [EMAIL_ADDRESS]" type="email" />
+                                id="email" name="email" placeholder="e.g. [EMAIL_ADDRESS]" type="email" />
                         </div>
                     </div>
                     <!-- Password -->
@@ -177,7 +178,7 @@
                         <div class="relative">
                             <input
                                 class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="password" placeholder="Min. 8 characters" type="password" />
+                                id="password" name="password placeholder=" Min. 8 characters" type="password" />
                         </div>
                     </div>
                     <!-- Confirm Password -->
@@ -187,7 +188,7 @@
                         <div class="relative">
                             <input
                                 class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="password" placeholder="Min. 8 characters" type="password" />
+                                id="password" name="confirm_password" placeholder="Min. 8 characters" type="password" />
                         </div>
                     </div>
                     <!-- CTA Button -->

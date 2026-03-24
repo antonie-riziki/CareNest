@@ -10,12 +10,12 @@ sms = africastalking.SMS
 
 
 # User New Account Welcome Notification
-def account_activation_message(phone_number, message_context):
+def account_activation_message(phone_number):
 
     recipients = [f"{str(phone_number)}"]
 
     # Set your message
-    message = f"{message_context}"
+    message = f"Welcome to Care Nest! A safe and trusted space for domestic work. Find jobs, grow, and get paid securely"
 
     # Set your shortCode or senderId
     sender = 20880
