@@ -18,11 +18,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from apps.core.views import *
+from apps.accounts.views import *
+from apps.dashboard.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Core
     path("", index),
     path("role-selection/", role_selection),
+    # Accounts
+    path("worker-signup/", worker_signup),
+    path("worker-signin/", worker_signin),
+    path("employer-signup/", employer_signup),
+    path("employer-signin/", employer_signin),
+    # Dashboard
+    path("worker-dashboard/", worker_dashboard),
+    path("employer-dashboard/", employer_dashboard),
+    # API
     path("api/accounts/", include("apps.accounts.urls")),
     path("api/profiles/", include("apps.profiles.urls")),
     path("api/jobs/", include("apps.jobs.urls")),

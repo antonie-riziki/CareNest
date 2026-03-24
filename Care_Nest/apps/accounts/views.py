@@ -6,13 +6,13 @@ def worker_signup(request):
     return render(request, "worker_signup.html")
 
 
-def worker_login(request):
-    return render(request, "worker_login.html")
+def worker_signin(request):
+    return render(request, "worker_signin.html")
 
 
 def employer_signup(request):
     return render(request, "employer_signup.html")
 
 
-def employer_login(request):
-    return render(request, "employer_login.html")
+def employer_signin(request):
+    return render(request, "employer_signin.html")
