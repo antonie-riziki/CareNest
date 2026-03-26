@@ -20,7 +20,7 @@ def send_message(phone_number, message_context):
     message = f"{message_context}"
 
     # Set your shortCode or senderId
-    sender = 20880
+    sender = 20384
 
     try:
         response = sms.send(message, recipients, sender)
