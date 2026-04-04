@@ -135,13 +135,18 @@
 </head>
 
 <body class="bg-surface font-body text-on-surface">
+    {% include 'worker_sidebar.html' %}
+    <div class="md:ml-64 lg:h-screen lg:flex lg:flex-col lg:overflow-hidden relative">
     <!-- TopAppBar -->
-    <header class="fixed top-0 z-50 w-full bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center px-6 py-4">
-        <div class="flex items-center gap-3">
+    <header class="fixed top-0 lg:static z-50 w-full bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center px-6 py-4">
+        <div class="flex items-center gap-3 lg:hidden">
             <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
             <h1
                 class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
                 CareNest</h1>
+        </div>
+        <div class="hidden lg:block w-full flex-1 ml-4">
+            <h1 class="text-xl font-bold font-headline text-primary tracking-tight">Job Discovery</h1>
         </div>
         <div class="flex items-center gap-4">
             <button class="p-2 rounded-full hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors">
@@ -150,9 +155,9 @@
             </button>
         </div>
     </header>
-    <main class="pt-16 pb-24 min-h-screen">
+    <main class="pt-16 lg:pt-0 pb-24 lg:pb-0 min-h-screen lg:min-h-0 lg:flex-1 lg:flex lg:flex-row w-full bg-surface">
         <!-- Search & Map Interaction Layer -->
-        <div class="relative h-[397px] w-full overflow-hidden">
+        <div class="relative h-[397px] lg:h-full lg:w-1/2 lg:order-2 w-full overflow-hidden flex-shrink-0 border-l border-outline-variant/10 z-0">
             <!-- Map Background -->
             <!-- Map Container -->
             <div id="map"></div>
@@ -215,9 +220,9 @@
                 </div>
             </div>
         </div>
-        </div>
+        
         <!-- Job Discovery Section -->
-        <div class="relative -mt-8 bg-surface rounded-t-lg px-6 pt-8 pb-4">
+        <div class="relative -mt-8 lg:mt-0 bg-surface rounded-t-lg lg:rounded-none px-6 pt-8 pb-4 lg:w-1/2 lg:order-1 lg:h-full lg:overflow-y-auto lg:py-6">
             <div class="flex justify-between items-end mb-6">
                 <div>
                     <p class="font-label text-xs uppercase tracking-widest text-secondary font-semibold mb-1">Nearby
@@ -240,10 +245,10 @@
                 </button>
             </div>
             <!-- Swipeable Job Cards -->
-            <div class="flex overflow-x-auto gap-5 pb-8 -mx-6 px-6 snap-x">
+            <div class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
                 <!-- Card 1 -->
                 <div
-                    class="snap-center min-w-[280px] bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
                             <span class="material-symbols-outlined text-on-secondary-container"
@@ -270,7 +275,7 @@
                 </div>
                 <!-- Card 2 -->
                 <div
-                    class="snap-center min-w-[280px] bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
                             <span class="material-symbols-outlined text-on-secondary-container"
@@ -297,7 +302,7 @@
                 </div>
                 <!-- Card 3 -->
                 <div
-                    class="snap-center min-w-[280px] bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
                             <span class="material-symbols-outlined text-on-secondary-container"
@@ -324,7 +329,7 @@
                 </div>
             </div>
             <!-- Recommendations Section (Editorial Layout) -->
-            <section class="mt-4">
+            <section class="mt-4 pb-12 lg:pb-0">
                 <h3 class="font-headline text-xl font-bold text-primary mb-6">Top Rated For You</h3>
                 <div class="grid grid-cols-1 gap-6">
                     <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col md:flex-row">
@@ -417,6 +422,7 @@
 
     <!-- BottomNavBar -->
     {% include 'worker_bottom_nav.html' %}
+    </div> <!-- End lg wrapper -->
 
 
 
