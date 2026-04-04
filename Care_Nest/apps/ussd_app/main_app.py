@@ -206,9 +206,8 @@ def ussd():
 
 def ussd_redirect(new_text):
     """Helper for navigating back"""
-    # In a real system, you might need to handle session logic here
-    # but for simplicity we return the main menu display
-    return ""
+
+    return
 
 
 if __name__ == "__main__":
