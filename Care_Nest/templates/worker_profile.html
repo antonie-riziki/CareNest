@@ -11,194 +11,249 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Sidebar for Desktop -->
-    {% include 'worker_sidebar.html' %}
+<!-- Sidebar for Desktop -->
+{% include 'worker_sidebar.html' %}
 
-    <!-- Main Content Wrapper -->
-    <div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
-        
-        <!-- TopAppBar (Mobile Only) -->
-        <header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
-                <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
-                </button>
-            </div>
-        </header>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
 
-        <!-- Desktop Header -->
-        <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
-            <div>
-                <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Provider Reputation</h2>
-                <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Your Profile</h1>
+    <!-- TopAppBar (Mobile Only) -->
+    <header
+        class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
+            <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Header -->
+    <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Provider Reputation</h2>
+            <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Your Profile</h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <div
+                class="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary rounded-2xl border border-secondary/10">
+                <span class="material-symbols-outlined text-sm"
+                    style="font-variation-settings: 'FILL' 1;">verified</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest">Identity Verified</span>
             </div>
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary rounded-2xl border border-secondary/10">
-                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
-                    <span class="text-[10px] font-bold uppercase tracking-widest">Identity Verified</span>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full space-y-12">
+
+        <!-- Profile Header Card -->
+        <section
+            class="bg-white rounded-[2.5rem] p-8 lg:p-12 border border-outline-variant/10 shadow-2xl shadow-primary/5 flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16">
+            <div class="relative shrink-0">
+                <div
+                    class="w-40 h-40 lg:w-56 lg:h-56 rounded-[3rem] overflow-hidden border-4 border-secondary/20 shadow-xl">
+                    <img alt="Jane Doe" class="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOd_1Oq4zKM88e0SnYrzVCCsV9oRhwD7jWXgzXUwutzNapVZUd7surjM9oAHeIRQKJjs2uL7jiIcNK6ezfR1nx6zfT2U2QfmD3boI0ppgcba9XnasbJ7C5KjLUbZwxXhSp4gz3qVPM4orpUWr5om9SdvSJswZF0O-ERysabgvRIZ5UVisUHJSVjK8ZQwcEDR7wn9CjhznCAWQM0dmYHYQ7A2MUYD0bqXRXG80jhzfZ7t73KMBlhTE1VRWOhyQ_UkEVGumWoFNa-0a7" />
+                </div>
+                <div
+                    class="absolute bottom-2 right-2 bg-secondary text-white p-2 rounded-2xl border-4 border-white shadow-lg">
+                    <span class="material-symbols-outlined text-xl block"
+                        style="font-variation-settings: 'FILL' 1;">verified</span>
                 </div>
             </div>
-        </header>
 
-        <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full space-y-12">
-            
-            <!-- Profile Header Card -->
-            <section class="bg-white rounded-[2.5rem] p-8 lg:p-12 border border-outline-variant/10 shadow-2xl shadow-primary/5 flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16">
-                <div class="relative shrink-0">
-                    <div class="w-40 h-40 lg:w-56 lg:h-56 rounded-[3rem] overflow-hidden border-4 border-secondary/20 shadow-xl">
-                        <img alt="Jane Doe" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOd_1Oq4zKM88e0SnYrzVCCsV9oRhwD7jWXgzXUwutzNapVZUd7surjM9oAHeIRQKJjs2uL7jiIcNK6ezfR1nx6zfT2U2QfmD3boI0ppgcba9XnasbJ7C5KjLUbZwxXhSp4gz3qVPM4orpUWr5om9SdvSJswZF0O-ERysabgvRIZ5UVisUHJSVjK8ZQwcEDR7wn9CjhznCAWQM0dmYHYQ7A2MUYD0bqXRXG80jhzfZ7t73KMBlhTE1VRWOhyQ_UkEVGumWoFNa-0a7" />
-                    </div>
-                    <div class="absolute bottom-2 right-2 bg-secondary text-white p-2 rounded-2xl border-4 border-white shadow-lg">
-                        <span class="material-symbols-outlined text-xl block" style="font-variation-settings: 'FILL' 1;">verified</span>
+            <div class="flex-1 text-center lg:text-left space-y-6">
+                <div>
+                    <h2 class="text-4xl lg:text-5xl font-extrabold text-primary tracking-tighter font-headline">Jane Doe
+                    </h2>
+                    <div class="flex items-center justify-center lg:justify-start gap-3 mt-3">
+                        <div class="flex text-yellow-500">
+                            <span class="material-symbols-outlined text-2xl"
+                                style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                        <span class="font-extrabold text-2xl text-primary tracking-tight">4.95</span>
+                        <span class="text-outline font-bold text-xs uppercase tracking-widest leading-none pt-1">/ 150+
+                            Success Missions</span>
                     </div>
                 </div>
-                
-                <div class="flex-1 text-center lg:text-left space-y-6">
-                    <div>
-                        <h2 class="text-4xl lg:text-5xl font-extrabold text-primary tracking-tighter font-headline">Jane Doe</h2>
-                        <div class="flex items-center justify-center lg:justify-start gap-3 mt-3">
-                            <div class="flex text-yellow-500">
-                                <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
-                            </div>
-                            <span class="font-extrabold text-2xl text-primary tracking-tight">4.95</span>
-                            <span class="text-outline font-bold text-xs uppercase tracking-widest leading-none pt-1">/ 150+ Success Missions</span>
-                        </div>
-                    </div>
 
-                    <!-- Meta Info Bento -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-surface-container-low p-5 rounded-3xl flex items-center justify-between border border-outline-variant/10 shadow-inner group">
-                            <span class="text-sm font-bold text-primary">Work Availability</span>
-                            <button class="w-14 h-8 bg-secondary rounded-full relative flex items-center px-1 group-active:scale-95 transition-all">
-                                <div class="w-6 h-6 bg-white rounded-full shadow-lg translate-x-6"></div>
-                            </button>
-                        </div>
-                        <div class="bg-primary/5 p-5 rounded-3xl flex items-center justify-between border border-primary/10 shadow-inner">
-                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Tier Level</span>
-                            <span class="text-[10px] font-bold text-white bg-primary px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Platinum Pro</span>
-                        </div>
+                <!-- Meta Info Bento -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div
+                        class="bg-surface-container-low p-5 rounded-3xl flex items-center justify-between border border-outline-variant/10 shadow-inner group">
+                        <span class="text-sm font-bold text-primary">Work Availability</span>
+                        <button
+                            class="w-14 h-8 bg-secondary rounded-full relative flex items-center px-1 group-active:scale-95 transition-all">
+                            <div class="w-6 h-6 bg-white rounded-full shadow-lg translate-x-6"></div>
+                        </button>
                     </div>
-                    
-                    <p class="text-lg text-on-surface-variant font-medium leading-relaxed max-w-2xl opacity-90 italic">
-                        "Professional residential hygiene expert with over 8 years of experience in executive housekeeping. Specialized in high-end fabric care and international culinary arts."
-                    </p>
+                    <div
+                        class="bg-primary/5 p-5 rounded-3xl flex items-center justify-between border border-primary/10 shadow-inner">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Tier Level</span>
+                        <span
+                            class="text-[10px] font-bold text-white bg-primary px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Platinum
+                            Pro</span>
+                    </div>
                 </div>
-            </section>
 
-            <!-- Success Metrics Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                
-                <!-- Core Competencies (Left) -->
-                <div class="lg:col-span-8 space-y-10">
-                    <section class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
-                                <span class="w-4 h-[2px] bg-secondary"></span>
-                                Core Expertise
-                            </h3>
-                            <button class="text-secondary font-bold text-xs uppercase tracking-widest hover:underline">Revise Portfolio</button>
-                        </div>
-                        <div class="flex flex-wrap gap-4">
-                            <div class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
-                                <span class="material-symbols-outlined text-secondary text-xl">laundry</span>
-                                <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Luxury Textile Care</span>
-                            </div>
-                            <div class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
-                                <span class="material-symbols-outlined text-secondary text-xl">cooking</span>
-                                <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Pan-African Culinary</span>
-                            </div>
-                            <div class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
-                                <span class="material-symbols-outlined text-error text-xl">vital_signs</span>
-                                <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Pediatric First Aid</span>
-                            </div>
-                            <button class="px-8 py-4 bg-surface-container-high rounded-2xl flex items-center gap-3 hover:bg-primary hover:text-white transition-all group">
-                                <span class="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">add</span>
-                                <span class="font-bold text-xs uppercase tracking-widest">Expand Skills</span>
-                            </button>
-                        </div>
-                    </section>
+                <p class="text-lg text-on-surface-variant font-medium leading-relaxed max-w-2xl opacity-90 italic">
+                    "Professional residential hygiene expert with over 8 years of experience in executive housekeeping.
+                    Specialized in high-end fabric care and international culinary arts."
+                </p>
+            </div>
+        </section>
 
-                    <!-- Feedback Loops -->
-                    <section class="space-y-6">
-                        <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
-                            <span class="w-4 h-[2px] bg-primary"></span>
-                            Client Testimonials
+        <!-- Success Metrics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+
+            <!-- Core Competencies (Left) -->
+            <div class="lg:col-span-8 space-y-10">
+                <section class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3
+                            class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
+                            <span class="w-4 h-[2px] bg-secondary"></span>
+                            Core Expertise
                         </h3>
-                        <div class="space-y-6">
-                            {% for i in "12" %}
-                            <div class="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm space-y-4 hover:shadow-xl transition-all group">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center font-bold text-primary">SW</div>
-                                        <div>
-                                            <p class="font-extrabold text-primary text-sm">Sarah Wambui</p>
-                                            <p class="text-[10px] text-outline font-bold uppercase tracking-widest mt-0.5">Kilimani • Feb 2026</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex text-yellow-500">
-                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                        <button
+                            class="text-secondary font-bold text-xs uppercase tracking-widest hover:underline">Revise
+                            Portfolio</button>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div
+                            class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
+                            <span class="material-symbols-outlined text-secondary text-xl">laundry</span>
+                            <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Luxury Textile
+                                Care</span>
+                        </div>
+                        <div
+                            class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
+                            <span class="material-symbols-outlined text-secondary text-xl">cooking</span>
+                            <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Pan-African
+                                Culinary</span>
+                        </div>
+                        <div
+                            class="px-8 py-4 bg-white border border-outline-variant/10 rounded-2xl shadow-sm flex items-center gap-3 hover:border-secondary transition-all">
+                            <span class="material-symbols-outlined text-error text-xl">vital_signs</span>
+                            <span class="font-extrabold text-primary text-sm uppercase tracking-tight">Pediatric First
+                                Aid</span>
+                        </div>
+                        <button
+                            class="px-8 py-4 bg-surface-container-high rounded-2xl flex items-center gap-3 hover:bg-primary hover:text-white transition-all group">
+                            <span
+                                class="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">add</span>
+                            <span class="font-bold text-xs uppercase tracking-widest">Expand Skills</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Feedback Loops -->
+                <section class="space-y-6">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
+                        <span class="w-4 h-[2px] bg-primary"></span>
+                        Client Testimonials
+                    </h3>
+                    <div class="space-y-6">
+                        {% for i in "12" %}
+                        <div
+                            class="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm space-y-4 hover:shadow-xl transition-all group">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center font-bold text-primary">
+                                        SW</div>
+                                    <div>
+                                        <p class="font-extrabold text-primary text-sm">Sarah Wambui</p>
+                                        <p class="text-[10px] text-outline font-bold uppercase tracking-widest mt-0.5">
+                                            Kilimani • Feb 2026</p>
                                     </div>
                                 </div>
-                                <p class="text-on-surface-variant font-medium leading-relaxed italic opacity-80 group-hover:opacity-100 transition-opacity">"Jane's attention to detail is remarkable. She managed our entire household during a very busy diplomatic season with absolute professionalism."</p>
+                                <div class="flex text-yellow-500">
+                                    <span class="material-symbols-outlined text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="material-symbols-outlined text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="material-symbols-outlined text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="material-symbols-outlined text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">star</span>
+                                    <span class="material-symbols-outlined text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">star</span>
+                                </div>
                             </div>
-                            {% endfor %}
+                            <p
+                                class="text-on-surface-variant font-medium leading-relaxed italic opacity-80 group-hover:opacity-100 transition-opacity">
+                                "Jane's attention to detail is remarkable. She managed our entire household during a
+                                very busy diplomatic season with absolute professionalism."</p>
                         </div>
-                    </section>
-                </div>
-
-                <!-- Snapshot Stats (Right) -->
-                <div class="lg:col-span-4 space-y-8">
-                    
-                    <div class="bg-primary p-8 lg:p-10 rounded-[2.5rem] text-white shadow-2xl shadow-primary/20 space-y-8 relative overflow-hidden group">
-                        <div class="relative z-10 space-y-8">
-                            <div>
-                                <h4 class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-2">Completion Velocity</h4>
-                                <div class="text-6xl font-extrabold tracking-tighter font-headline">158</div>
-                                <p class="text-xs font-medium text-white/60 mt-2">Verified Professional Engagements</p>
-                            </div>
-                            <div class="h-[1px] bg-white/10"></div>
-                            <div>
-                                <h4 class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-2">Reliability Index</h4>
-                                <div class="text-6xl font-extrabold tracking-tighter font-headline">98%</div>
-                                <p class="text-xs font-medium text-white/60 mt-2">Attendance & Payment Consistency</p>
-                            </div>
-                            <button class="w-full py-5 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-primary transition-all">Download Report</button>
-                        </div>
-                        <!-- Abstract Design -->
-                        <div class="absolute -right-10 top-20 w-32 h-32 bg-secondary/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                        {% endfor %}
                     </div>
-
-                    <div class="bg-surface-container-low rounded-[2rem] p-8 space-y-6 border border-outline-variant/10 shadow-inner">
-                        <h4 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] px-2">Account Control</h4>
-                        <div class="space-y-3">
-                            <a href="{% url 'worker-settings' %}" class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/10 hover:border-secondary transition-all group">
-                                <span class="font-bold text-primary group-hover:text-secondary transition-colors">Configuration</span>
-                                <span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
-                            </a>
-                            <a href="{% url 'worker-wallet' %}" class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/10 hover:border-secondary transition-all group">
-                                <span class="font-bold text-primary group-hover:text-secondary transition-colors">Wallet Registry</span>
-                                <span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
-                            </a>
-                            <a href="{% url 'worker-logout' %}" class="flex items-center justify-between p-5 bg-error/5 text-error rounded-2xl border border-error/10 hover:bg-error hover:text-white transition-all group mt-6">
-                                <span class="font-bold uppercase tracking-widest text-[10px]">De-authenticate</span>
-                                <span class="material-symbols-outlined text-lg">logout</span>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
+                </section>
             </div>
-        </main>
-    </div>
 
-    <!-- BottomNavBar (Mobile Only) -->
-    {% include 'worker_bottom_nav.html' %}
+            <!-- Snapshot Stats (Right) -->
+            <div class="lg:col-span-4 space-y-8">
+
+                <div
+                    class="bg-primary p-8 lg:p-10 rounded-[2.5rem] text-white shadow-2xl shadow-primary/20 space-y-8 relative overflow-hidden group">
+                    <div class="relative z-10 space-y-8">
+                        <div>
+                            <h4 class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-2">
+                                Completion Velocity</h4>
+                            <div class="text-6xl font-extrabold tracking-tighter font-headline">158</div>
+                            <p class="text-xs font-medium text-white/60 mt-2">Verified Professional Engagements</p>
+                        </div>
+                        <div class="h-[1px] bg-white/10"></div>
+                        <div>
+                            <h4 class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-2">
+                                Reliability Index</h4>
+                            <div class="text-6xl font-extrabold tracking-tighter font-headline">98%</div>
+                            <p class="text-xs font-medium text-white/60 mt-2">Attendance & Payment Consistency</p>
+                        </div>
+                        <button
+                            class="w-full py-5 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-primary transition-all">Download
+                            Report</button>
+                    </div>
+                    <!-- Abstract Design -->
+                    <div
+                        class="absolute -right-10 top-20 w-32 h-32 bg-secondary/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
+                    </div>
+                </div>
+
+                <div
+                    class="bg-surface-container-low rounded-[2rem] p-8 space-y-6 border border-outline-variant/10 shadow-inner">
+                    <h4 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] px-2">Account Control</h4>
+                    <div class="space-y-3">
+                        <a href="{% url 'worker-settings' %}"
+                            class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/10 hover:border-secondary transition-all group">
+                            <span
+                                class="font-bold text-primary group-hover:text-secondary transition-colors">Configuration</span>
+                            <span
+                                class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+                        <a href="{% url 'worker-wallet' %}"
+                            class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/10 hover:border-secondary transition-all group">
+                            <span class="font-bold text-primary group-hover:text-secondary transition-colors">Wallet
+                                Registry</span>
+                            <span
+                                class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+                        <a href="{% url 'worker-logout' %}"
+                            class="flex items-center justify-between p-5 bg-error/5 text-error rounded-2xl border border-error/10 hover:bg-error hover:text-white transition-all group mt-6">
+                            <span class="font-bold uppercase tracking-widest text-[10px]">Logout</span>
+                            <span class="material-symbols-outlined text-lg">logout</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- BottomNavBar (Mobile Only) -->
+{% include 'worker_bottom_nav.html' %}
 {% endblock %}

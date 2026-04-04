@@ -11,222 +11,274 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Sidebar for Desktop -->
-    {% include 'worker_sidebar.html' %}
+<!-- Sidebar for Desktop -->
+{% include 'worker_sidebar.html' %}
 
-    <!-- Main Content Wrapper -->
-    <div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
-        
-        <!-- TopAppBar (Mobile Only) -->
-        <header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
-                <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
-                </button>
-            </div>
-        </header>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
 
-        <!-- Desktop Header -->
-        <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
-            <div>
-                <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Account Management</h2>
-                <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Profile Settings</h1>
-            </div>
-            <div class="flex items-center gap-6">
-                <button class="px-6 py-2.5 bg-primary text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Save Changes</button>
-            </div>
-        </header>
+    <!-- TopAppBar (Mobile Only) -->
+    <header
+        class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
+            <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
+            </button>
+        </div>
+    </header>
 
-        <main class="flex-1 p-6 lg:p-10 max-w-5xl mx-auto w-full space-y-12">
-            
-            <!-- Availability Hero Card -->
-            <section class="kenyan-gradient p-8 lg:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/10 relative overflow-hidden group">
-                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div>
-                        <h2 class="font-headline font-extrabold text-3xl text-white tracking-tighter">Ready for Work?</h2>
-                        <p class="text-primary-fixed-dim mt-2 text-sm font-medium max-w-md">Toggle your status to receive priority job invitations in your area. Your profile will be visible to employers.</p>
+    <!-- Desktop Header -->
+    <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Account Management</h2>
+            <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Profile Settings</h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <button
+                class="px-6 py-2.5 bg-primary text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Save
+                Changes</button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 lg:p-10 max-w-5xl mx-auto w-full space-y-12">
+
+        <!-- Availability Hero Card -->
+        <section
+            class="kenyan-gradient p-8 lg:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/10 relative overflow-hidden group">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div>
+                    <h2 class="font-headline font-extrabold text-3xl text-white tracking-tighter">Ready for Work?</h2>
+                    <p class="text-primary-fixed-dim mt-2 text-sm font-medium max-w-md">Toggle your status to receive
+                        priority job invitations in your area. Your profile will be visible to employers.</p>
+                </div>
+                <div
+                    class="flex items-center gap-6 bg-white/10 backdrop-blur-xl p-3 rounded-[2rem] border border-white/20">
+                    <span
+                        class="text-white font-extrabold text-sm uppercase tracking-widest px-6 py-3 bg-secondary rounded-full shadow-lg">Online
+                        Now</span>
+                    <button
+                        class="w-16 h-10 bg-white/20 rounded-full relative flex items-center px-1.5 cursor-pointer group/toggle">
+                        <div
+                            class="w-7 h-7 bg-white rounded-full shadow-xl translate-x-6 transition-transform group-active/toggle:scale-90">
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <!-- Abstract Design Elements -->
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-[80px]"></div>
+            <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-secondary/20 rounded-full blur-[60px]"></div>
+        </section>
+
+        <!-- Settings Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+            <!-- Left Column: Primary Sections -->
+            <div class="lg:col-span-12 xl:col-span-7 space-y-12">
+
+                <!-- Personal Info -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined text-xl"
+                                style="font-variation-settings: 'FILL' 1;">person</span>
+                        </div>
+                        <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Personal
+                            Identity</h3>
                     </div>
-                    <div class="flex items-center gap-6 bg-white/10 backdrop-blur-xl p-3 rounded-[2rem] border border-white/20">
-                        <span class="text-white font-extrabold text-sm uppercase tracking-widest px-6 py-3 bg-secondary rounded-full shadow-lg">Online Now</span>
-                        <button class="w-16 h-10 bg-white/20 rounded-full relative flex items-center px-1.5 cursor-pointer group/toggle">
-                            <div class="w-7 h-7 bg-white rounded-full shadow-xl translate-x-6 transition-transform group-active/toggle:scale-90"></div>
+
+                    <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-8 shadow-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Legal
+                                    Full Name</label>
+                                <div
+                                    class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
+                                    <span class="font-bold text-primary">Wanjiku Kamau</span>
+                                    <span
+                                        class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Phone
+                                    Protocol</label>
+                                <div
+                                    class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
+                                    <span class="font-bold text-primary">+254 701 234 567</span>
+                                    <span
+                                        class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-6 border-t border-outline-variant/5">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Geographic
+                                Focus</label>
+                            <div
+                                class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-secondary text-xl">location_on</span>
+                                    <span class="font-bold text-primary">Kilimani, Nairobi, Kenya</span>
+                                </div>
+                                <button
+                                    class="bg-white text-secondary px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-outline-variant/10 hover:bg-secondary hover:text-white transition-all">Update
+                                    Map</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Professional Profile Preferences -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-xl"
+                                style="font-variation-settings: 'FILL' 1;">work</span>
+                        </div>
+                        <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Skill
+                            Preferences</h3>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button
+                            class="flex items-center justify-between p-4 bg-primary text-white rounded-2xl shadow-lg shadow-primary/10">
+                            <span class="font-bold text-sm">Housekeeping</span>
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                        </button>
+                        <button
+                            class="flex items-center justify-between p-4 bg-surface-container-low text-primary rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all">
+                            <span class="font-bold text-sm">Child Care</span>
+                            <span class="material-symbols-outlined text-outline text-lg"
+                                style="font-variation-settings: 'FILL' 0;">circle</span>
+                        </button>
+                        <button
+                            class="flex items-center justify-between p-4 bg-primary text-white rounded-2xl shadow-lg shadow-primary/10">
+                            <span class="font-bold text-sm">Laundry</span>
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                        </button>
+                        <button
+                            class="flex items-center justify-between p-4 bg-surface-container-low text-primary rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all">
+                            <span class="font-bold text-sm">Cooking</span>
+                            <span class="material-symbols-outlined text-outline text-lg"
+                                style="font-variation-settings: 'FILL' 0;">circle</span>
                         </button>
                     </div>
-                </div>
-                <!-- Abstract Design Elements -->
-                <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-[80px]"></div>
-                <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-secondary/20 rounded-full blur-[60px]"></div>
-            </section>
+                </section>
 
-            <!-- Settings Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                
-                <!-- Left Column: Primary Sections -->
-                <div class="lg:col-span-12 xl:col-span-7 space-y-12">
-                    
-                    <!-- Personal Info -->
-                    <section class="space-y-6">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">person</span>
-                            </div>
-                            <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Personal Identity</h3>
-                        </div>
-                        
-                        <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-8 shadow-sm">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                <div class="space-y-3">
-                                    <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Legal Full Name</label>
-                                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
-                                        <span class="font-bold text-primary">Wanjiku Kamau</span>
-                                        <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
-                                    </div>
-                                </div>
-                                <div class="space-y-3">
-                                    <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Phone Protocol</label>
-                                    <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
-                                        <span class="font-bold text-primary">+254 701 234 567</span>
-                                        <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-3 pt-6 border-t border-outline-variant/5">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Geographic Focus</label>
-                                <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-symbols-outlined text-secondary text-xl">location_on</span>
-                                        <span class="font-bold text-primary">Kilimani, Nairobi, Kenya</span>
-                                    </div>
-                                    <button class="bg-white text-secondary px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-outline-variant/10 hover:bg-secondary hover:text-white transition-all">Update Map</button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Professional Profile Preferences -->
-                    <section class="space-y-6">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">work</span>
-                            </div>
-                            <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Skill Preferences</h3>
-                        </div>
-                        
-                        <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <button class="flex items-center justify-between p-4 bg-primary text-white rounded-2xl shadow-lg shadow-primary/10">
-                                <span class="font-bold text-sm">Housekeeping</span>
-                                <span class="material-symbols-outlined text-lg">check_circle</span>
-                            </button>
-                            <button class="flex items-center justify-between p-4 bg-surface-container-low text-primary rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all">
-                                <span class="font-bold text-sm">Child Care</span>
-                                <span class="material-symbols-outlined text-outline text-lg" style="font-variation-settings: 'FILL' 0;">circle</span>
-                            </button>
-                            <button class="flex items-center justify-between p-4 bg-primary text-white rounded-2xl shadow-lg shadow-primary/10">
-                                <span class="font-bold text-sm">Laundry</span>
-                                <span class="material-symbols-outlined text-lg">check_circle</span>
-                            </button>
-                            <button class="flex items-center justify-between p-4 bg-surface-container-low text-primary rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all">
-                                <span class="font-bold text-sm">Cooking</span>
-                                <span class="material-symbols-outlined text-outline text-lg" style="font-variation-settings: 'FILL' 0;">circle</span>
-                            </button>
-                        </div>
-                    </section>
-
-                </div>
-
-                <!-- Right Column: Secondary Sections -->
-                <div class="lg:col-span-12 xl:col-span-5 space-y-12">
-                    
-                    <!-- Security & Privacy Bento -->
-                    <section class="space-y-6">
-                        <div class="flex items-center gap-3 px-1">
-                            <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-600">
-                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-                            </div>
-                            <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Privacy Hub</h3>
-                        </div>
-                        
-                        <div class="bg-surface-container-low rounded-[2rem] p-6 space-y-4 border border-outline-variant/10 shadow-inner">
-                            <a href="#" class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-orange-500/5 flex items-center justify-center text-orange-600">
-                                        <span class="material-symbols-outlined text-xl">lock</span>
-                                    </div>
-                                    <span class="font-bold text-primary group-hover:text-secondary transition-colors">Credential Guard</span>
-                                </div>
-                                <span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
-                            </a>
-
-                            <div class="p-5 bg-white rounded-2xl border border-outline-variant/5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
-                                            <span class="material-symbols-outlined text-xl">shield_person</span>
-                                        </div>
-                                        <span class="font-bold text-primary">Biometric Login</span>
-                                    </div>
-                                    <div class="w-10 h-5 bg-secondary rounded-full relative flex items-center px-1">
-                                        <div class="w-3.5 h-3.5 bg-white rounded-full shadow-lg translate-x-5"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a href="#" class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary">
-                                        <span class="material-symbols-outlined text-xl">notifications_active</span>
-                                    </div>
-                                    <span class="font-bold text-primary group-hover:text-secondary transition-colors">Alert Settings</span>
-                                </div>
-                                <span class="text-[10px] font-bold text-secondary-container bg-primary px-3 py-1 rounded-full uppercase tracking-widest">Active</span>
-                            </a>
-                        </div>
-                    </section>
-
-                    <!-- Support Section -->
-                    <section class="space-y-6">
-                        <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter px-1">Resources</h3>
-                        <div class="space-y-3">
-                            <a href="#" class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-outline-variant/10 hover:border-primary/30 transition-all group">
-                                <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline group-hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-xl">help</span>
-                                </div>
-                                <span class="font-bold text-primary flex-1">Knowledge Center</span>
-                                <span class="material-symbols-outlined text-outline-variant text-lg">open_in_new</span>
-                            </a>
-                            <a href="#" class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-outline-variant/10 hover:border-primary/30 transition-all group">
-                                <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline group-hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-xl">verified</span>
-                                </div>
-                                <span class="font-bold text-primary flex-1">Platform Guidelines</span>
-                                <span class="material-symbols-outlined text-outline-variant text-lg">chevron_right</span>
-                            </a>
-                        </div>
-                    </section>
-
-                </div>
             </div>
 
-            <!-- Danger Zone -->
-            <section class="pt-12 flex flex-col items-center gap-6">
-                <button class="px-12 py-5 bg-error-container text-on-error-container font-extrabold rounded-2xl flex items-center gap-3 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest shadow-xl shadow-error/10">
-                    <span class="material-symbols-outlined">logout</span>
-                    De-authenticate Session
-                </button>
-                <div class="text-center">
-                    <p class="text-[10px] text-outline font-bold uppercase tracking-[0.3em]">Build Identifier: 1.4.0-COASTAL</p>
-                    <p class="text-[10px] text-outline/40 font-bold uppercase tracking-[0.2em] mt-1">© 2026 Care Nest Kenya</p>
-                </div>
-            </section>
+            <!-- Right Column: Secondary Sections -->
+            <div class="lg:col-span-12 xl:col-span-5 space-y-12">
 
-        </main>
-    </div>
+                <!-- Security & Privacy Bento -->
+                <section class="space-y-6">
+                    <div class="flex items-center gap-3 px-1">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-600">
+                            <span class="material-symbols-outlined text-xl"
+                                style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                        </div>
+                        <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">Privacy Hub</h3>
+                    </div>
 
-    <!-- BottomNavBar (Mobile Only) -->
-    {% include 'worker_bottom_nav.html' %}
+                    <div
+                        class="bg-surface-container-low rounded-[2rem] p-6 space-y-4 border border-outline-variant/10 shadow-inner">
+                        <a href="#"
+                            class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-orange-500/5 flex items-center justify-center text-orange-600">
+                                    <span class="material-symbols-outlined text-xl">lock</span>
+                                </div>
+                                <span
+                                    class="font-bold text-primary group-hover:text-secondary transition-colors">Credential
+                                    Guard</span>
+                            </div>
+                            <span
+                                class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+                        </a>
+
+                        <div class="p-5 bg-white rounded-2xl border border-outline-variant/5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
+                                        <span class="material-symbols-outlined text-xl">shield_person</span>
+                                    </div>
+                                    <span class="font-bold text-primary">Biometric Login</span>
+                                </div>
+                                <div class="w-10 h-5 bg-secondary rounded-full relative flex items-center px-1">
+                                    <div class="w-3.5 h-3.5 bg-white rounded-full shadow-lg translate-x-5"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="#"
+                            class="flex items-center justify-between p-5 bg-white rounded-2xl border border-outline-variant/5 hover:border-secondary transition-all group">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary">
+                                    <span class="material-symbols-outlined text-xl">notifications_active</span>
+                                </div>
+                                <span class="font-bold text-primary group-hover:text-secondary transition-colors">Alert
+                                    Settings</span>
+                            </div>
+                            <span
+                                class="text-[10px] font-bold text-secondary-container bg-primary px-3 py-1 rounded-full uppercase tracking-widest">Active</span>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Support Section -->
+                <section class="space-y-6">
+                    <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter px-1">Resources</h3>
+                    <div class="space-y-3">
+                        <a href="#"
+                            class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-outline-variant/10 hover:border-primary/30 transition-all group">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-xl">help</span>
+                            </div>
+                            <span class="font-bold text-primary flex-1">Knowledge Center</span>
+                            <span class="material-symbols-outlined text-outline-variant text-lg">open_in_new</span>
+                        </a>
+                        <a href="#"
+                            class="flex items-center gap-4 p-5 rounded-2xl bg-white border border-outline-variant/10 hover:border-primary/30 transition-all group">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-xl">verified</span>
+                            </div>
+                            <span class="font-bold text-primary flex-1">Platform Guidelines</span>
+                            <span class="material-symbols-outlined text-outline-variant text-lg">chevron_right</span>
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <section class="pt-12 flex flex-col items-center gap-6">
+            <button
+                class="px-12 py-5 bg-error-container text-on-error-container font-extrabold rounded-2xl flex items-center gap-3 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest shadow-xl shadow-error/10">
+                <span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+            <div class="text-center">
+                <p class="text-[10px] text-outline font-bold uppercase tracking-[0.3em]">Build Identifier: 1.4.0-COASTAL
+                </p>
+                <p class="text-[10px] text-outline/40 font-bold uppercase tracking-[0.2em] mt-1">© 2026 Care Nest Kenya
+                </p>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- BottomNavBar (Mobile Only) -->
+{% include 'worker_bottom_nav.html' %}
 {% endblock %}

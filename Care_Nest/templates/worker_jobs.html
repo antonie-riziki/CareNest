@@ -1,427 +1,362 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html class="light" lang="en">
+{% block title %}Settings | Care Nest{% endblock %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-secondary": "#ffffff",
-                        "tertiary": "#002522",
-                        "surface-container-highest": "#e0e3e5",
-                        "tertiary-fixed": "#79f7ea",
-                        "on-primary-fixed": "#001b3c",
-                        "inverse-surface": "#2d3133",
-                        "on-tertiary": "#ffffff",
-                        "on-surface": "#181c1e",
-                        "inverse-primary": "#adc7f7",
-                        "primary-fixed-dim": "#adc7f7",
-                        "on-tertiary-fixed": "#00201d",
-                        "on-background": "#181c1e",
-                        "error-container": "#ffdad6",
-                        "on-surface-variant": "#43474e",
-                        "secondary": "#13696a",
-                        "on-primary": "#ffffff",
-                        "surface-variant": "#e0e3e5",
-                        "secondary-container": "#a2eded",
-                        "secondary-fixed": "#a5eff0",
-                        "surface-bright": "#f7fafc",
-                        "outline": "#74777f",
-                        "tertiary-container": "#003d38",
-                        "on-primary-container": "#86a0cd",
-                        "inverse-on-surface": "#eef1f3",
-                        "tertiary-fixed-dim": "#5adace",
-                        "primary-container": "#1a365d",
-                        "surface-tint": "#455f88",
-                        "primary-fixed": "#d6e3ff",
-                        "on-error": "#ffffff",
-                        "background": "#f7fafc",
-                        "surface-container-low": "#f1f4f6",
-                        "on-error-container": "#93000a",
-                        "surface-dim": "#d7dadc",
-                        "error": "#ba1a1a",
-                        "on-secondary-fixed": "#002020",
-                        "secondary-fixed-dim": "#89d3d4",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#2d476f",
-                        "on-tertiary-fixed-variant": "#00504a",
-                        "surface-container-high": "#e5e9eb",
-                        "surface-container": "#ebeef0",
-                        "outline-variant": "#c4c6cf",
-                        "primary": "#002045",
-                        "on-tertiary-container": "#1eb1a5",
-                        "on-secondary-container": "#1a6d6e",
-                        "surface": "#f7fafc",
-                        "on-secondary-fixed-variant": "#004f50"
-                    },
-                    fontFamily: {
-                        "headline": ["Manrope"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            display: inline-block;
-            line-height: 1;
-        }
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        line-height: 1;
+    }
 
-        ::-webkit-scrollbar {
-            display: none;
-        }
+    ::-webkit-scrollbar {
+        display: none;
+    }
 
-        .glass-nav {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
+    .glass-nav {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
 
-        .kenyan-gradient {
-            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
-        }
+    .kenyan-gradient {
+        background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+    }
 
-        #map {
-            height: 100%;
-            width: 100%;
-            z-index: 1;
-        }
+    #map {
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+    }
 
-        .vertical-slider {
-            -webkit-appearance: none;
-            width: 150px;
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 5px;
-            outline: none;
-            transform: rotate(-90deg);
-            cursor: pointer;
-        }
+    .vertical-slider {
+        -webkit-appearance: none;
+        width: 150px;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 5px;
+        outline: none;
+        transform: rotate(-90deg);
+        cursor: pointer;
+    }
 
-        .vertical-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #1193d4;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
+    .vertical-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #1193d4;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+</style>
+<style>
+    body {
+        min-height: max(884px, 100dvh);
+    }
+</style>
 </head>
 
 <body class="bg-surface font-body text-on-surface">
     {% include 'worker_sidebar.html' %}
     <div class="md:ml-64 lg:h-screen lg:flex lg:flex-col lg:overflow-hidden relative">
-    <!-- TopAppBar -->
-    <header class="fixed top-0 lg:static z-50 w-full bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center px-6 py-4">
-        <div class="flex items-center gap-3 lg:hidden">
-            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
-            <h1
-                class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
-                CareNest</h1>
-        </div>
-        <div class="hidden lg:block w-full flex-1 ml-4">
-            <h1 class="text-xl font-bold font-headline text-primary tracking-tight">Job Discovery</h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <button class="p-2 rounded-full hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors">
-                <span class="material-symbols-outlined text-slate-500 dark:text-slate-400"
-                    data-icon="notifications">notifications</span>
-            </button>
-        </div>
-    </header>
-    <main class="pt-16 lg:pt-0 pb-24 lg:pb-0 min-h-screen lg:min-h-0 lg:flex-1 lg:flex lg:flex-row w-full bg-surface">
-        <!-- Search & Map Interaction Layer -->
-        <div class="relative h-[397px] lg:h-full lg:w-1/2 lg:order-2 w-full overflow-hidden flex-shrink-0 border-l border-outline-variant/10 z-0">
-            <!-- Map Background -->
-            <!-- Map Container -->
-            <div id="map"></div>
-
-            <!-- Location Status Pill -->
+        <!-- TopAppBar -->
+        <header
+            class="fixed top-0 lg:static z-50 w-full bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center px-6 py-4">
+            <div class="flex items-center gap-3 lg:hidden">
+                <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
+                <h1
+                    class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
+                    CareNest</h1>
+            </div>
+            <div class="hidden lg:block w-full flex-1 ml-4">
+                <h1 class="text-xl font-bold font-headline text-primary tracking-tight">Job Discovery</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-full hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500 dark:text-slate-400"
+                        data-icon="notifications">notifications</span>
+                </button>
+            </div>
+        </header>
+        <main
+            class="pt-16 lg:pt-0 pb-24 lg:pb-0 min-h-screen lg:min-h-0 lg:flex-1 lg:flex lg:flex-row w-full bg-surface">
+            <!-- Search & Map Interaction Layer -->
             <div
-                class="absolute bottom-4 left-6 z-10 flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg border border-outline-variant/10">
-                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                <span id="location-status" class="text-[10px] font-bold text-primary uppercase tracking-wider">Detecting
-                    Location...</span>
-            </div>
+                class="relative h-[397px] lg:h-full lg:w-1/2 lg:order-2 w-full overflow-hidden flex-shrink-0 border-l border-outline-variant/10 z-0">
+                <!-- Map Background -->
+                <!-- Map Container -->
+                <div id="map"></div>
 
-            <!-- Map Layer Toggle/Center FAB -->
-            <div class="absolute bottom-4 right-6 z-10 flex flex-col gap-3">
-                <!-- Radius Toggle FAB -->
-                <button onclick="toggleRadiusSlider()"
-                    class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-secondary active:scale-95 transition-transform">
-                    <span class="material-symbols-outlined text-[20px]">radar</span>
-                </button>
-                <!-- Location FAB -->
-                <button onclick="centerOnLocation()"
-                    class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
-                    <span class="material-symbols-outlined text-[20px]">my_location</span>
-                </button>
-            </div>
-
-            <!-- Vertical Radius Slider Panel -->
-            <div id="radius-panel"
-                class="absolute right-6 top-1/2 -translate-y-1/2 z-10 hidden flex-col items-center gap-4 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-8 rounded-full shadow-xl border border-outline-variant/10 transition-all duration-300 transform translate-x-4 opacity-0">
-                <span class="text-[10px] font-bold text-primary uppercase vertical-text">Range</span>
-                <div class="h-40 flex items-center justify-center w-8">
-                    <input type="range" min="1" max="25" value="5" class="vertical-slider"
-                        oninput="updateRadius(this.value)">
+                <!-- Location Status Pill -->
+                <div
+                    class="absolute bottom-4 left-6 z-10 flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg border border-outline-variant/10">
+                    <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                    <span id="location-status"
+                        class="text-[10px] font-bold text-primary uppercase tracking-wider">Detecting
+                        Location...</span>
                 </div>
-                <div class="flex flex-col items-center gap-0.5">
-                    <span id="radius-value-v" class="text-xs font-bold text-secondary">5</span>
-                    <span class="text-[8px] font-bold text-outline">KM</span>
-                </div>
-            </div>
 
-            <!-- Loading Overlay -->
-            <div id="loading-overlay"
-                class="absolute inset-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-center z-50">
-                <div class="text-center">
+                <!-- Map Layer Toggle/Center FAB -->
+                <div class="absolute bottom-4 right-6 z-10 flex flex-col gap-3">
+                    <!-- Radius Toggle FAB -->
+                    <button onclick="toggleRadiusSlider()"
+                        class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-secondary active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-[20px]">radar</span>
+                    </button>
+                    <!-- Location FAB -->
+                    <button onclick="centerOnLocation()"
+                        class="w-10 h-10 bg-surface-container-lowest rounded-full shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-[20px]">my_location</span>
+                    </button>
+                </div>
+
+                <!-- Vertical Radius Slider Panel -->
+                <div id="radius-panel"
+                    class="absolute right-6 top-1/2 -translate-y-1/2 z-10 hidden flex-col items-center gap-4 bg-surface-container-lowest/90 backdrop-blur-md px-2 py-8 rounded-full shadow-xl border border-outline-variant/10 transition-all duration-300 transform translate-x-4 opacity-0">
+                    <!-- <span class="text-[10px] font-bold text-primary uppercase vertical-text">Range</span> -->
+                    <div class="h-40 flex items-center justify-center w-8">
+                        <input type="range" min="1" max="25" value="5" class="vertical-slider"
+                            oninput="updateRadius(this.value)">
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <span id="radius-value-v" class="text-xs font-bold text-secondary">5</span>
+                        <span class="text-[8px] font-bold text-outline">KM</span>
+                    </div>
+                </div>
+
+                <!-- Loading Overlay -->
+                <div id="loading-overlay"
+                    class="absolute inset-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div class="text-center">
+                        <div
+                            class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4">
+                        </div>
+                        <p class="text-lg font-semibold">Loading map...</p>
+                        <p class="text-sm text-slate-500">Fetching your location</p>
+                    </div>
+                </div>
+                <!-- Floating Search Bar -->
+                <div class="absolute top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-10">
                     <div
-                        class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4">
-                    </div>
-                    <p class="text-lg font-semibold">Loading map...</p>
-                    <p class="text-sm text-slate-500">Fetching your location</p>
-                </div>
-            </div>
-            <!-- Floating Search Bar -->
-            <div class="absolute top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-10">
-                <div
-                    class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(24,28,30,0.06)] flex items-center px-4 py-3 gap-3">
-                    <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
-                    <input class="bg-transparent border-none focus:ring-0 w-full text-sm font-medium"
-                        placeholder="Job Type or Location" type="text" />
-                    <span class="material-symbols-outlined text-secondary" data-icon="tune">tune</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Job Discovery Section -->
-        <div class="relative -mt-8 lg:mt-0 bg-surface rounded-t-lg lg:rounded-none px-6 pt-8 pb-4 lg:w-1/2 lg:order-1 lg:h-full lg:overflow-y-auto lg:py-6">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <p class="font-label text-xs uppercase tracking-widest text-secondary font-semibold mb-1">Nearby
-                        opportunities</p>
-                    <h2 class="font-headline text-2xl font-bold tracking-tight text-primary">Explore Jobs</h2>
-                    <div class="flex gap-4 mt-2">
-                        <div class="flex items-center gap-1.5">
-                            <span id="worker-count" class="text-secondary font-bold text-sm">0</span>
-                            <span class="text-[10px] text-outline uppercase font-medium">Jobs Nearby</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span id="verified-count" class="text-primary font-bold text-sm">0</span>
-                            <span class="text-[10px] text-outline uppercase font-medium">Verified Posters</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="text-secondary text-sm font-semibold flex items-center gap-1">
-                    View list <span class="material-symbols-outlined text-sm"
-                        data-icon="arrow_forward">arrow_forward</span>
-                </button>
-            </div>
-            <!-- Swipeable Job Cards -->
-            <div class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
-                <!-- Card 1 -->
-                <div
-                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                            <span class="material-symbols-outlined text-on-secondary-container"
-                                data-icon="cleaning_services">cleaning_services</span>
-                        </div>
-                        <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                            <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="text-xs font-bold text-on-surface">4.8</span>
-                        </div>
-                    </div>
-                    <h3 class="font-headline text-lg font-bold text-primary mb-1">General Cleaning</h3>
-                    <p class="text-sm text-outline mb-4">Kilimani, Nairobi</p>
-                    <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                            <p class="font-headline font-bold text-secondary">KES 1,500</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                            <p class="font-headline font-bold text-primary">2.5km</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div
-                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                            <span class="material-symbols-outlined text-on-secondary-container"
-                                data-icon="garden_cart">garden_cart</span>
-                        </div>
-                        <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                            <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="text-xs font-bold text-on-surface">4.9</span>
-                        </div>
-                    </div>
-                    <h3 class="font-headline text-lg font-bold text-primary mb-1">Garden Maintenance</h3>
-                    <p class="text-sm text-outline mb-4">Lavington, Nairobi</p>
-                    <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                            <p class="font-headline font-bold text-secondary">KES 1,800</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                            <p class="font-headline font-bold text-primary">3.1km</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div
-                    class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                            <span class="material-symbols-outlined text-on-secondary-container"
-                                data-icon="electric_bolt">electric_bolt</span>
-                        </div>
-                        <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                            <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="text-xs font-bold text-on-surface">4.7</span>
-                        </div>
-                    </div>
-                    <h3 class="font-headline text-lg font-bold text-primary mb-1">Culinary - Nigerian Cuisine</h3>
-                    <p class="text-sm text-outline mb-4">Westlands, Nairobi</p>
-                    <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                            <p class="font-headline font-bold text-secondary">KES 2,200</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                            <p class="font-headline font-bold text-primary">1.2km</p>
-                        </div>
+                        class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(24,28,30,0.06)] flex items-center px-4 py-3 gap-3">
+                        <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+                        <input class="bg-transparent border-none focus:ring-0 w-full text-sm font-medium"
+                            placeholder="Job Type or Location" type="text" />
+                        <span class="material-symbols-outlined text-secondary" data-icon="tune">tune</span>
                     </div>
                 </div>
             </div>
-            <!-- Recommendations Section (Editorial Layout) -->
-            <section class="mt-4 pb-12 lg:pb-0">
-                <h3 class="font-headline text-xl font-bold text-primary mb-6">Top Rated For You</h3>
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col md:flex-row">
-                        <div class="h-48 md:w-1/3 relative">
-                            <img class="w-full h-full object-cover"
-                                data-alt="Modern clean bathroom interior with professional cleaning supplies on a marble counter, soft bright natural lighting"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMWahs2xTX-MOYUgVw7qxweaSWlMNFaHTcDwAEOUGwwl2O7kf3x2icryNM0-aWBLSoAJv45aBA-z9xSJdhV9fLyZmu6OAmwemozYbdxzm_xfLYzRaVHEEWspO2KmKB_k6ImcNSXTpDgn-9YLLZy23rZnUXVqieR6hYF4cBnFg6BWENvKftyMNV1lqVjvvlzTWKbzvQ0tUfFHNoMBQZDJMlIc6OJ0wqdLzLR5UnFrwlgZ3ZFstQOqUWTIk5rcL8O0aZ3RHBvpj2Qtsc" />
-                            <div class="absolute top-4 left-4">
-                                <span
-                                    class="bg-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Verified
-                                    Host</span>
-                            </div>
-                        </div>
-                        <div class="p-6 md:w-2/3 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <h4 class="font-headline text-xl font-bold text-primary">Move-out Deep Clean</h4>
-                                    <p class="text-secondary font-bold">KES 3,500</p>
-                                </div>
-                                <p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">Require a
-                                    comprehensive deep clean for a 3-bedroom apartment before handover. All supplies
-                                    provided onsite.</p>
-                                <div class="flex gap-4 mb-6">
-                                    <div class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-secondary text-lg"
-                                            data-icon="schedule">schedule</span>
-                                        <span class="text-xs text-on-surface font-medium">Today, 2 PM</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-secondary text-lg"
-                                            data-icon="location_on">location_on</span>
-                                        <span class="text-xs text-on-surface font-medium">Kilimani Area</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                class="kenyan-gradient text-white font-bold py-3 px-6 rounded-xl w-full md:w-max">Apply
-                                Now</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-    <!-- Detailed Job View Overlay (Simulated Popup Hidden Initially/Interaction Ready) -->
-    <div class="fixed inset-0 z-[60] bg-primary/20 backdrop-blur-md flex items-end justify-center hidden"
-        id="job-overlay" onclick="closeJobOverlay()">
-        <div class="bg-surface-container-lowest w-full max-w-2xl rounded-t-lg p-8 shadow-2xl"
-            onclick="event.stopPropagation()">
-            <div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-8"></div>
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h2 class="font-headline text-3xl font-extrabold text-primary mb-2">General Cleaning</h2>
-                    <div class="flex items-center gap-3">
-                        <span
-                            class="bg-secondary-container text-on-secondary-container text-xs font-bold px-3 py-1 rounded-full">DOMESTIC</span>
-                        <span class="text-outline text-sm font-medium flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill"
-                                style="font-variation-settings: 'FILL' 1;">star</span> 4.8 (12 reviews)
-                        </span>
-                    </div>
-                </div>
-                <button onclick="closeJobOverlay()"
-                    class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
-                    <span class="material-symbols-outlined" data-icon="close">close</span>
-                </button>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-surface-container-low p-4 rounded-lg">
-                    <p class="text-[10px] uppercase font-bold text-outline mb-1">Total Pay</p>
-                    <p class="text-xl font-headline font-bold text-secondary">KES 1,500</p>
-                </div>
-                <div class="bg-surface-container-low p-4 rounded-lg">
-                    <p class="text-[10px] uppercase font-bold text-outline mb-1">Estimated Time</p>
-                    <p class="text-xl font-headline font-bold text-primary">3 Hours</p>
-                </div>
-            </div>
-            <div class="mb-8">
-                <h4 class="font-headline text-lg font-bold text-primary mb-2">Job Description</h4>
-                <p class="text-on-surface-variant leading-relaxed">Standard house cleaning for a small studio apartment.
-                    Tasks include floor mopping, kitchen surface cleaning, and dusting. Tools and detergents are
-                    provided by the client.</p>
-            </div>
-            <a href="{% url 'worker-jobs' %}"
-                class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-primary-container to-secondary text-white rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">Apply
-                for this Job</a>
-        </div>
-    </div>
-    <!-- FAB (Suppressed based on context: not home or dashboard, this is a search/map screen) -->
 
-    <!-- BottomNavBar -->
-    {% include 'worker_bottom_nav.html' %}
+            <!-- Job Discovery Section -->
+            <div
+                class="relative -mt-8 lg:mt-0 bg-surface rounded-t-lg lg:rounded-none px-6 pt-8 pb-4 lg:w-1/2 lg:order-1 lg:h-full lg:overflow-y-auto lg:py-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <p class="font-label text-xs uppercase tracking-widest text-secondary font-semibold mb-1">Nearby
+                            opportunities</p>
+                        <h2 class="font-headline text-2xl font-bold tracking-tight text-primary">Explore Jobs</h2>
+                        <div class="flex gap-4 mt-2">
+                            <div class="flex items-center gap-1.5">
+                                <span id="worker-count" class="text-secondary font-bold text-sm">0</span>
+                                <span class="text-[10px] text-outline uppercase font-medium">Jobs Nearby</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span id="verified-count" class="text-primary font-bold text-sm">0</span>
+                                <span class="text-[10px] text-outline uppercase font-medium">Verified Posters</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="text-secondary text-sm font-semibold flex items-center gap-1">
+                        View list <span class="material-symbols-outlined text-sm"
+                            data-icon="arrow_forward">arrow_forward</span>
+                    </button>
+                </div>
+                <!-- Swipeable Job Cards -->
+                <div
+                    class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
+                    <!-- Card 1 -->
+                    <div
+                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-on-secondary-container"
+                                    data-icon="cleaning_services">cleaning_services</span>
+                            </div>
+                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="text-xs font-bold text-on-surface">4.8</span>
+                            </div>
+                        </div>
+                        <h3 class="font-headline text-lg font-bold text-primary mb-1">General Cleaning</h3>
+                        <p class="text-sm text-outline mb-4">Kilimani, Nairobi</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
+                                <p class="font-headline font-bold text-secondary">KES 1,500</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
+                                <p class="font-headline font-bold text-primary">2.5km</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div
+                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-on-secondary-container"
+                                    data-icon="garden_cart">garden_cart</span>
+                            </div>
+                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="text-xs font-bold text-on-surface">4.9</span>
+                            </div>
+                        </div>
+                        <h3 class="font-headline text-lg font-bold text-primary mb-1">Garden Maintenance</h3>
+                        <p class="text-sm text-outline mb-4">Lavington, Nairobi</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
+                                <p class="font-headline font-bold text-secondary">KES 1,800</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
+                                <p class="font-headline font-bold text-primary">3.1km</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div
+                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-on-secondary-container"
+                                    data-icon="electric_bolt">electric_bolt</span>
+                            </div>
+                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
+                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="text-xs font-bold text-on-surface">4.7</span>
+                            </div>
+                        </div>
+                        <h3 class="font-headline text-lg font-bold text-primary mb-1">Culinary - Nigerian Cuisine</h3>
+                        <p class="text-sm text-outline mb-4">Westlands, Nairobi</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
+                                <p class="font-headline font-bold text-secondary">KES 2,200</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
+                                <p class="font-headline font-bold text-primary">1.2km</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recommendations Section (Editorial Layout) -->
+                <section class="mt-4 pb-12 lg:pb-0">
+                    <h3 class="font-headline text-xl font-bold text-primary mb-6">Top Rated For You</h3>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col md:flex-row">
+                            <div class="h-48 md:w-1/3 relative">
+                                <img class="w-full h-full object-cover"
+                                    data-alt="Modern clean bathroom interior with professional cleaning supplies on a marble counter, soft bright natural lighting"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMWahs2xTX-MOYUgVw7qxweaSWlMNFaHTcDwAEOUGwwl2O7kf3x2icryNM0-aWBLSoAJv45aBA-z9xSJdhV9fLyZmu6OAmwemozYbdxzm_xfLYzRaVHEEWspO2KmKB_k6ImcNSXTpDgn-9YLLZy23rZnUXVqieR6hYF4cBnFg6BWENvKftyMNV1lqVjvvlzTWKbzvQ0tUfFHNoMBQZDJMlIc6OJ0wqdLzLR5UnFrwlgZ3ZFstQOqUWTIk5rcL8O0aZ3RHBvpj2Qtsc" />
+                                <div class="absolute top-4 left-4">
+                                    <span
+                                        class="bg-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Verified
+                                        Host</span>
+                                </div>
+                            </div>
+                            <div class="p-6 md:w-2/3 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-headline text-xl font-bold text-primary">Move-out Deep Clean
+                                        </h4>
+                                        <p class="text-secondary font-bold">KES 3,500</p>
+                                    </div>
+                                    <p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">Require
+                                        a
+                                        comprehensive deep clean for a 3-bedroom apartment before handover. All supplies
+                                        provided onsite.</p>
+                                    <div class="flex gap-4 mb-6">
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-secondary text-lg"
+                                                data-icon="schedule">schedule</span>
+                                            <span class="text-xs text-on-surface font-medium">Today, 2 PM</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-secondary text-lg"
+                                                data-icon="location_on">location_on</span>
+                                            <span class="text-xs text-on-surface font-medium">Kilimani Area</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    class="kenyan-gradient text-white font-bold py-3 px-6 rounded-xl w-full md:w-max">Apply
+                                    Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <!-- Detailed Job View Overlay (Simulated Popup Hidden Initially/Interaction Ready) -->
+        <div class="fixed inset-0 z-[60] bg-primary/20 backdrop-blur-md flex items-end justify-center hidden"
+            id="job-overlay" onclick="closeJobOverlay()">
+            <div class="bg-surface-container-lowest w-full max-w-2xl rounded-t-lg p-8 shadow-2xl"
+                onclick="event.stopPropagation()">
+                <div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-8"></div>
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="font-headline text-3xl font-extrabold text-primary mb-2">General Cleaning</h2>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="bg-secondary-container text-on-secondary-container text-xs font-bold px-3 py-1 rounded-full">DOMESTIC</span>
+                            <span class="text-outline text-sm font-medium flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill"
+                                    style="font-variation-settings: 'FILL' 1;">star</span> 4.8 (12 reviews)
+                            </span>
+                        </div>
+                    </div>
+                    <button onclick="closeJobOverlay()"
+                        class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                        <span class="material-symbols-outlined" data-icon="close">close</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-surface-container-low p-4 rounded-lg">
+                        <p class="text-[10px] uppercase font-bold text-outline mb-1">Total Pay</p>
+                        <p class="text-xl font-headline font-bold text-secondary">KES 1,500</p>
+                    </div>
+                    <div class="bg-surface-container-low p-4 rounded-lg">
+                        <p class="text-[10px] uppercase font-bold text-outline mb-1">Estimated Time</p>
+                        <p class="text-xl font-headline font-bold text-primary">3 Hours</p>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <h4 class="font-headline text-lg font-bold text-primary mb-2">Job Description</h4>
+                    <p class="text-on-surface-variant leading-relaxed">Standard house cleaning for a small studio
+                        apartment.
+                        Tasks include floor mopping, kitchen surface cleaning, and dusting. Tools and detergents are
+                        provided by the client.</p>
+                </div>
+                <a href="{% url 'worker-jobs' %}"
+                    class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-primary-container to-secondary text-white rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">Apply
+                    for this Job</a>
+            </div>
+        </div>
+        <!-- FAB (Suppressed based on context: not home or dashboard, this is a search/map screen) -->
+
+        <!-- BottomNavBar -->
+        {% include 'worker_bottom_nav.html' %}
     </div> <!-- End lg wrapper -->
 
 
@@ -701,3 +636,6 @@
 </body>
 
 </html>
+
+
+{% endblock %}
