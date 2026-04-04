@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% block title %}Care Nest{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#eef1f3",
+                        "on-surface": "#181c1e",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#a2eded",
+                        "on-error": "#ffffff",
+                        "primary": "#002045",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7fafc",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "secondary-fixed": "#a5eff0",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary-container": "#86a0cd",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#003d38",
+                        "tertiary-fixed": "#79f7ea",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "surface-dim": "#d7dadc",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#1eb1a5",
+                        "surface-container-low": "#f1f4f6",
+                        "outline": "#74777f",
+                        "on-surface-variant": "#43474e",
+                        "surface-container-high": "#e5e9eb",
+                        "secondary": "#13696a",
+                        "primary-container": "#1a365d",
+                        "on-secondary-fixed": "#002020",
+                        "outline-variant": "#c4c6cf",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary": "#002522",
+                        "background": "#f7fafc",
+                        "tertiary-fixed-dim": "#5adace",
+                        "on-secondary-container": "#1a6d6e",
+                        "on-background": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "on-primary-fixed": "#001b3c"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+        .glass-nav {
+            background: rgba(247, 250, 252, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        body {
+            min-height: 100dvh;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-surface font-body text-on-surface antialiased {% block body_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+    {% block extra_body %}{% endblock %}
+</body>
+</html>
