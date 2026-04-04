@@ -11,206 +11,253 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Sidebar for Desktop -->
-    {% include 'worker_sidebar.html' %}
+<!-- Sidebar for Desktop -->
+{% include 'worker_sidebar.html' %}
 
-    <!-- Main Content Wrapper -->
-    <div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
-        
-        <!-- TopAppBar (Mobile Only) -->
-        <header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
-                <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
-            </div>
-            <div class="relative active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container-high transition-colors">
-                <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
-                <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
-            </div>
-        </header>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
 
-        <!-- Desktop Header (Breadcrumbs/Status) -->
-        <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
-            <div>
-                <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Worker Ecosystem</h2>
-                <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Good morning, Zuhura</h1>
+    <!-- TopAppBar (Mobile Only) -->
+    <header
+        class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
+            <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
+        </div>
+        <div
+            class="relative active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+        </div>
+    </header>
+
+    <!-- Desktop Header (Breadcrumbs/Status) -->
+    <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Worker Ecosystem</h2>
+            <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Good morning, Zuhura</h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <div
+                class="flex items-center gap-3 px-5 py-2.5 bg-secondary-container/20 rounded-2xl border border-secondary/10">
+                <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+                <span class="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">Operational &
+                    Active</span>
             </div>
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3 px-5 py-2.5 bg-secondary-container/20 rounded-2xl border border-secondary/10">
-                    <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
-                    <span class="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">Operational & Active</span>
+            <button
+                class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group hover:bg-primary hover:text-white transition-all shadow-sm">
+                <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">notifications</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 lg:p-10 space-y-8 lg:space-y-12 max-w-7xl">
+
+        <!-- Welcome Alert (Transactional Focus) -->
+        <section>
+            <div
+                class="bg-secondary-container text-on-secondary-container px-5 py-4 rounded-3xl flex items-center justify-between shadow-sm border border-secondary/10 hover:shadow-md transition-shadow cursor-pointer">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined" data-icon="auto_awesome"
+                            style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm tracking-tight">Priority Job Invitation</p>
+                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">High Match in
+                            Kilimani Area</p>
+                    </div>
                 </div>
-                <button class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group hover:bg-primary hover:text-white transition-all shadow-sm">
-                    <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">notifications</span>
-                </button>
+                <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
             </div>
-        </header>
+        </section>
 
-        <main class="flex-1 p-6 lg:p-10 space-y-8 lg:space-y-12 max-w-7xl">
-            
-            <!-- Welcome Alert (Transactional Focus) -->
-            <section>
-                <div class="bg-secondary-container text-on-secondary-container px-5 py-4 rounded-3xl flex items-center justify-between shadow-sm border border-secondary/10 hover:shadow-md transition-shadow cursor-pointer">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm tracking-tight">Priority Job Invitation</p>
-                            <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">High Match in Kilimani Area</p>
+        <!-- Top Grid: Earnings and Active Job -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+
+            <!-- Total Earnings Card -->
+            <div
+                class="lg:col-span-12 xl:col-span-8 bg-kenyan-gradient p-8 lg:p-10 rounded-[2.5rem] text-white shadow-2xl shadow-primary/10 relative overflow-hidden group">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8 h-full">
+                    <div>
+                        <p
+                            class="font-label text-[10px] uppercase font-bold tracking-[0.3em] text-primary-fixed/60 mb-4">
+                            Cumulative Revenue Today</p>
+                        <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES 4,250
+                        </h2>
+                        <div class="flex items-center gap-4">
+                            <a href="{% url 'worker-wallet' %}"
+                                class="bg-white/10 backdrop-blur-xl text-white font-bold px-8 py-4 rounded-2xl flex items-center gap-3 border border-white/20 hover:bg-white hover:text-primary transition-all text-sm uppercase tracking-widest">
+                                <span>Wallet Analytics</span>
+                                <span class="material-symbols-outlined text-lg">trending_up</span>
+                            </a>
+                            <div
+                                class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/20 border border-secondary-container/20">
+                                <span
+                                    class="text-[10px] font-bold text-secondary-container uppercase tracking-widest">+12%
+                                    from yesterday</span>
+                            </div>
                         </div>
                     </div>
-                    <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
+                    <!-- Micro Chart/Visual for Desktop -->
+                    <div class="hidden xl:flex flex-col gap-2 items-end">
+                        <div class="flex items-baseline gap-1">
+                            <div class="w-1.5 h-8 bg-white/20 rounded-full"></div>
+                            <div class="w-1.5 h-12 bg-white/40 rounded-full"></div>
+                            <div class="w-1.5 h-16 bg-white/60 rounded-full"></div>
+                            <div class="w-1.5 h-24 bg-white/80 rounded-full"></div>
+                            <div class="w-1.5 h-20 bg-white rounded-full"></div>
+                        </div>
+                        <p class="text-[8px] font-bold uppercase tracking-widest opacity-60">Status: High Performance
+                        </p>
+                    </div>
+                </div>
+                <!-- Decorative Accents -->
+                <div
+                    class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/5 rounded-full blur-[100px] group-hover:scale-110 transition-transform duration-700">
+                </div>
+            </div>
+
+            <!-- Active Job Status Panel -->
+            <div
+                class="lg:col-span-12 xl:col-span-4 bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10 flex flex-col justify-between shadow-sm">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <span
+                            class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">On
+                            Duty</span>
+                        <div
+                            class="flex items-center gap-2 text-primary font-bold text-sm bg-white px-3 py-1.5 rounded-xl shadow-sm">
+                            <span class="material-symbols-outlined text-lg animate-pulse" data-icon="schedule"
+                                style="font-variation-settings: 'FILL' 1;">schedule</span>
+                            02:45:12
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-primary tracking-tighter font-headline leading-tight">
+                            Housekeeping in <br />Kilimani Area</h3>
+                        <p
+                            class="text-outline font-bold text-xs uppercase tracking-widest mt-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                            Status: Arrived at location
+                        </p>
+                    </div>
+                </div>
+                <button
+                    class="w-full signature-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-8 text-sm uppercase tracking-widest">
+                    <a href="{% url 'worker-contracts' %}" class="block w-full h-full">System Check-In</a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Ecosystem Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+            <!-- Quick Actions Bento -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Operational Toolkit</h3>
+                    <div class="h-[1px] flex-1 bg-outline-variant/10 ml-6"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 sm:gap-6">
+                    <a href="{% url 'worker-jobs' %}"
+                        class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                            <span class="material-symbols-outlined text-2xl"
+                                data-icon="person_search">person_search</span>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-primary block text-lg tracking-tight">Job Discovery</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">12 New
+                                Matches</span>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'worker-contracts' %}"
+                        class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-all shadow-inner">
+                            <span class="material-symbols-outlined text-2xl" data-icon="alarm_on">alarm_on</span>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-primary block text-lg tracking-tight">Active Duty</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Check-in
+                                Status</span>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'worker-courses' %}"
+                        class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-error-container/10 flex items-center justify-center text-error group-hover:bg-error group-hover:text-white transition-all shadow-inner">
+                            <span class="material-symbols-outlined text-2xl" data-icon="school">school</span>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-primary block text-lg tracking-tight">Upskilling</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">New
+                                Curriculum</span>
+                        </div>
+                    </a>
+
+                    <a href="{% url 'worker-settings' %}"
+                        class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                            <span class="material-symbols-outlined text-2xl"
+                                data-icon="support_agent">support_agent</span>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-primary block text-lg tracking-tight">Help Center</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">24/7
+                                Assistance</span>
+                        </div>
+                    </a>
+
                 </div>
             </section>
 
-            <!-- Top Grid: Earnings and Active Job -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                
-                <!-- Total Earnings Card -->
-                <div class="lg:col-span-12 xl:col-span-8 bg-kenyan-gradient p-8 lg:p-10 rounded-[2.5rem] text-white shadow-2xl shadow-primary/10 relative overflow-hidden group">
-                    <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8 h-full">
-                        <div>
-                            <p class="font-label text-[10px] uppercase font-bold tracking-[0.3em] text-primary-fixed/60 mb-4">Cumulative Revenue Today</p>
-                            <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES 4,250</h2>
-                            <div class="flex items-center gap-4">
-                                <a href="{% url 'worker-wallet' %}" 
-                                   class="bg-white/10 backdrop-blur-xl text-white font-bold px-8 py-4 rounded-2xl flex items-center gap-3 border border-white/20 hover:bg-white hover:text-primary transition-all text-sm uppercase tracking-widest">
-                                    <span>Wallet Analytics</span>
-                                    <span class="material-symbols-outlined text-lg">trending_up</span>
-                                </a>
-                                <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/20 border border-secondary-container/20">
-                                    <span class="text-[10px] font-bold text-secondary-container uppercase tracking-widest">+12% from yesterday</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Micro Chart/Visual for Desktop -->
-                        <div class="hidden xl:flex flex-col gap-2 items-end">
-                            <div class="flex items-baseline gap-1">
-                                <div class="w-1.5 h-8 bg-white/20 rounded-full"></div>
-                                <div class="w-1.5 h-12 bg-white/40 rounded-full"></div>
-                                <div class="w-1.5 h-16 bg-white/60 rounded-full"></div>
-                                <div class="w-1.5 h-24 bg-white/80 rounded-full"></div>
-                                <div class="w-1.5 h-20 bg-white rounded-full"></div>
-                            </div>
-                            <p class="text-[8px] font-bold uppercase tracking-widest opacity-60">Status: High Performance</p>
-                        </div>
-                    </div>
-                    <!-- Decorative Accents -->
-                    <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/5 rounded-full blur-[100px] group-hover:scale-110 transition-transform duration-700"></div>
+            <!-- Featured Learning / Community -->
+            <section class="h-full flex flex-col" style="margin-bottom: 60px;">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Growth & Upskilling</h3>
                 </div>
-
-                <!-- Active Job Status Panel -->
-                <div class="lg:col-span-12 xl:col-span-4 bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10 flex flex-col justify-between shadow-sm">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <span class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">On Duty</span>
-                            <div class="flex items-center gap-2 text-primary font-bold text-sm bg-white px-3 py-1.5 rounded-xl shadow-sm">
-                                <span class="material-symbols-outlined text-lg animate-pulse" data-icon="schedule" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                                02:45:12
-                            </div>
-                        </div>
+                <div
+                    class="flex-1 bg-surface-container-highest rounded-[2.5rem] overflow-hidden flex flex-col sm:flex-row items-stretch border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="sm:w-2/5 min-h-[220px] relative">
+                        <img alt="Care Giving"
+                            class="absolute inset-0 w-full h-full object-cover transition-all duration-700"
+                            src="https://www.celestialcareinc.com/wp-content/uploads/2023/09/iStock-493831355.jpg" />
+                        <div class="absolute inset-0 bg-primary/10"></div>
+                    </div>
+                    <div class="sm:w-3/5 p-8 lg:p-10 flex flex-col justify-center gap-6 bg-white">
                         <div>
-                            <h3 class="text-2xl font-extrabold text-primary tracking-tighter font-headline leading-tight">Housekeeping in <br/>Kilimani Area</h3>
-                            <p class="text-outline font-bold text-xs uppercase tracking-widest mt-3 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-secondary"></span>
-                                Status: Arrived at location
-                            </p>
+                            <p class="text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-2">Recommended
+                                Course</p>
+                            <h4
+                                class="font-extrabold text-2xl text-primary tracking-tighter leading-tight font-headline">
+                                Advanced Elder Care <br />Certification</h4>
                         </div>
-                    </div>
-                    <button class="w-full signature-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-8 text-sm uppercase tracking-widest">
-                        <a href="{% url 'worker-contracts' %}" class="block w-full h-full">System Check-In</a>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dashboard Ecosystem Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                
-                <!-- Quick Actions Bento -->
-                <section>
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Operational Toolkit</h3>
-                        <div class="h-[1px] flex-1 bg-outline-variant/10 ml-6"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 sm:gap-6">
-                        <a href="{% url 'worker-jobs' %}"
-                            class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
-                            <div class="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                                <span class="material-symbols-outlined text-2xl" data-icon="person_search">person_search</span>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-primary block text-lg tracking-tight">Job Discovery</span>
-                                <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">12 New Matches</span>
-                            </div>
-                        </a>
-
-                        <a href="{% url 'worker-contracts' %}"
-                            class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
-                            <div class="w-14 h-14 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-all shadow-inner">
-                                <span class="material-symbols-outlined text-2xl" data-icon="alarm_on">alarm_on</span>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-primary block text-lg tracking-tight">Active Duty</span>
-                                <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Check-in Status</span>
-                            </div>
-                        </a>
-
-                        <a href="{% url 'worker-settings' %}"
-                            class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
-                            <div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                                <span class="material-symbols-outlined text-2xl" data-icon="support_agent">support_agent</span>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-primary block text-lg tracking-tight">Help Center</span>
-                                <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">24/7 Assistance</span>
-                            </div>
-                        </a>
-
+                        <p class="text-sm text-outline leading-relaxed font-medium">Boost your daily revenue potential
+                            by gaining specialized skills in geriatric care and support.</p>
                         <a href="{% url 'worker-courses' %}"
-                            class="bg-white p-6 rounded-3xl border border-outline-variant/10 flex flex-col gap-5 hover:border-secondary/30 hover:shadow-xl hover:shadow-secondary/5 transition-all group">
-                            <div class="w-14 h-14 rounded-2xl bg-error-container/10 flex items-center justify-center text-error group-hover:bg-error group-hover:text-white transition-all shadow-inner">
-                                <span class="material-symbols-outlined text-2xl" data-icon="school">school</span>
-                            </div>
-                            <div>
-                                <span class="font-extrabold text-primary block text-lg tracking-tight">Upskilling</span>
-                                <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">New Curriculum</span>
+                            class="flex items-center justify-between group pt-6 border-t border-outline-variant/10">
+                            <span
+                                class="font-bold text-primary text-xs uppercase tracking-widest group-hover:text-secondary transition-colors">Start
+                                Learning</span>
+                            <div
+                                class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary group-hover:translate-x-2 transition-transform">
+                                <span class="material-symbols-outlined text-lg">arrow_forward</span>
                             </div>
                         </a>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Featured Learning / Community -->
-                <section class="h-full flex flex-col">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Growth & Upskilling</h3>
-                    </div>
-                    <div class="flex-1 bg-surface-container-highest rounded-[2.5rem] overflow-hidden flex flex-col sm:flex-row items-stretch border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="sm:w-2/5 min-h-[220px] relative">
-                            <img alt="Care Giving" class="absolute inset-0 w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700"
-                                src="https://media.istockphoto.com/id/493831355/photo/african-senior-patient-with-female-nurse.jpg?s=612x612&w=0&k=20&c=xAj4v5CmwLlK-H1TI0pDPgdGkAYQ5zIGmkfJQE0suBc=" />
-                            <div class="absolute inset-0 bg-primary/20 backdrop-blur-[2px]"></div>
-                        </div>
-                        <div class="sm:w-3/5 p-8 lg:p-10 flex flex-col justify-center gap-6 bg-white">
-                            <div>
-                                <p class="text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-2">Recommended Course</p>
-                                <h4 class="font-extrabold text-2xl text-primary tracking-tighter leading-tight font-headline">Advanced Elder Care <br/>Certification</h4>
-                            </div>
-                            <p class="text-sm text-outline leading-relaxed font-medium">Boost your daily revenue potential by gaining specialized skills in geriatric care and support.</p>
-                            <a href="{% url 'worker-courses' %}" class="flex items-center justify-between group pt-6 border-t border-outline-variant/10">
-                                <span class="font-bold text-primary text-xs uppercase tracking-widest group-hover:text-secondary transition-colors">Start Learning</span>
-                                <div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary group-hover:translate-x-2 transition-transform">
-                                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </section>
+        </div>
+    </main>
+</div>
 
-            </div>
-        </main>
-    </div>
-
-    <!-- BottomNavBar (Mobile Only) -->
-    {% include 'worker_bottom_nav.html' %}
+<!-- BottomNavBar (Mobile Only) -->
+{% include 'worker_bottom_nav.html' %}
 {% endblock %}

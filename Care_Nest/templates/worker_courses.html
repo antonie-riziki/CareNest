@@ -66,15 +66,30 @@
                             </div>
                             
                             <div class="flex -space-x-6">
-                                {% for i in "123" %}
-                                <div class="w-24 h-32 bg-white rounded-2xl shadow-2xl border border-outline-variant/10 flex flex-col items-center justify-center gap-2 transform {% if forloop.counter == 1 %}-rotate-6{% elif forloop.counter == 3 %}rotate-6 mt-4{% else %}scale-110 z-10 -mt-2{% endif %} hover:rotate-0 hover:translate-y-[-8px] transition-all duration-300">
+                                <!-- Card 1 -->
+                                <div class="w-24 h-32 bg-white rounded-2xl shadow-2xl border border-outline-variant/10 flex flex-col items-center justify-center gap-2 transform -rotate-6 hover:rotate-0 hover:translate-y-[-8px] transition-all duration-300">
                                     <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
                                         <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">verified</span>
                                     </div>
                                     <div class="h-1 w-12 bg-surface-container-high rounded-full"></div>
                                     <div class="h-1 w-8 bg-surface-container-high rounded-full"></div>
                                 </div>
-                                {% endfor %}
+                                <!-- Card 2 -->
+                                <div class="w-24 h-32 bg-white rounded-2xl shadow-2xl border border-outline-variant/10 flex flex-col items-center justify-center gap-2 transform scale-110 z-10 -mt-2 hover:rotate-0 hover:translate-y-[-8px] transition-all duration-300">
+                                    <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                                    </div>
+                                    <div class="h-1 w-12 bg-surface-container-high rounded-full"></div>
+                                    <div class="h-1 w-8 bg-surface-container-high rounded-full"></div>
+                                </div>
+                                <!-- Card 3 -->
+                                <div class="w-24 h-32 bg-white rounded-2xl shadow-2xl border border-outline-variant/10 flex flex-col items-center justify-center gap-2 transform rotate-6 mt-4 hover:rotate-0 hover:translate-y-[-8px] transition-all duration-300">
+                                    <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                                    </div>
+                                    <div class="h-1 w-12 bg-surface-container-high rounded-full"></div>
+                                    <div class="h-1 w-8 bg-surface-container-high rounded-full"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -224,14 +239,34 @@
                             <p class="text-on-surface-variant font-medium leading-relaxed">Our programs are built to international standards, providing you with a certificate that's recognized by high-end employers locally and globally. Every course you finish adds a <span class="text-secondary font-bold">Badge of Merit</span> to your profile.</p>
                         </div>
                         <div class="grid grid-cols-2 gap-6">
-                            {% for label, icon in [('Verified Skills', 'verified_user'), ('Global Standards', 'workspace_premium'), ('Priority Hires', 'handshake'), ('Career Growth', 'trending_up')] %}
+                            <!-- Feature 1 -->
                             <div class="flex items-center gap-4 group">
                                 <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm group-hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined text-xl">{{ icon }}</span>
+                                    <span class="material-symbols-outlined text-xl">verified_user</span>
                                 </div>
-                                <span class="text-sm font-bold text-primary">{{ label }}</span>
+                                <span class="text-sm font-bold text-primary">Verified Skills</span>
                             </div>
-                            {% endfor %}
+                            <!-- Feature 2 -->
+                            <div class="flex items-center gap-4 group">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-xl">workspace_premium</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">Global Standards</span>
+                            </div>
+                            <!-- Feature 3 -->
+                            <div class="flex items-center gap-4 group">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-xl">handshake</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">Priority Hires</span>
+                            </div>
+                            <!-- Feature 4 -->
+                            <div class="flex items-center gap-4 group">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-xl">trending_up</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">Career Growth</span>
+                            </div>
                         </div>
                     </div>
 
