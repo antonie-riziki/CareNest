@@ -1,250 +1,187 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html class="light" lang="en">
+{% block title %}My Wallet | Care Nest{% endblock %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-secondary": "#ffffff",
-                        "tertiary": "#002522",
-                        "surface-container-highest": "#e0e3e5",
-                        "tertiary-fixed": "#79f7ea",
-                        "on-primary-fixed": "#001b3c",
-                        "inverse-surface": "#2d3133",
-                        "on-tertiary": "#ffffff",
-                        "on-surface": "#181c1e",
-                        "inverse-primary": "#adc7f7",
-                        "primary-fixed-dim": "#adc7f7",
-                        "on-tertiary-fixed": "#00201d",
-                        "on-background": "#181c1e",
-                        "error-container": "#ffdad6",
-                        "on-surface-variant": "#43474e",
-                        "secondary": "#13696a",
-                        "on-primary": "#ffffff",
-                        "surface-variant": "#e0e3e5",
-                        "secondary-container": "#a2eded",
-                        "secondary-fixed": "#a5eff0",
-                        "surface-bright": "#f7fafc",
-                        "outline": "#74777f",
-                        "tertiary-container": "#003d38",
-                        "on-primary-container": "#86a0cd",
-                        "inverse-on-surface": "#eef1f3",
-                        "tertiary-fixed-dim": "#5adace",
-                        "primary-container": "#1a365d",
-                        "surface-tint": "#455f88",
-                        "primary-fixed": "#d6e3ff",
-                        "on-error": "#ffffff",
-                        "background": "#f7fafc",
-                        "surface-container-low": "#f1f4f6",
-                        "on-error-container": "#93000a",
-                        "surface-dim": "#d7dadc",
-                        "error": "#ba1a1a",
-                        "on-secondary-fixed": "#002020",
-                        "secondary-fixed-dim": "#89d3d4",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#2d476f",
-                        "on-tertiary-fixed-variant": "#00504a",
-                        "surface-container-high": "#e5e9eb",
-                        "surface-container": "#ebeef0",
-                        "outline-variant": "#c4c6cf",
-                        "primary": "#002045",
-                        "on-tertiary-container": "#1eb1a5",
-                        "on-secondary-container": "#1a6d6e",
-                        "surface": "#f7fafc",
-                        "on-secondary-fixed-variant": "#004f50"
-                    },
-                    fontFamily: {
-                        "headline": ["Manrope"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+{% block extra_head %}
+<style>
+    .bg-kenyan-gradient {
+        background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+    }
+</style>
+{% endblock %}
 
-        .kenyan-gradient {
-            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-</head>
+{% block content %}
+    <!-- Sidebar for Desktop -->
+    {% include 'worker_sidebar.html' %}
 
-<body class="bg-surface font-body text-on-surface">
-    <!-- TopAppBar -->
-    <header class="bg-[#f7fafc] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
-        <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[#002045] dark:text-blue-400" data-icon="waves">waves</span>
-            <h1
-                class="font-['Manrope'] font-bold tracking-tight text-2xl font-extrabold text-[#002045] dark:text-blue-400 tracking-tighter">
-                Care Nest</h1>
-        </div>
-        <div class="flex items-center gap-4">
-            <button
-                class="hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors p-2 rounded-full active:scale-95 duration-150">
-                <span class="material-symbols-outlined text-slate-500 dark:text-slate-400"
-                    data-icon="notifications">notifications</span>
-            </button>
-        </div>
-    </header>
-    <main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
-        <!-- Wallet Hero Section -->
-        <section class="mb-10">
-            <div class="flex flex-col gap-1 mb-6">
-                <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-medium">Total
-                    Balance</p>
-                <h2 class="font-headline text-5xl font-extrabold text-primary tracking-tight">KES 12,450</h2>
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
+        
+        <!-- TopAppBar (Mobile Only) -->
+        <header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary" data-icon="waves">waves</span>
+                <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">Care Nest</span>
             </div>
-            <div
-                class="kenyan-gradient p-8 rounded-lg shadow-[0_20px_40px_rgba(24,28,30,0.06)] text-white relative overflow-hidden">
-                <!-- Abstract Texture Decor -->
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-secondary-container/20 rounded-full blur-3xl">
-                </div>
-                <div class="relative z-10 flex flex-col gap-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="font-label text-[10px] uppercase tracking-widest opacity-80 mb-1">Pending Escrow
-                            </p>
-                            <p class="font-headline text-3xl font-bold">KES 3,000</p>
-                        </div>
-                        <span class="material-symbols-outlined text-secondary-container" data-icon="verified_user"
-                            style="font-variation-settings: 'FILL' 1;">verified_user</span>
-                    </div>
-                    <p class="text-xs opacity-70 leading-relaxed max-w-[200px]">
-                        Funds are held securely and will be released upon job completion.
-                    </p>
-                </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-outline" data-icon="notifications">notifications</span>
+                </button>
             </div>
-        </section>
-        <!-- Actions -->
-        <section class="mb-12">
-            <button
-                class="w-full kenyan-gradient text-white py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg">
-                <span class="material-symbols-outlined" data-icon="account_balance_wallet"
-                    style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
-                Withdraw Funds
-            </button>
-            <p class="text-center mt-4 text-sm text-on-surface-variant">
-                Instant M-Pesa transfer available
-            </p>
-        </section>
-        <!-- Transaction History -->
-        <section class="space-y-6">
-            <div class="flex justify-between items-end">
-                <h3 class="font-headline text-2xl font-bold text-primary">Transaction History</h3>
-                <button class="text-secondary font-semibold text-sm hover:underline">View All</button>
+        </header>
+
+        <!-- Desktop Header -->
+        <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10">
+            <div>
+                <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Financial Registry</h2>
+                <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Wallet Analytics</h1>
             </div>
-            <div class="flex flex-col gap-4">
-                <!-- Transaction Item 1 -->
-                <div
-                    class="bg-surface-container-lowest p-6 rounded-lg flex items-center justify-between group transition-all">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
-                            <span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-primary">Job #4521 Payment</p>
-                            <p class="text-xs text-on-surface-variant font-medium">Oct 24, 2025 • Professional Design
-                            </p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-secondary text-lg">+KES 4,500</p>
-                        <span
-                            class="font-label text-[10px] uppercase tracking-tighter text-on-surface-variant">Completed</span>
-                    </div>
-                </div>
-                <!-- Transaction Item 2 -->
-                <div
-                    class="bg-surface-container-lowest p-6 rounded-lg flex items-center justify-between group transition-all">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                            <span class="material-symbols-outlined" data-icon="payments">payments</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-primary">M-Pesa Withdrawal</p>
-                            <p class="text-xs text-on-surface-variant font-medium">Oct 22, 2025 • To 254701***321</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-primary text-lg">-KES 2,000</p>
-                        <span
-                            class="font-label text-[10px] uppercase tracking-tighter text-on-surface-variant">Success</span>
-                    </div>
-                </div>
-                <!-- Transaction Item 3 -->
-                <div
-                    class="bg-surface-container-lowest p-6 rounded-lg flex items-center justify-between group transition-all">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
-                            <span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-primary">Job #4490 Payment</p>
-                            <p class="text-xs text-on-surface-variant font-medium">Oct 20, 2025 • Site Inspection</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-secondary text-lg">+KES 8,000</p>
-                        <span
-                            class="font-label text-[10px] uppercase tracking-tighter text-on-surface-variant">Completed</span>
-                    </div>
-                </div>
-                <!-- Transaction Item 4 - Staggered Height Effect -->
-                <div
-                    class="bg-surface-container-lowest p-8 rounded-lg flex items-center justify-between group transition-all border-l-4 border-secondary">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 rounded-full bg-secondary-container/40 flex items-center justify-center text-secondary">
-                            <span class="material-symbols-outlined" data-icon="schedule"
-                                style="font-variation-settings: 'FILL' 1;">schedule</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-primary">Job #4532 Deposit</p>
-                            <p class="text-xs text-on-surface-variant font-medium">Oct 19, 2025 • In Review</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-secondary-container text-lg" style="color: #13696a;">KES 3,000</p>
-                        <span
-                            class="font-label text-[10px] uppercase tracking-tighter text-on-secondary-container bg-secondary-container px-2 py-0.5 rounded">Escrow</span>
-                    </div>
-                </div>
+            <div class="flex items-center gap-6">
+                <button class="px-8 py-3 bg-secondary/10 text-secondary rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-secondary/10 hover:bg-secondary hover:text-white transition-all shadow-sm">Statement Export</button>
             </div>
-        </section>
-    </main>
-    <!-- BottomNavBar -->
+        </header>
+
+        <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full space-y-12">
+            
+            <!-- Financial Totals Grid -->
+            <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                
+                <!-- Main Balance Card -->
+                <div class="lg:col-span-8 flex flex-col justify-between bg-white p-10 lg:p-12 rounded-[2.5rem] border border-outline-variant/10 shadow-2xl shadow-primary/5 group relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] mb-4">Liquid Assets Profile</p>
+                        <h2 class="text-5xl lg:text-7xl font-extrabold text-primary tracking-tighter font-headline">KES 12,450.00</h2>
+                        <div class="flex items-center gap-4 mt-8">
+                            <button class="signature-gradient text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest">
+                                <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+                                Initiate Withdrawal
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex items-center gap-6 text-[10px] font-bold text-outline uppercase tracking-widest relative z-10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-secondary"></span>
+                            Verified via Safaricom M-Pesa
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-primary/20"></span>
+                            ID Contract Reference: CN-9821
+                        </div>
+                    </div>
+                    <!-- Abstract Design -->
+                    <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] group-hover:scale-110 transition-transform duration-700"></div>
+                </div>
+
+                <!-- Secondary Escrow Card -->
+                <div class="lg:col-span-4 bg-kenyan-gradient p-10 rounded-[2.5rem] text-white shadow-2xl shadow-primary/10 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="relative z-10 space-y-6">
+                        <div>
+                            <p class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-3">Escrow Obligations</p>
+                            <h3 class="text-4xl font-extrabold tracking-tighter font-headline">KES 3,000</h3>
+                        </div>
+                        <p class="text-sm text-primary-fixed-dim font-medium leading-relaxed opacity-80">Funds currently protected by Care Nest Escrow. Released upon milestone verification.</p>
+                    </div>
+                    <div class="relative z-10 pt-8 mt-8 border-t border-white/10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">shield</span>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest">Fully Insured Funds</span>
+                        </div>
+                    </div>
+                    <!-- Decor -->
+                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                </div>
+            </section>
+
+            <!-- Transactional Intelligence -->
+            <section class="space-y-8">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
+                        <span class="w-4 h-[2px] bg-secondary"></span>
+                        Transactional History
+                    </h3>
+                    <div class="flex items-center gap-4">
+                        <button class="hidden sm:flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest bg-white px-4 py-2 rounded-xl border border-outline-variant/10 hover:bg-surface transition-all">
+                            <span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filter Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Tx Item 1 -->
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-secondary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
+                        <div class="flex gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform shadow-inner">
+                                <span class="material-symbols-outlined text-3xl">arrow_downward</span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">Service Completion #4521</h4>
+                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 24, 2026 • Executive Level Housekeeping</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start sm:items-end gap-2">
+                            <p class="text-2xl font-extrabold text-secondary tracking-tight">+KES 4,500.00</p>
+                            <span class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded-full border border-secondary/10">Settled & Verified</span>
+                        </div>
+                    </div>
+
+                    <!-- Tx Item 2 -->
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
+                        <div class="flex gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-105 transition-transform shadow-inner">
+                                <span class="material-symbols-outlined text-3xl">payments</span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">M-Pesa Withdrawal Initiation</h4>
+                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 22, 2026 • Encrypted Transfer</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start sm:items-end gap-2">
+                            <p class="text-2xl font-extrabold text-primary tracking-tight">-KES 2,000.00</p>
+                            <span class="text-[9px] font-black text-outline uppercase tracking-[0.2em] bg-surface-container-high px-3 py-1 rounded-full border border-outline-variant/10">Disbursed to +2547...321</span>
+                        </div>
+                    </div>
+
+                    <!-- Tx Item 3 -->
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-secondary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
+                        <div class="flex gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform shadow-inner">
+                                <span class="material-symbols-outlined text-3xl">arrow_downward</span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">Service Completion #4490</h4>
+                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 20, 2026 • Full Day Residential Mgmt</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start sm:items-end gap-2">
+                            <p class="text-2xl font-extrabold text-secondary tracking-tight">+KES 8,000.00</p>
+                            <span class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded-full border border-secondary/10">Settled & Verified</span>
+                        </div>
+                    </div>
+
+                    <!-- Tx Item 4 (Escrow State) -->
+                    <div class="bg-surface-container-low p-8 lg:p-10 rounded-[2.5rem] border border-secondary/10 shadow-inner group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer opacity-70 hover:opacity-100 transition-all">
+                        <div class="flex gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-amber-500 shadow-sm group-hover:scale-105 transition-transform">
+                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">schedule</span>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-extrabold text-primary text-lg font-headline">Upcoming Disbursement #4532</h4>
+                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Processing Phase • Westlands Project</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start sm:items-end gap-2">
+                            <p class="text-2xl font-extrabold text-amber-600 tracking-tight">KES 3,000.00</p>
+                            <span class="text-[9px] font-black text-amber-700 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-[0.2em]">In Escrow Custody</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- BottomNavBar (Mobile Only) -->
     {% include 'worker_bottom_nav.html' %}
-
-</body>
-
-</html>
+{% endblock %}

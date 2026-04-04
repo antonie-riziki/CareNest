@@ -1,213 +1,153 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html class="light" lang="en">
+{% block title %}Join as an Employer | Care Nest{% endblock %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Care Nest - Join as an Employer</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "secondary-container": "#a2eded",
-                        "primary-fixed-dim": "#adc7f7",
-                        "tertiary-fixed-dim": "#5adace",
-                        "on-secondary": "#ffffff",
-                        "on-tertiary-fixed": "#00201d",
-                        "secondary-fixed": "#a5eff0",
-                        "on-error": "#ffffff",
-                        "inverse-surface": "#2d3133",
-                        "surface-container": "#ebeef0",
-                        "primary": "#002045",
-                        "error": "#ba1a1a",
-                        "primary-container": "#1a365d",
-                        "error-container": "#ffdad6",
-                        "surface-container-highest": "#e0e3e5",
-                        "on-tertiary-fixed-variant": "#00504a",
-                        "on-primary": "#ffffff",
-                        "on-secondary-container": "#1a6d6e",
-                        "on-error-container": "#93000a",
-                        "tertiary-fixed": "#79f7ea",
-                        "surface-container-low": "#f1f4f6",
-                        "secondary-fixed-dim": "#89d3d4",
-                        "on-primary-container": "#86a0cd",
-                        "surface-container-lowest": "#ffffff",
-                        "secondary": "#13696a",
-                        "surface-dim": "#d7dadc",
-                        "on-secondary-fixed-variant": "#004f50",
-                        "on-secondary-fixed": "#002020",
-                        "on-surface-variant": "#43474e",
-                        "surface": "#f7fafc",
-                        "on-primary-fixed-variant": "#2d476f",
-                        "tertiary": "#002522",
-                        "surface-container-high": "#e5e9eb",
-                        "surface-tint": "#455f88",
-                        "primary-fixed": "#d6e3ff",
-                        "background": "#f7fafc",
-                        "surface-bright": "#f7fafc",
-                        "on-background": "#181c1e",
-                        "surface-variant": "#e0e3e5",
-                        "on-primary-fixed": "#001b3c",
-                        "on-tertiary": "#ffffff",
-                        "inverse-on-surface": "#eef1f3",
-                        "outline-variant": "#c4c6cf",
-                        "on-tertiary-container": "#1eb1a5",
-                        "inverse-primary": "#adc7f7",
-                        "outline": "#74777f",
-                        "tertiary-container": "#003d38",
-                        "on-surface": "#181c1e"
-                    },
-                    fontFamily: {
-                        "headline": ["Manrope"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        .kenyan-gradient {
-            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
-        }
+{% block extra_head %}
+<style>
+    .employer-gradient {
+        background: linear-gradient(135deg, #002045 0%, #13696a 100%);
+    }
+</style>
+{% endblock %}
 
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-</head>
-
-<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
-
-    <main class="flex-grow flex flex-col md:flex-row items-stretch overflow-hidden">
-        <!-- Visual Anchor (Side Panel for Desktop) -->
-        <div class="hidden md:flex md:w-1/2 kenyan-gradient relative items-center justify-center p-12 overflow-hidden">
-            <div class="absolute inset-0 opacity-20"></div>
-            <div class="relative z-10 max-w-md">
-                <h2 class="font-headline font-extrabold text-white text-5xl tracking-tight mb-6">Find trusted help for
-                    your home.</h2>
-                <p class="text-on-primary-container text-lg leading-relaxed">Join Care Nest to connect with professional
-                    domestic workers and manage agreements with secure escrow payments.</p>
-                <div class="mt-12 flex gap-4">
-                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
-                        <span class="material-symbols-outlined text-secondary-container mb-2">verified_user</span>
-                        <p class="text-white font-medium">Verified Workers</p>
+{% block content %}
+    <main class="min-h-screen flex items-center justify-center p-0 lg:p-12 xl:p-24 bg-surface">
+        <div class="w-full max-w-[1440px] grid grid-cols-1 lg:grid-cols-2 lg:gap-12 xl:gap-20 items-stretch lg:bg-white lg:rounded-[2.5rem] lg:shadow-2xl lg:shadow-primary/5 lg:border lg:border-outline-variant/10 overflow-hidden min-h-[100dvh] lg:min-h-[850px]">
+            
+            <!-- Left Side: Editorial Branding & Visual (Desktop Only) -->
+            <div class="hidden lg:flex flex-col justify-between employer-gradient p-16 xl:p-24 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-12 border border-white/20">
+                        <span class="material-symbols-outlined text-4xl">waves</span>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
-                        <span class="material-symbols-outlined text-secondary-container mb-2">security</span>
-                        <p class="text-white font-medium">Secure Escrow</p>
+                    <h1 class="font-headline font-extrabold text-5xl xl:text-6xl tracking-tighter leading-[1.1] mb-8">
+                        Find Trusted <br/>Help for Your <br/>Modern Home.
+                    </h1>
+                    <p class="font-body text-primary-fixed-dim text-xl max-w-md leading-relaxed opacity-90">
+                        Connect with the best domestic professionals in Kenya. Manage your home with ease and security.
+                    </p>
+                </div>
+
+                <div class="relative z-10 mt-12 grid grid-cols-2 gap-4">
+                    <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/10">
+                        <span class="material-symbols-outlined text-secondary-container text-3xl mb-3">verified_user</span>
+                        <p class="font-extrabold text-lg leading-tight">Verified Help</p>
+                        <p class="text-xs font-bold text-secondary-container/60 uppercase tracking-widest mt-1">Background Checked</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/10">
+                        <span class="material-symbols-outlined text-secondary-container text-3xl mb-3">security</span>
+                        <p class="font-extrabold text-lg leading-tight">Secure Escrow</p>
+                        <p class="text-xs font-bold text-secondary-container/60 uppercase tracking-widest mt-1">Safe Transactions</p>
                     </div>
                 </div>
+
+                <!-- Abstract Patterns -->
+                <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary/30 rounded-full blur-[100px] pointer-events-none"></div>
             </div>
-        </div>
-        <!-- Form Canvas -->
-        <div class="flex-grow md:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-24 bg-surface-container-low">
-            <div
-                class="w-full max-w-md bg-surface-container-lowest rounded-lg p-8 md:p-10 shadow-[0_20px_40px_rgba(24,28,30,0.06)]">
-                <div class="mb-10">
-                    <h2 class="font-headline font-extrabold text-primary text-3xl tracking-tight mb-2">Join as Employer
-                    </h2>
-                    <p class="text-on-surface-variant text-sm">Start finding the best domestic help for your household
-                        today.</p>
-                </div>
-                <form class="space-y-6" method="POST" action="{% url 'employer-signup' %}">
-                    {% csrf_token %}
-                    <!-- Full Name -->
-                    <div class="space-y-2">
-                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
-                            for="full-name">Full Name</label>
-                        <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="full-name" name="full-name" placeholder="Enter your full name" type="text" />
+
+            <!-- Right Side: Sign Up Form -->
+            <div class="flex flex-col justify-center px-6 py-16 lg:px-16 xl:px-24 bg-white overflow-y-auto">
+                <div class="w-full max-w-md mx-auto">
+                    <div class="mb-10">
+                        <div class="lg:hidden flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 employer-gradient rounded-xl flex items-center justify-center text-white">
+                                <span class="material-symbols-outlined text-2xl">waves</span>
+                            </div>
+                            <span class="font-headline font-extrabold text-2xl tracking-tighter text-primary">CareNest</span>
+                        </div>
+                        <h2 class="font-headline font-extrabold text-4xl text-primary tracking-tighter mb-3">Join as Employer.</h2>
+                        <p class="text-outline font-medium">Create your employer account and start hiring the best.</p>
+                    </div>
+
+                    <form action="{% url 'employer-signup' %}" method="POST" class="space-y-5">
+                        {% csrf_token %}
+                        
+                        <!-- Full Name -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest ml-1" for="full_name">Full Name</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-5 flex items-center text-outline group-focus-within:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">person</span>
+                                </span>
+                                <input class="block w-full pl-14 pr-6 py-4 bg-surface-container-low border border-transparent rounded-2xl focus:ring-2 focus:ring-secondary/10 focus:border-secondary/20 focus:bg-white transition-all text-sm font-bold text-primary placeholder:text-outline/40"
+                                    id="full_name" name="full_name" placeholder="Jane Doe" type="text" />
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest ml-1" for="phone">Phone Number</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-5 flex items-center text-outline group-focus-within:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">call</span>
+                                </span>
+                                <input class="block w-full pl-14 pr-6 py-4 bg-surface-container-low border border-transparent rounded-2xl focus:ring-2 focus:ring-secondary/10 focus:border-secondary/20 focus:bg-white transition-all text-sm font-bold text-primary placeholder:text-outline/40"
+                                    id="phone" name="phone" placeholder="0712 345 678" type="tel" />
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest ml-1" for="email">Email Address</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-5 flex items-center text-outline group-focus-within:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">mail</span>
+                                </span>
+                                <input class="block w-full pl-14 pr-6 py-4 bg-surface-container-low border border-transparent rounded-2xl focus:ring-2 focus:ring-secondary/10 focus:border-secondary/20 focus:bg-white transition-all text-sm font-bold text-primary placeholder:text-outline/40"
+                                    id="email" name="email" placeholder="jane@example.com" type="email" />
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest ml-1" for="password">Password</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-5 flex items-center text-outline group-focus-within:text-secondary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">lock</span>
+                                </span>
+                                <input class="block w-full pl-14 pr-6 py-4 bg-surface-container-low border border-transparent rounded-2xl focus:ring-2 focus:ring-secondary/10 focus:border-secondary/20 focus:bg-white transition-all text-sm font-bold text-primary placeholder:text-outline/40"
+                                    id="password" name="password" placeholder="Min. 8 characters" type="password" />
+                            </div>
+                        </div>
+
+                        <button class="w-full employer-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest mt-4"
+                            type="submit">
+                            Create Account
+                        </button>
+                    </form>
+
+                    <!-- Social Signup -->
+                    <div class="relative my-10">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-outline-variant/10"></div>
+                        </div>
+                        <div class="relative flex justify-center text-[10px] font-bold uppercase tracking-[0.2em] text-outline">
+                            <span class="px-6 bg-white">Instant Sign up</span>
                         </div>
                     </div>
-                    <!-- Phone Number -->
-                    <div class="space-y-2">
-                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
-                            for="phone">Phone Number</label>
-                        <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="phone" name="phone" placeholder="e.g. +254 700 000 000" type="number" />
-                        </div>
-                    </div>
-                    <!-- Email Address -->
-                    <div class="space-y-2">
-                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
-                            for="email">Email Address</label>
-                        <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="email" name="email" placeholder="e.g. [EMAIL_ADDRESS]" type="email" />
-                        </div>
-                    </div>
-                    <!-- Password -->
-                    <div class="space-y-2">
-                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
-                            for="password">Password Creation</label>
-                        <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="password" name="password" placeholder="Min. 8 characters" type="password" />
-                        </div>
-                    </div>
-                    <!-- Confirm Password -->
-                    <div class="space-y-2">
-                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
-                            for="confirm-password">Confirm Password</label>
-                        <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
-                                id="confirm_password" name="confirm_password" placeholder="Min. 8 characters"
-                                type="password" />
-                        </div>
-                    </div>
-                    <!-- CTA Button -->
-                    <button
-                        class="w-full kenyan-gradient text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200 mt-4"
-                        type="submit">
-                        Create Account
+
+                    <button class="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors text-primary font-bold text-xs border border-transparent hover:border-outline-variant/20">
+                        <img alt="Google" class="w-5 h-5" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" />
+                        Sign up with Google
                     </button>
-                </form>
-                <div class="relative my-8">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-outline-variant/30"></div>
-                    </div>
-                    <div class="relative flex justify-center text-xs">
-                        <span
-                            class="bg-surface-container-lowest px-4 text-on-surface-variant uppercase tracking-tighter">or
-                            continue with</span>
-                    </div>
+
+                    <p class="mt-10 text-center text-outline font-medium">
+                        Already joined? 
+                        <a class="text-secondary font-extrabold hover:underline ml-2" href="{% url 'employer-signin' %}">Sign In</a>
+                    </p>
                 </div>
-                <!-- Social Sign In -->
-                <button
-                    class="w-full flex items-center justify-center gap-3 bg-surface-container-high text-on-surface font-semibold py-4 rounded-xl hover:bg-surface-container-highest transition-colors active:scale-95 duration-200">
-                    <img alt="Google Logo" class="w-5 h-5"
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" />
-                    Sign up with Google
-                </button>
-                <!-- Footer Link -->
-                <p class="mt-8 text-center text-sm text-on-surface-variant">
-                    Already a member?
-                    <a class="text-secondary font-bold hover:underline decoration-secondary/30 underline-offset-4"
-                        href="{% url 'employer-signin' %}">Sign In</a>
-                </p>
             </div>
         </div>
     </main>
-    <div class="md:hidden w-full h-2 kenyan-gradient"></div>
-</body>
 
-</html>
+    <footer class="py-10 bg-white border-t border-outline-variant/10 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-outline/60">
+            <p>© 2026 Care Nest Kenya</p>
+            <div class="flex gap-10">
+                <a class="hover:text-secondary transition-colors" href="#">Privacy</a>
+                <a class="hover:text-secondary transition-colors" href="#">Terms</a>
+                <a class="hover:text-secondary transition-colors" href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+{% endblock %}

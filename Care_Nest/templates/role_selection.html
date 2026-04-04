@@ -1,197 +1,137 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html lang="en">
+{% block title %}Choose Your Journey | Care Nest{% endblock %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Care Nest - Role Selection</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "inverse-on-surface": "#eef1f3",
-                        "on-surface": "#181c1e",
-                        "on-error-container": "#93000a",
-                        "secondary-container": "#a2eded",
-                        "on-error": "#ffffff",
-                        "primary": "#002045",
-                        "on-secondary-fixed-variant": "#004f50",
-                        "on-primary-fixed-variant": "#2d476f",
-                        "on-tertiary-fixed": "#00201d",
-                        "on-tertiary": "#ffffff",
-                        "surface": "#f7fafc",
-                        "on-secondary": "#ffffff",
-                        "error": "#ba1a1a",
-                        "on-primary": "#ffffff",
-                        "surface-container-lowest": "#ffffff",
-                        "surface-container": "#ebeef0",
-                        "secondary-fixed": "#a5eff0",
-                        "inverse-surface": "#2d3133",
-                        "on-tertiary-fixed-variant": "#00504a",
-                        "on-primary-container": "#86a0cd",
-                        "error-container": "#ffdad6",
-                        "tertiary-container": "#003d38",
-                        "tertiary-fixed": "#79f7ea",
-                        "surface-variant": "#e0e3e5",
-                        "secondary-fixed-dim": "#89d3d4",
-                        "primary-fixed-dim": "#adc7f7",
-                        "surface-bright": "#f7fafc",
-                        "surface-tint": "#455f88",
-                        "surface-dim": "#d7dadc",
-                        "surface-container-highest": "#e0e3e5",
-                        "on-tertiary-container": "#1eb1a5",
-                        "surface-container-low": "#f1f4f6",
-                        "outline": "#74777f",
-                        "on-surface-variant": "#43474e",
-                        "surface-container-high": "#e5e9eb",
-                        "secondary": "#13696a",
-                        "primary-container": "#1a365d",
-                        "on-secondary-fixed": "#002020",
-                        "outline-variant": "#c4c6cf",
-                        "primary-fixed": "#d6e3ff",
-                        "tertiary": "#002522",
-                        "background": "#f7fafc",
-                        "tertiary-fixed-dim": "#5adace",
-                        "on-secondary-container": "#1a6d6e",
-                        "on-background": "#181c1e",
-                        "inverse-primary": "#adc7f7",
-                        "on-primary-fixed": "#001b3c"
-                    },
-                    fontFamily: {
-                        "headline": ["Manrope"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        .material-icons-round {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+{% block extra_head %}
+<style>
+    .selection-gradient {
+        background: linear-gradient(135deg, #002045 0%, #13696a 100%);
+    }
+</style>
+{% endblock %}
 
-        .signature-gradient {
-            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
-        }
-
-        .glass-nav {
-            background: rgba(247, 250, 252, 0.7);
-            backdrop-filter: blur(20px);
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
-</head>
-
-<body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-6 antialiased">
-
-    <!-- Back to Home Button -->
-    <div class="w-full max-w-md mb-6">
-        <a href="/"
-            class="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
-            <span class="material-icons-round text-lg">home</span>
-            Back to Home
-        </a>
-    </div>
-    <!-- Progress & Header -->
-    <div class="w-full max-w-md mb-8">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex gap-1.5">
-                <div class="h-1.5 w-12 rounded-full bg-primary"></div>
-                <div class="h-1.5 w-12 rounded-full bg-primary/20 dark:bg-primary/10"></div>
-                <div class="h-1.5 w-12 rounded-full bg-primary/20 dark:bg-primary/10"></div>
-            </div>
-            <span class="text-xs font-medium text-primary/60 tracking-wider uppercase">Step 1 of 3</span>
-        </div>
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2 leading-tight">Choose your role</h1>
-        <p class="text-slate-500 dark:text-slate-400">Help us tailor your Care Nest experience.</p>
-    </div>
-    <!-- Role Selection Cards -->
-    <div class="w-full max-w-md space-y-4 flex-grow">
-        <!-- Employer Card -->
-        <button onclick="selectRole('employer')" id="employer-card"
-            class="w-full text-left group transition-all duration-300 transform active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-xl">
-            <div
-                class="bg-white dark:bg-slate-800/50 border-2 border-transparent hover:border-primary/30 p-6 rounded-xl shadow-sm hover:shadow-md flex flex-col items-start gap-4 transition-all">
-                <div class="absolute top-6 right-6 text-primary employer-check opacity-0">
-                    <span class="material-icons-round text-2xl">check_circle</span>
-                </div>
-                <div class="bg-primary/10 dark:bg-primary/20 p-3 rounded-lg text-primary">
-                    <span class="material-icons-round text-3xl">home_work</span>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
-                        I am an Employer
-                        <!-- <span
-                            class="material-icons-round text-primary text-xl opacity-0 group-hover:opacity-100 transition-opacity employer-check">check_circle</span> -->
-                    </h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                        Find trusted domestic help and manage secure escrow payments.
+{% block content %}
+    <main class="min-h-screen flex items-center justify-center p-0 lg:p-12 xl:p-24 bg-surface">
+        <div class="w-full max-w-[1440px] grid grid-cols-1 lg:grid-cols-2 lg:gap-12 xl:gap-20 items-stretch lg:bg-white lg:rounded-[2.5rem] lg:shadow-2xl lg:shadow-primary/5 lg:border lg:border-outline-variant/10 overflow-hidden min-h-[100dvh] lg:min-h-[800px]">
+            
+            <!-- Left Side: Editorial Branding (Desktop Only) -->
+            <div class="hidden lg:flex flex-col justify-between selection-gradient p-16 xl:p-24 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-12 border border-white/20">
+                        <span class="material-symbols-outlined text-4xl">waves</span>
+                    </div>
+                    <h1 class="font-headline font-extrabold text-5xl xl:text-6xl tracking-tighter leading-[1.1] mb-8">
+                        The Future of <br/>Domestic Care <br/>Starts Here.
+                    </h1>
+                    <p class="font-body text-primary-fixed-dim text-xl max-w-md leading-relaxed opacity-90">
+                        Whether you're looking for elite professional help or seeking to provide it, Care Nest is your home for trusted domestic transitions.
                     </p>
                 </div>
-            </div>
-        </button>
-        <!-- Worker Card -->
-        <button onclick="selectRole('worker')" id="worker-card"
-            class="w-full text-left group transition-all duration-300 transform active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-xl">
-            <div
-                class="bg-white dark:bg-slate-800/50 border-2 border-transparent hover:border-primary/30 p-6 rounded-xl shadow-sm hover:shadow-md flex flex-col items-start gap-4 transition-all relative">
-                <!-- Selected Indicator -->
-                <div class="absolute top-6 right-6 text-primary worker-check opacity-0">
-                    <span class="material-icons-round text-2xl">check_circle</span>
+
+                <div class="relative z-10 mt-12 bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex -space-x-4">
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-primary"></div>
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-secondary"></div>
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-secondary-container"></div>
+                        </div>
+                        <p class="text-sm font-bold text-white uppercase tracking-widest">Join 5,000+ Users</p>
+                    </div>
+                    <p class="text-[10px] font-bold text-secondary-container uppercase tracking-[0.2em]">Verified & Secure Ecosystem</p>
                 </div>
-                <div class="bg-primary/10 dark:bg-primary/20 p-3 rounded-lg text-primary">
-                    <span class="material-icons-round text-3xl">engineering</span>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">
-                        I am a Worker
-                    </h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                        Secure fair agreements and receive guaranteed payments for your services.
-                    </p>
+
+                <!-- Abstract Patterns -->
+                <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary/30 rounded-full blur-[100px] pointer-events-none"></div>
+            </div>
+
+            <!-- Right Side: Role Selection -->
+            <div class="flex flex-col justify-center px-6 py-16 lg:px-16 xl:px-24 bg-white">
+                <div class="w-full max-w-md mx-auto">
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-12">
+                        <div class="lg:hidden flex items-center gap-3 mb-10">
+                            <div class="w-10 h-10 selection-gradient rounded-xl flex items-center justify-center text-white">
+                                <span class="material-symbols-outlined text-2xl">waves</span>
+                            </div>
+                            <span class="font-headline font-extrabold text-2xl tracking-tighter text-primary">CareNest</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex gap-2">
+                                <div class="h-1.5 w-12 rounded-full bg-secondary shadow-sm shadow-secondary/20"></div>
+                                <div class="h-1.5 w-12 rounded-full bg-surface-container-high"></div>
+                                <div class="h-1.5 w-12 rounded-full bg-surface-container-high"></div>
+                            </div>
+                            <span class="text-[10px] font-extrabold text-secondary uppercase tracking-[0.2em]">Phase 01</span>
+                        </div>
+                        
+                        <h2 class="font-headline font-extrabold text-4xl text-primary tracking-tighter mb-3">Define your role.</h2>
+                        <p class="text-outline font-medium">Select how you'll be interacting with the Care Nest platform.</p>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="space-y-4">
+                        <button onclick="selectRole('employer')" id="employer-card" class="w-full text-left group transition-all active:scale-[0.98] focus:outline-none">
+                            <div class="relative bg-white border-2 border-outline-variant/10 group-hover:border-secondary/30 p-6 rounded-3xl transition-all shadow-sm group-hover:shadow-xl group-hover:shadow-secondary/5 overflow-hidden">
+                                <div class="absolute top-6 right-6 text-secondary employer-check opacity-0 transform scale-0 transition-all duration-300">
+                                    <span class="material-icons-round text-3xl">check_circle</span>
+                                </div>
+                                <div class="w-14 h-14 bg-secondary/5 rounded-2xl flex items-center justify-center text-secondary mb-6 shadow-inner">
+                                    <span class="material-icons-round text-3xl">home_work</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-primary tracking-tighter mb-2">I am an Employer</h3>
+                                <p class="text-sm font-medium text-outline leading-relaxed">Find professional help, manage schedule, and secure payments effortlessly.</p>
+                            </div>
+                        </button>
+
+                        <button onclick="selectRole('worker')" id="worker-card" class="w-full text-left group transition-all active:scale-[0.98] focus:outline-none">
+                            <div class="relative bg-white border-2 border-outline-variant/10 group-hover:border-secondary/30 p-6 rounded-3xl transition-all shadow-sm group-hover:shadow-xl group-hover:shadow-secondary/5 overflow-hidden">
+                                <div class="absolute top-6 right-6 text-secondary worker-check opacity-0 transform scale-0 transition-all duration-300">
+                                    <span class="material-icons-round text-3xl">check_circle</span>
+                                </div>
+                                <div class="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-6 shadow-inner">
+                                    <span class="material-icons-round text-3xl">engineering</span>
+                                </div>
+                                <h3 class="text-xl font-extrabold text-primary tracking-tighter mb-2">I am a Worker</h3>
+                                <p class="text-sm font-medium text-outline leading-relaxed">Access premium opportunities, secure fair pay, and grow your career.</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Continue Action -->
+                    <div class="mt-12">
+                        <button onclick="continueToRegister()" id="continue-btn" disabled
+                            class="w-full signature-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group">
+                            Continue Setup
+                            <span class="material-symbols-outlined text-xl group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                        </button>
+                        
+                        <div class="mt-8 flex flex-col items-center gap-3">
+                            <div class="flex items-center gap-2 text-[10px] font-bold text-outline uppercase tracking-widest">
+                                <span class="material-symbols-outlined text-sm">enhanced_encryption</span>
+                                Profile Security Active
+                            </div>
+                            <p class="text-[9px] text-outline/40 font-bold text-center px-8 uppercase tracking-widest leading-relaxed">
+                                You can transition between roles within your account settings later.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </button>
-    </div>
-    <!-- Footer & Action -->
-    <div class="w-full max-w-md mt-10">
-        <button onclick="continueToRegister()" id="continue-btn"
-            class="signature-gradient w-full bg-primary hover:bg-primary/90 text-white font-semibold py-4 rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled>
-            Continue
-            <span
-                class="material-icons-round text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
-        </button>
-        <div class="mt-6 flex flex-col items-center gap-2">
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
-                <span class="material-icons-round text-sm">lock</span>
-                <span>Encrypted &amp; Secure</span>
-            </div>
-            <p class="text-[10px] text-slate-400 dark:text-slate-500 text-center px-4">
-                By continuing, you agree to our Terms of Service. You can change your primary role later in settings.
-            </p>
         </div>
-    </div>
-    <!-- Decorative Elements (Subtle) -->
-    <div class="fixed -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="fixed -bottom-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+    </main>
+
+    <footer class="py-10 bg-white border-t border-outline-variant/10 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-outline/60">
+            <p>© 2026 Care Nest Kenya</p>
+            <div class="flex gap-10">
+                <a class="hover:text-secondary transition-colors" href="#">Security</a>
+                <a class="hover:text-secondary transition-colors" href="#">Privacy</a>
+                <a class="hover:text-secondary transition-colors" href="#">Legal</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
         let selectedRole = null;
@@ -199,38 +139,34 @@
         function selectRole(role) {
             selectedRole = role;
 
-            // Reset both cards
-            const employerCard = document.getElementById('employer-card').querySelector('div');
-            const workerCard = document.getElementById('worker-card').querySelector('div');
-            const employerCheck = document.querySelector('.employer-check');
-            const workerCheck = document.querySelector('.worker-check');
-            const continueBtn = document.getElementById('continue-btn');
+            // Select elements
+            const empCard = document.getElementById('employer-card').firstElementChild;
+            const worCard = document.getElementById('worker-card').firstElementChild;
+            const empCheck = document.querySelector('.employer-check');
+            const worCheck = document.querySelector('.worker-check');
+            const btn = document.getElementById('continue-btn');
 
-            // Remove selected state from both
-            employerCard.classList.remove('border-primary', 'shadow-md');
-            employerCard.classList.add('border-transparent');
-            workerCard.classList.remove('border-primary', 'shadow-md');
-            workerCard.classList.add('border-transparent');
-            employerCheck.classList.remove('opacity-100');
-            employerCheck.classList.add('opacity-0');
-            workerCheck.classList.remove('opacity-100');
-            workerCheck.classList.add('opacity-0');
+            // Reset
+            empCard.classList.replace('border-secondary', 'border-outline-variant/10');
+            worCard.classList.replace('border-secondary', 'border-outline-variant/10');
+            empCard.classList.remove('shadow-xl', 'shadow-secondary/10');
+            worCard.classList.remove('shadow-xl', 'shadow-secondary/10');
+            
+            empCheck.classList.add('opacity-0', 'scale-0');
+            worCheck.classList.add('opacity-0', 'scale-0');
 
-            // Apply selected state to chosen role
+            // Apply selected
             if (role === 'employer') {
-                employerCard.classList.remove('border-transparent');
-                employerCard.classList.add('border-primary', 'shadow-md');
-                employerCheck.classList.remove('opacity-0');
-                employerCheck.classList.add('opacity-100');
-            } else if (role === 'worker') {
-                workerCard.classList.remove('border-transparent');
-                workerCard.classList.add('border-primary', 'shadow-md');
-                workerCheck.classList.remove('opacity-0');
-                workerCheck.classList.add('opacity-100');
+                empCard.classList.replace('border-outline-variant/10', 'border-secondary');
+                empCard.classList.add('shadow-xl', 'shadow-secondary/10');
+                empCheck.classList.remove('opacity-0', 'scale-0');
+            } else {
+                worCard.classList.replace('border-outline-variant/10', 'border-secondary');
+                worCard.classList.add('shadow-xl', 'shadow-secondary/10');
+                worCheck.classList.remove('opacity-0', 'scale-0');
             }
 
-            // Enable continue button
-            continueBtn.disabled = false;
+            btn.disabled = false;
         }
 
         function continueToRegister() {
@@ -241,6 +177,4 @@
             }
         }
     </script>
-</body>
-
-</html>
+{% endblock %}

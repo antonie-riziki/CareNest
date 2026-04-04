@@ -1,0 +1,65 @@
+<!-- worker_sidebar.html -->
+<aside class="hidden md:flex flex-col w-64 h-screen bg-surface border-r border-outline-variant/10 fixed left-0 top-0 z-50">
+    <!-- Branding Header -->
+    <div class="px-8 py-8 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl signature-gradient flex items-center justify-center text-white shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined text-2xl">waves</span>
+        </div>
+        <div>
+            <h2 class="text-xl font-extrabold text-primary tracking-tighter font-headline leading-none">Care Nest</h2>
+            <p class="text-[10px] font-bold text-secondary uppercase tracking-widest mt-1">Worker Panel</p>
+        </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-4 py-4 space-y-2">
+        <a href="{% url 'worker-dashboard' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-dashboard' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">home</span>
+            <span class="font-bold text-sm">Dashboard</span>
+        </a>
+
+        <a href="{% url 'worker-jobs' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-jobs' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">work</span>
+            <span class="font-bold text-sm">Find Jobs</span>
+        </a>
+
+        <a href="{% url 'worker-contracts' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-contracts' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">description</span>
+            <span class="font-bold text-sm">Contracts</span>
+        </a>
+
+        <a href="{% url 'worker-wallet' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-wallet' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">account_balance_wallet</span>
+            <span class="font-bold text-sm">My Wallet</span>
+        </a>
+
+        <a href="{% url 'worker-courses' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-courses' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">school</span>
+            <span class="font-bold text-sm">Upskilling</span>
+        </a>
+
+        <div class="pt-8 pb-2">
+            <p class="px-4 text-[10px] font-bold text-outline uppercase tracking-widest">Account</p>
+        </div>
+
+        <a href="{% url 'worker-settings' %}" 
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-settings' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">person</span>
+            <span class="font-bold text-sm">Profile Settings</span>
+        </a>
+    </nav>
+
+    <!-- Support Section -->
+    <div class="px-6 py-8">
+        <div class="bg-surface-container-low rounded-3xl p-5 border border-outline-variant/10">
+            <p class="text-xs font-bold text-primary mb-2">Need help?</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mb-4 leading-relaxed">Our support team is available 24/7 for assistance.</p>
+            <button class="w-full py-2.5 bg-white text-primary text-[10px] font-bold rounded-xl border border-outline-variant/20 shadow-sm hover:bg-surface-container-high transition-colors">Contact Support</button>
+        </div>
+    </div>
+</aside>
