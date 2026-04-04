@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Care Nest - Role Selection</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#eef1f3",
+                        "on-surface": "#181c1e",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#a2eded",
+                        "on-error": "#ffffff",
+                        "primary": "#002045",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed": "#00201d",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7fafc",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ebeef0",
+                        "secondary-fixed": "#a5eff0",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary-container": "#86a0cd",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#003d38",
+                        "tertiary-fixed": "#79f7ea",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface-bright": "#f7fafc",
+                        "surface-tint": "#455f88",
+                        "surface-dim": "#d7dadc",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#1eb1a5",
+                        "surface-container-low": "#f1f4f6",
+                        "outline": "#74777f",
+                        "on-surface-variant": "#43474e",
+                        "surface-container-high": "#e5e9eb",
+                        "secondary": "#13696a",
+                        "primary-container": "#1a365d",
+                        "on-secondary-fixed": "#002020",
+                        "outline-variant": "#c4c6cf",
+                        "primary-fixed": "#d6e3ff",
+                        "tertiary": "#002522",
+                        "background": "#f7fafc",
+                        "tertiary-fixed-dim": "#5adace",
+                        "on-secondary-container": "#1a6d6e",
+                        "on-background": "#181c1e",
+                        "inverse-primary": "#adc7f7",
+                        "on-primary-fixed": "#001b3c"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-icons-round {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .signature-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
+
+        .glass-nav {
+            background: rgba(247, 250, 252, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-6 antialiased">
+
+    <!-- Back to Home Button -->
+    <div class="w-full max-w-md mb-6">
+        <a href="/"
+            class="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+            <span class="material-icons-round text-lg">home</span>
+            Back to Home
+        </a>
+    </div>
+    <!-- Progress & Header -->
+    <div class="w-full max-w-md mb-8">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex gap-1.5">
+                <div class="h-1.5 w-12 rounded-full bg-primary"></div>
+                <div class="h-1.5 w-12 rounded-full bg-primary/20 dark:bg-primary/10"></div>
+                <div class="h-1.5 w-12 rounded-full bg-primary/20 dark:bg-primary/10"></div>
+            </div>
+            <span class="text-xs font-medium text-primary/60 tracking-wider uppercase">Step 1 of 3</span>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2 leading-tight">Choose your role</h1>
+        <p class="text-slate-500 dark:text-slate-400">Help us tailor your Care Nest experience.</p>
+    </div>
+    <!-- Role Selection Cards -->
+    <div class="w-full max-w-md space-y-4 flex-grow">
+        <!-- Employer Card -->
+        <button onclick="selectRole('employer')" id="employer-card"
+            class="w-full text-left group transition-all duration-300 transform active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-xl">
+            <div
+                class="bg-white dark:bg-slate-800/50 border-2 border-transparent hover:border-primary/30 p-6 rounded-xl shadow-sm hover:shadow-md flex flex-col items-start gap-4 transition-all">
+                <div class="absolute top-6 right-6 text-primary employer-check opacity-0">
+                    <span class="material-icons-round text-2xl">check_circle</span>
+                </div>
+                <div class="bg-primary/10 dark:bg-primary/20 p-3 rounded-lg text-primary">
+                    <span class="material-icons-round text-3xl">home_work</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                        I am an Employer
+                        <!-- <span
+                            class="material-icons-round text-primary text-xl opacity-0 group-hover:opacity-100 transition-opacity employer-check">check_circle</span> -->
+                    </h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        Find trusted domestic help and manage secure escrow payments.
+                    </p>
+                </div>
+            </div>
+        </button>
+        <!-- Worker Card -->
+        <button onclick="selectRole('worker')" id="worker-card"
+            class="w-full text-left group transition-all duration-300 transform active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-xl">
+            <div
+                class="bg-white dark:bg-slate-800/50 border-2 border-transparent hover:border-primary/30 p-6 rounded-xl shadow-sm hover:shadow-md flex flex-col items-start gap-4 transition-all relative">
+                <!-- Selected Indicator -->
+                <div class="absolute top-6 right-6 text-primary worker-check opacity-0">
+                    <span class="material-icons-round text-2xl">check_circle</span>
+                </div>
+                <div class="bg-primary/10 dark:bg-primary/20 p-3 rounded-lg text-primary">
+                    <span class="material-icons-round text-3xl">engineering</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">
+                        I am a Worker
+                    </h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        Secure fair agreements and receive guaranteed payments for your services.
+                    </p>
+                </div>
+            </div>
+        </button>
+    </div>
+    <!-- Footer & Action -->
+    <div class="w-full max-w-md mt-10">
+        <button onclick="continueToRegister()" id="continue-btn"
+            class="signature-gradient w-full bg-primary hover:bg-primary/90 text-white font-semibold py-4 rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            Continue
+            <span
+                class="material-icons-round text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </button>
+        <div class="mt-6 flex flex-col items-center gap-2">
+            <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                <span class="material-icons-round text-sm">lock</span>
+                <span>Encrypted &amp; Secure</span>
+            </div>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 text-center px-4">
+                By continuing, you agree to our Terms of Service. You can change your primary role later in settings.
+            </p>
+        </div>
+    </div>
+    <!-- Decorative Elements (Subtle) -->
+    <div class="fixed -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed -bottom-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <script>
+        let selectedRole = null;
+
+        function selectRole(role) {
+            selectedRole = role;
+
+            // Reset both cards
+            const employerCard = document.getElementById('employer-card').querySelector('div');
+            const workerCard = document.getElementById('worker-card').querySelector('div');
+            const employerCheck = document.querySelector('.employer-check');
+            const workerCheck = document.querySelector('.worker-check');
+            const continueBtn = document.getElementById('continue-btn');
+
+            // Remove selected state from both
+            employerCard.classList.remove('border-primary', 'shadow-md');
+            employerCard.classList.add('border-transparent');
+            workerCard.classList.remove('border-primary', 'shadow-md');
+            workerCard.classList.add('border-transparent');
+            employerCheck.classList.remove('opacity-100');
+            employerCheck.classList.add('opacity-0');
+            workerCheck.classList.remove('opacity-100');
+            workerCheck.classList.add('opacity-0');
+
+            // Apply selected state to chosen role
+            if (role === 'employer') {
+                employerCard.classList.remove('border-transparent');
+                employerCard.classList.add('border-primary', 'shadow-md');
+                employerCheck.classList.remove('opacity-0');
+                employerCheck.classList.add('opacity-100');
+            } else if (role === 'worker') {
+                workerCard.classList.remove('border-transparent');
+                workerCard.classList.add('border-primary', 'shadow-md');
+                workerCheck.classList.remove('opacity-0');
+                workerCheck.classList.add('opacity-100');
+            }
+
+            // Enable continue button
+            continueBtn.disabled = false;
+        }
+
+        function continueToRegister() {
+            if (selectedRole === 'worker') {
+                window.location.href = `/worker-signup/?type=${selectedRole}`;
+            } else if (selectedRole === 'employer') {
+                window.location.href = `/employer-signup/?type=${selectedRole}`;
+            }
+        }
+    </script>
+</body>
+
+</html>

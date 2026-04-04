@@ -1,144 +1,213 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
 
-{% block title %}Join as Employer | Care Nest{% endblock %}
+<html class="light" lang="en">
 
-{% block content %}
-    <main class="min-h-screen bg-surface flex flex-col md:flex-row items-stretch relative overflow-hidden">
-        
-        <!-- Left Side: Visual Anchor (Desktop) -->
-        <div class="hidden lg:flex lg:w-1/2 signature-gradient relative items-center justify-center p-16 overflow-hidden transition-all duration-1000 group">
-            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at center, white 1px, transparent 1px); background-size: 40px 40px;"></div>
-            
-            <div class="relative z-10 max-w-lg space-y-12">
-                <div class="space-y-6">
-                    <h2 class="text-6xl font-black text-white font-headline leading-[0.95] tracking-tighter">
-                        Find Trusted <br />
-                        Help for <br />
-                        Your Home.
-                    </h2>
-                    <p class="text-xl text-white/70 font-medium leading-relaxed">
-                        Join Care Nest to connect with verified professional domestic workers and manage agreements with secure escrow protection.
-                    </p>
-                </div>
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Care Nest - Join as an Employer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-container": "#a2eded",
+                        "primary-fixed-dim": "#adc7f7",
+                        "tertiary-fixed-dim": "#5adace",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#00201d",
+                        "secondary-fixed": "#a5eff0",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "surface-container": "#ebeef0",
+                        "primary": "#002045",
+                        "error": "#ba1a1a",
+                        "primary-container": "#1a365d",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#1a6d6e",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#79f7ea",
+                        "surface-container-low": "#f1f4f6",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "on-primary-container": "#86a0cd",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#13696a",
+                        "surface-dim": "#d7dadc",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-secondary-fixed": "#002020",
+                        "on-surface-variant": "#43474e",
+                        "surface": "#f7fafc",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "tertiary": "#002522",
+                        "surface-container-high": "#e5e9eb",
+                        "surface-tint": "#455f88",
+                        "primary-fixed": "#d6e3ff",
+                        "background": "#f7fafc",
+                        "surface-bright": "#f7fafc",
+                        "on-background": "#181c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eef1f3",
+                        "outline-variant": "#c4c6cf",
+                        "on-tertiary-container": "#1eb1a5",
+                        "inverse-primary": "#adc7f7",
+                        "outline": "#74777f",
+                        "tertiary-container": "#003d38",
+                        "on-surface": "#181c1e"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .kenyan-gradient {
+            background: linear-gradient(135deg, #1a365d 0%, #13696a 100%);
+        }
 
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-xl">
-                        <span class="material-symbols-outlined text-secondary-fixed text-4xl mb-4 block" style="font-variation-settings: 'FILL' 1;">verified</span>
-                        <p class="text-white font-black text-xs uppercase tracking-widest leading-tight">Vetted <br/>Professionals</p>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
+
+    <main class="flex-grow flex flex-col md:flex-row items-stretch overflow-hidden">
+        <!-- Visual Anchor (Side Panel for Desktop) -->
+        <div class="hidden md:flex md:w-1/2 kenyan-gradient relative items-center justify-center p-12 overflow-hidden">
+            <div class="absolute inset-0 opacity-20"></div>
+            <div class="relative z-10 max-w-md">
+                <h2 class="font-headline font-extrabold text-white text-5xl tracking-tight mb-6">Find trusted help for
+                    your home.</h2>
+                <p class="text-on-primary-container text-lg leading-relaxed">Join Care Nest to connect with professional
+                    domestic workers and manage agreements with secure escrow payments.</p>
+                <div class="mt-12 flex gap-4">
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
+                        <span class="material-symbols-outlined text-secondary-container mb-2">verified_user</span>
+                        <p class="text-white font-medium">Verified Workers</p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-xl">
-                        <span class="material-symbols-outlined text-secondary-fixed text-4xl mb-4 block" style="font-variation-settings: 'FILL' 1;">shield_with_heart</span>
-                        <p class="text-white font-black text-xs uppercase tracking-widest leading-tight">Secure <br/>Escrow Pay</p>
-                    </div>
-                </div>
-
-                <div class="pt-12 flex items-center gap-6 border-t border-white/10">
-                    <div class="flex items-center gap-2">
-                        <div class="flex text-amber-400">
-                            {% for i in "12345" %}<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>{% endfor %}
-                        </div>
-                        <p class="text-xs font-bold text-white uppercase tracking-widest">Top Rated Service</p>
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-lg flex-1">
+                        <span class="material-symbols-outlined text-secondary-container mb-2">security</span>
+                        <p class="text-white font-medium">Secure Escrow</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Right Side: Form Canvas -->
-        <div class="flex-grow lg:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-24 bg-surface-container-low min-h-screen">
-            <div class="w-full max-w-xl space-y-10">
-                
-                <!-- Mobile Header -->
-                <div class="lg:hidden flex flex-col items-center gap-6 mb-12">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-4xl">waves</span>
-                        <span class="text-3xl font-black tracking-tighter text-primary font-headline">Care Nest</span>
-                    </div>
+        <!-- Form Canvas -->
+        <div class="flex-grow md:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-24 bg-surface-container-low">
+            <div
+                class="w-full max-w-md bg-surface-container-lowest rounded-lg p-8 md:p-10 shadow-[0_20px_40px_rgba(24,28,30,0.06)]">
+                <div class="mb-10">
+                    <h2 class="font-headline font-extrabold text-primary text-3xl tracking-tight mb-2">Join as Employer
+                    </h2>
+                    <p class="text-on-surface-variant text-sm">Start finding the best domestic help for your household
+                        today.</p>
                 </div>
-
-                <div class="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-outline-variant/10">
-                    <div class="mb-12 space-y-3">
-                        <h2 class="text-4xl font-black text-primary font-headline tracking-tighter">Join as Employer</h2>
-                        <p class="text-lg text-on-surface-variant font-medium">Create your home management account.</p>
-                    </div>
-
-                    <form action="{% url 'employer-signup' %}" method="POST" class="space-y-6">
-                        {% csrf_token %}
-                        
-                        <!-- Full Name -->
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-outline uppercase tracking-widest ml-2" for="full-name">Full Name</label>
-                            <input type="text" id="full-name" name="full-name" required
-                                   class="block w-full px-6 py-5 bg-surface-container-low border-none rounded-3xl focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all text-primary font-bold placeholder:text-outline/50"
-                                   placeholder="Your Name">
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Phone -->
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-outline uppercase tracking-widest ml-2" for="phone">Phone</label>
-                                <input type="tel" id="phone" name="phone" required
-                                       class="block w-full px-6 py-5 bg-surface-container-low border-none rounded-3xl focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all text-primary font-bold"
-                                       placeholder="+254...">
-                            </div>
-                            <!-- Email -->
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-outline uppercase tracking-widest ml-2" for="email">Email</label>
-                                <input type="email" id="email" name="email" required
-                                       class="block w-full px-6 py-5 bg-surface-container-low border-none rounded-3xl focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all text-primary font-bold"
-                                       placeholder="home@email.com">
-                            </div>
-                        </div>
-
-                        <!-- Password Pair -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-outline uppercase tracking-widest ml-2" for="password">Password</label>
-                                <input type="password" id="password" name="password" required
-                                       class="block w-full px-6 py-5 bg-surface-container-low border-none rounded-3xl focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all text-primary font-bold"
-                                       placeholder="••••••••">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-outline uppercase tracking-widest ml-2" for="confirm_password">Confirm</label>
-                                <input type="password" id="confirm_password" name="confirm_password" required
-                                       class="block w-full px-6 py-5 bg-surface-container-low border-none rounded-3xl focus:ring-4 focus:ring-primary/5 focus:bg-white transition-all text-primary font-bold"
-                                       placeholder="••••••••">
-                            </div>
-                        </div>
-
-                        <!-- CTA -->
-                        <button type="submit" class="w-full py-6 signature-gradient text-white rounded-[2rem] text-lg font-black shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all mt-6">
-                            Register My Home
-                        </button>
-                    </form>
-
-                    <div class="relative my-12">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-outline-variant/10"></div>
-                        </div>
-                        <div class="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
-                            <span class="px-6 bg-white text-outline">Social Connect</span>
+                <form class="space-y-6" method="POST" action="{% url 'employer-signup' %}">
+                    {% csrf_token %}
+                    <!-- Full Name -->
+                    <div class="space-y-2">
+                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
+                            for="full-name">Full Name</label>
+                        <div class="relative">
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                                id="full-name" name="full-name" placeholder="Enter your full name" type="text" />
                         </div>
                     </div>
-
-                    <button class="w-full flex items-center justify-center gap-4 py-5 rounded-[1.5rem] bg-surface-container-low hover:bg-surface-container-high transition-all border border-outline-variant/5">
-                        <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" class="w-6 h-6">
-                        <span class="text-xs font-black text-primary uppercase tracking-widest">Register with Google</span>
+                    <!-- Phone Number -->
+                    <div class="space-y-2">
+                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
+                            for="phone">Phone Number</label>
+                        <div class="relative">
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                                id="phone" name="phone" placeholder="e.g. +254 700 000 000" type="number" />
+                        </div>
+                    </div>
+                    <!-- Email Address -->
+                    <div class="space-y-2">
+                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
+                            for="email">Email Address</label>
+                        <div class="relative">
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                                id="email" name="email" placeholder="e.g. [EMAIL_ADDRESS]" type="email" />
+                        </div>
+                    </div>
+                    <!-- Password -->
+                    <div class="space-y-2">
+                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
+                            for="password">Password Creation</label>
+                        <div class="relative">
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                                id="password" name="password" placeholder="Min. 8 characters" type="password" />
+                        </div>
+                    </div>
+                    <!-- Confirm Password -->
+                    <div class="space-y-2">
+                        <label class="font-label text-xs font-bold uppercase tracking-widest text-secondary"
+                            for="confirm-password">Confirm Password</label>
+                        <div class="relative">
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all"
+                                id="confirm_password" name="confirm_password" placeholder="Min. 8 characters"
+                                type="password" />
+                        </div>
+                    </div>
+                    <!-- CTA Button -->
+                    <button
+                        class="w-full kenyan-gradient text-white font-headline font-bold py-4 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200 mt-4"
+                        type="submit">
+                        Create Account
                     </button>
-
-                    <p class="mt-12 text-center text-sm font-medium text-on-surface-variant">
-                        Already have a home account? 
-                        <a href="{% url 'employer-signin' %}" class="text-secondary font-black hover:underline uppercase tracking-widest text-xs ml-2">Sign In</a>
-                    </p>
+                </form>
+                <div class="relative my-8">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-outline-variant/30"></div>
+                    </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span
+                            class="bg-surface-container-lowest px-4 text-on-surface-variant uppercase tracking-tighter">or
+                            continue with</span>
+                    </div>
                 </div>
-                
-                <!-- Safe Return -->
-                <div class="flex items-center justify-center gap-8">
-                    <a href="/" class="flex items-center gap-2 text-[10px] font-black text-outline uppercase tracking-widest hover:text-primary transition-colors group">
-                        <span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                        Back to Home
-                    </a>
-                </div>
+                <!-- Social Sign In -->
+                <button
+                    class="w-full flex items-center justify-center gap-3 bg-surface-container-high text-on-surface font-semibold py-4 rounded-xl hover:bg-surface-container-highest transition-colors active:scale-95 duration-200">
+                    <img alt="Google Logo" class="w-5 h-5"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" />
+                    Sign up with Google
+                </button>
+                <!-- Footer Link -->
+                <p class="mt-8 text-center text-sm text-on-surface-variant">
+                    Already a member?
+                    <a class="text-secondary font-bold hover:underline decoration-secondary/30 underline-offset-4"
+                        href="{% url 'employer-signin' %}">Sign In</a>
+                </p>
             </div>
         </div>
     </main>
-{% endblock %}
+    <div class="md:hidden w-full h-2 kenyan-gradient"></div>
+</body>
+
+</html>
