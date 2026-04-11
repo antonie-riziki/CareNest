@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}Employer Dashboard | Care Nest{% endblock %}
+
+{% block extra_head %}
+<style>
+    .employer-gradient {
+        background: linear-gradient(135deg, #002045 0%, #13696a 100%);
+    }
+    /* Safe area padding for mobile bottom nav */
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 12px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar for Desktop (Embedded) -->
+<aside class="hidden md:flex flex-col w-64 h-screen bg-surface border-r border-outline-variant/10 fixed left-0 top-0 z-50">
+    <!-- Branding Header -->
+    <div class="px-8 py-8 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl employer-gradient flex items-center justify-center text-white shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined text-2xl">waves</span>
+        </div>
+        <div>
+            <h2 class="text-xl font-extrabold text-primary tracking-tighter font-headline leading-none">Care Nest</h2>
+            <p class="text-[10px] font-bold text-secondary uppercase tracking-widest mt-1">Employer Panel</p>
+        </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+        <a href="#" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group bg-primary-container/10 text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">dashboard</span>
+            <span class="font-bold text-sm">Dashboard</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group text-outline hover:text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">people</span>
+            <span class="font-bold text-sm">My Workers</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group text-outline hover:text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">work_outline</span>
+            <span class="font-bold text-sm">Job Postings</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group text-outline hover:text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">account_balance_wallet</span>
+            <span class="font-bold text-sm">Wallet</span>
+        </a>
+
+        <div class="pt-8 pb-2">
+            <p class="px-4 text-[10px] font-bold text-outline uppercase tracking-widest">Account</p>
+        </div>
+
+        <a href="#" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group text-outline hover:text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">settings</span>
+            <span class="font-bold text-sm">Settings</span>
+        </a>
+    </nav>
+
+    <!-- Support Section -->
+    <div class="px-6 py-8">
+        <div class="bg-surface-container-low rounded-3xl p-5 border border-outline-variant/10">
+            <p class="text-xs font-bold text-primary mb-2">Need help?</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mb-4 leading-relaxed">Reach our dedicated support team.</p>
+            <button class="w-full py-2.5 bg-white text-primary text-[10px] font-bold rounded-xl border border-outline-variant/20 shadow-sm hover:bg-surface-container-high transition-colors">Contact Support</button>
+        </div>
+    </div>
+</aside>
+
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
+
+    <!-- TopAppBar (Mobile Only) -->
+    <header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-2xl">waves</span>
+            <span class="text-2xl font-extrabold text-primary tracking-tighter font-headline">CareNest</span>
+        </div>
+        <div class="relative active:scale-95 duration-100 p-2 rounded-full hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-outline">notifications</span>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+        </div>
+    </header>
+
+    <!-- Desktop Header -->
+    <header class="hidden md:flex items-center justify-between px-10 py-8 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-sm sticky top-0 z-40">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Household Management</h2>
+            <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">
+                Welcome back, <span class="text-secondary">{{ request.user.first_name|default:"Employer" }}</span>.
+            </h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <button class="employer-gradient text-white px-7 py-4 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">add</span>
+                Post a Job
+            </button>
+            <button class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group hover:bg-primary hover:text-white transition-all shadow-sm relative">
+                <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">notifications</span>
+                <span class="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 lg:p-10 space-y-8 lg:space-y-12 max-w-7xl pb-24 md:pb-10">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-secondary-container text-on-secondary-container px-6 py-4 rounded-2xl shadow-sm border border-secondary/10 flex items-center gap-4">
+                    <span class="material-symbols-outlined">info</span>
+                    <p class="font-bold text-sm">{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm flex flex-col justify-between group hover:border-secondary/30 transition-colors">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">badge</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-full">Active</span>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-extrabold text-primary mb-1 font-headline">2</h3>
+                    <p class="text-xs font-bold text-outline uppercase tracking-widest">Active Workers</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm flex flex-col justify-between group hover:border-secondary/30 transition-colors">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">work_history</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-extrabold text-primary mb-1 font-headline">1</h3>
+                    <p class="text-xs font-bold text-outline uppercase tracking-widest">Pending Requests</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm flex flex-col justify-between group hover:border-secondary/30 transition-colors">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-error-container/20 flex items-center justify-center text-error group-hover:bg-error group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-extrabold text-primary mb-1 font-headline">KES 12K</h3>
+                    <p class="text-xs font-bold text-outline uppercase tracking-widest">Spent This Month</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Card -->
+            <div class="employer-gradient p-6 rounded-[2rem] shadow-xl flex flex-col justify-between group hover:scale-[1.02] transition-transform cursor-pointer text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">add_circle</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-extrabold mb-1 font-headline">Hire Now</h3>
+                    <p class="text-xs font-bold text-secondary-container uppercase tracking-widest">Find new talent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Main Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Side: Active Contracts -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Your Active Workers</h3>
+                    <a href="#" class="text-[10px] font-bold text-secondary uppercase tracking-widest hover:underline">View All</a>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Worker Card 1 -->
+                    <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
+                        <div class="flex items-center gap-5">
+                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface flex-shrink-0 relative">
+                                <img src="https://i.pravatar.cc/150?img=47" alt="Worker Profile" class="w-full h-full object-cover">
+                                <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-lg text-primary tracking-tight">Mary Wanjiku</h4>
+                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Nanny • Since Jan 2026</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <span class="px-4 py-1.5 bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-widest rounded-full border border-secondary/20">On Duty</span>
+                            <button class="w-10 h-10 rounded-xl bg-surface-container-low hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors ml-auto sm:ml-0">
+                                <span class="material-symbols-outlined text-xl">more_vert</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Worker Card 2 -->
+                    <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
+                        <div class="flex items-center gap-5">
+                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface flex-shrink-0">
+                                <img src="https://i.pravatar.cc/150?img=11" alt="Worker Profile" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-lg text-primary tracking-tight">John Mutua</h4>
+                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Gardener • Part-time</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <span class="px-4 py-1.5 bg-surface-container-high text-outline text-[10px] font-bold uppercase tracking-widest rounded-full border border-outline-variant/10">Off Duty</span>
+                            <button class="w-10 h-10 rounded-xl bg-surface-container-low hover:bg-surface-container-high flex items-center justify-center text-primary transition-colors ml-auto sm:ml-0">
+                                <span class="material-symbols-outlined text-xl">more_vert</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Recent Job Postings -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Recent Postings</h3>
+                </div>
+
+                <div class="bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10 relative overflow-hidden group">
+                    <div class="absolute -top-4 -right-4 p-6 pointer-events-none opacity-5 group-hover:opacity-10 transition-opacity">
+                        <span class="material-symbols-outlined text-8xl">post_add</span>
+                    </div>
+                    <div class="relative z-10 space-y-4">
+                        <span class="bg-white text-primary px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm inline-block">Active</span>
+                        <h4 class="font-extrabold text-xl text-primary font-headline leading-tight">Need a full-time chef</h4>
+                        <p class="text-sm font-medium text-outline">Looking for someone available 5 days a week for daily meal preparation.</p>
+                        
+                        <div class="pt-5 mt-4 border-t border-outline-variant/20 flex justify-between items-center">
+                            <span class="text-xs font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-lg">3 Applicants</span>
+                            <a href="#" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline flex items-center gap-1 group-hover:text-secondary transition-colors">
+                                Review 
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant/10 z-50 px-6 py-3 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] pb-safe">
+    <a href="#" class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-icons-round text-2xl">dashboard</span>
+        <span class="text-[10px] font-bold">Home</span>
+    </a>
+    <a href="#" class="flex flex-col items-center gap-1 text-outline hover:text-primary transition-colors">
+        <span class="material-icons-round text-2xl">people</span>
+        <span class="text-[10px] font-bold">Workers</span>
+    </a>
+    <a href="#" class="flex flex-col items-center justify-center gap-1 text-outline hover:text-primary transition-colors transform -translate-y-4">
+        <div class="w-14 h-14 rounded-full employer-gradient text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-2xl">add</span>
+        </div>
+    </a>
+    <a href="#" class="flex flex-col items-center gap-1 text-outline hover:text-primary transition-colors">
+        <span class="material-icons-round text-2xl">account_balance_wallet</span>
+        <span class="text-[10px] font-bold">Wallet</span>
+    </a>
+    <a href="#" class="flex flex-col items-center gap-1 text-outline hover:text-primary transition-colors">
+        <span class="material-icons-round text-2xl">person</span>
+        <span class="text-[10px] font-bold">Profile</span>
+    </a>
+</nav>
+
+{% endblock %}

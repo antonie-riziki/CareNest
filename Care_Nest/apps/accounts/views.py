@@ -22,7 +22,7 @@ User = get_user_model()
 # Create your views here.
 def worker_signup(request):
     if request.method == "POST":
-        full_name = request.POST.get("full-name")
+        full_name = request.POST.get("full_name")
         email = request.POST.get("email")
         phone = request.POST.get("phone")
         password = request.POST.get("password")
@@ -55,6 +55,7 @@ def worker_signup(request):
             password=password,
             first_name=first_name,
             last_name=last_name,
+            role="worker",
         )
 
         user.save()
@@ -97,7 +98,7 @@ def worker_signin(request):
 
 def employer_signup(request):
     if request.method == "POST":
-        full_name = request.POST.get("full-name")
+        full_name = request.POST.get("full_name")
         email = request.POST.get("email")
         phone = request.POST.get("phone")
         password = request.POST.get("password")
@@ -125,6 +126,7 @@ def employer_signup(request):
             password=password,
             first_name=first_name,
             last_name=last_name,
+            role="employer",
         )
 
         user.save()
