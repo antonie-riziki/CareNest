@@ -1,83 +1,132 @@
-# CareNest
+# CareNest WorkOS
 
-CareNest is a centralized platform designed to seamlessly connect domestic workers with employers, providing a safe, reliable, and efficient ecosystem for job discovery, hiring, and management.
+CareNest is a Django marketplace that connects domestic workers and employers. This branch adds **CareNest WorkOS**: a persistent agent that manages the engagement lifecycle, with Stellar/Soroban as the settlement and audit layer.
 
-## 🚀 Features
+The marketplace, worker/employer flows, USSD app and existing UI are preserved. The agent is a workflow manager, not a chatbot.
 
-### For Domestic Workers
-* **Job Discovery (Map-based):** A location-aware job discovery interface displaying nearby opportunities using an interactive map, and filtering jobs based on a proximity radius.
-* **Profiles & Reputation Management:** A polished profile showcasing verified skills, detailed ratings, core expertise badges, and client testimonials.
-* **Dashboard & Earnings:** A centralized hub to view cumulative daily revenue, check active duty status, and quickly access operational toolkits.
-* **Wallet Analytics:** Keep track of payments, reliability metrics, and completion data.
-* **Growth & Upskilling Hub:** Access premium professional courses to expand skillsets in areas like housekeeping, culinary arts, child care, and more.
+## What was added
 
-### Platform Architecture
-* **Responsive Design:** Mobile-first architecture for workers on the go, paired with a unified sidebar and split-screen interface crafted specifically for larger desktop environments.
-* **USSD Integration:** Alternative USSD application pathway designed for accessibility and offline usability in low connectivity scenarios.
+- Soroban `WorkContract` with an explicit state machine (`CREATED` → `FUNDED` → `WORKING` → `SUBMITTED` → `APPROVAL_PENDING` → `RELEASED` / `DISPUTED` / `CANCELLED`). Escrow cannot be funded or released twice.
+- Persistent Omega-compatible agent (`apps/agentic_core`) with memory, tools, audit trail and human approval gates.
+- Stellar testnet integration (wallet connect, contract invoke, tx status, RPC event ingestion) plus a clearly labelled **DEMO DATA** fallback.
+- Work Passport: verifiable proof of completed work (hash anchored on-chain). Workers are not tokenized.
+- Agent Command Center for employers.
 
-## 🧱 System Architecture
+## Local run
 
-CareNest is built on a highly available, robust, and scalable architecture that ensures zero-downtime, fault-tolerance, and lightning-fast execution. The system seamlessly unifies a traditional robust backend with bleeding-edge Web3 decentralized infrastructure.
+```bash
+cd Care_Nest
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# set DJANGO_DEBUG=true and, optionally, ASI_API_KEY
+python3 manage.py migrate
+python3 manage.py seed_workos
+python3 manage.py runserver 0.0.0.0:8000
+```
 
-### High-Performance Infrastructure
-* **Distributed Backend:** Powered by Django, our core API interfaces effortlessly handle high-volume concurrent requests, ensuring data integrity, rapid response times, and an unbreachable security perimeter.
-* **Real-time Event-Driven Busses:** Mission-critical updates, such as job matching and immediate proximity alerts, are processed to guarantee sub-second latency across the network.
-* **Persistent Data Layer:** Employs advanced relational databases for user and administrative data, seamlessly harmonized with high-velocity caching layers for ephemeral data like live rapid GPS tracking streams.
+Demo accounts (password `CareNestDemo1!`):
 
-## ⚡ Smart Contract & Web3 Integration
+| Role | Email |
+| --- | --- |
+| Employer | `sarah@carenest.demo` |
+| Worker (Mary) | `mary@carenest.demo` |
+| Worker | `jane@carenest.demo` |
+| Worker | `john@carenest.demo` |
 
-CareNest transcends traditional gig-economy platforms by heavily integrating decentralized Web3 protocols to guarantee immutable trust, irrefutable reputation, and programmatic, trustless escrow mechanisms.
+Open http://127.0.0.1:8000
 
-### Core Decentralized Components
-* **Automated Escrow Agreements:** Every service engagement on CareNest orchestrates a smart contract on a high-throughput blockchain network. Funds are programmatically and cryptographically locked before the job commences and automatically released upon verifiable mathematical completion based on predetermined consensus.
-* **Immutable Reputation System (Soulbound Tokens):** Worker ratings, verified skills, and rigorous background-check certifications are minted as non-transferable Soulbound Tokens (SBTs) directly linked to the worker's decentralized identity. This constructs a cryptographic, tamper-proof professional history that is permanently verifiable and impervious to manipulation.
-* **Decentralized Dispute Resolution:** In the event of a dispute, smart contracts algorithmically trigger deterministic fallback logic and multi-signature arbitration, resolving conflicts securely and transparently without centralized bias points.
-* **Zero-Friction Transaction Abstraction:** Through robust meta-transaction relayers, end-users interact with complex smart contracts completely gas-free. CareNest entirely abstracts the underlying blockchain cryptographic complexity, ensuring a seamless, high-velocity user experience indistinguishable from traditional platforms.
+## Tests
 
-## 🛠 Tech Stack
+```bash
+cd Care_Nest
+python3 manage.py test apps.agentic_core
+```
 
-* **Backend:** [Django](https://www.djangoproject.com/) Application Framework
-* **Frontend:** HTML Interface, [Tailwind CSS](https://tailwindcss.com/)
-* **Mapping:** [Leaflet.js](https://leafletjs.com/) for real-time location discovery
-* **Icons & Assets:** Google Material Symbols (Outlined)
+Soroban contract tests (requires the Stellar/Soroban 22+ toolchain):
 
-## 💻 Local Development Setup
+```bash
+cd Care_Nest/apps/contracts
+cargo test
+```
 
-To run the CareNest application locally, follow these steps:
+## Demo flow
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd CareNest/Care_Nest
-   ```
+1. Sign in as Sarah (`sarah@carenest.demo`).
+2. Connect a Stellar wallet at `/wallet/connect/` (Freighter, or paste a testnet `G…` public key). Without a live contract id the UI shows **DEMO DATA**.
+3. Open **WorkOS Agent** (`/agent/`). Enter: `I need a full-time nanny in Westlands, KES 45,000/month.`
+4. The agent parses the requirement, searches CareNest worker profiles, and ranks Mary Wanjiku.
+5. Choose Mary → **Prepare engagement**. Terms are hashed off-chain; nothing financial happens.
+6. In the Command Center, approve **create agreement**, then **fund escrow**. Each step needs an explicit human approval. The agent never releases funds on its own.
+7. Sign in as Mary (`mary@carenest.demo`) → **Engagements** → start work → submit completion.
+8. Back as Sarah, approve payment once. The payment transaction hash is shown. A Work Credential is issued.
+9. As Mary, open **Work Passport**.
 
-2. **Set up a Virtual Environment (Recommended):**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+Session persistence: after step 6, reload the app and ask `What is happening with Mary's contract?` The agent answers from `AgentMemory` + ingested events, not from invented state.
 
-3. **Install Requirements:**
-   *(Ensure you have Django and required dependencies installed.)*
-   ```bash
-   pip install -r requirements.txt
-   ```
+USSD: `POST /ussd/callback/` — menu option **5. WorkOS Agent** looks up a real engagement; option **3** plus an id returns live contract status.
 
-4. **Run Migrations:**
-   ```bash
-   python3 manage.py migrate
-   ```
+## Environment variables
 
-5. **Start the Development Server:**
-   ```bash
-   python3 manage.py runserver
-   ```
+See `Care_Nest/.env.example`. Important:
 
-6. Open your browser and navigate to `http://127.0.0.1:8000`.
+| Variable | Purpose |
+| --- | --- |
+| `ASI_API_KEY` | Omega/ASI Alliance inference (same convention as `singnet/Omega` ASICloud). Parsing/explaining only. |
+| `OMEGA_LLM_BASE_URL` | Default `https://llm.c.singularitynet.io/v1` |
+| `OMEGA_LLM_MODEL` | Default `asi1-mini` |
+| `CARENEST_CONTRACT_ID` | Deployed Soroban contract (`C…`). Empty → DEMO DATA. |
+| `CARENEST_FORCE_DEMO_MODE` | Force recorded fixtures even if a contract id is set. |
+| `STELLAR_DEMO_EMPLOYER_SECRET` / `STELLAR_DEMO_WORKER_SECRET` | Optional **testnet** keys so the guided demo can sign without Freighter. Never mainnet. |
+| `DJANGO_SECRET_KEY` | Required in production. |
 
-## 🤝 Project Structure
-- `templates/`: Contains all our mobile-responsive HTML templates (Dashboards, Maps, Profiles).
-- `apps/ussd_app/`: Micro-service handling USSD menus for basic phone users.
+The agent never logs secrets. Stellar secret seeds are stripped from audit payloads.
 
-## 📄 Organization
-© 2026 Care Nest Kenya. All Rights Reserved.
+## Stellar deployment (testnet)
+
+Requires the current Stellar CLI and a funded testnet account.
+
+```bash
+cd Care_Nest/apps/contracts
+stellar contract build
+stellar contract deploy \
+  --wasm target/wasm32v1-none/release/carenest_work_contract.wasm \
+  --network testnet \
+  --source-account <YOUR_TESTNET_SECRET>
+stellar contract invoke \
+  --id <CONTRACT_ID> \
+  --network testnet \
+  --source-account <ARBITER_SECRET> \
+  -- initialize --arbiter <ARBITER_G_ADDRESS>
+```
+
+Then set `CARENEST_CONTRACT_ID` and restart Django. Native XLM SAC on testnet is `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`.
+
+Pull events:
+
+```bash
+python3 manage.py ingest_stellar_events
+```
+
+If RPC is down, the UI falls back to **DEMO DATA**. Live activity is never labelled as demo, and demo activity is never labelled live.
+
+## Architecture
+
+- **Django** is the application index (jobs, profiles, agent memory, credentials).
+- **Stellar/Soroban** is the source of truth for escrow state and settlement.
+- **Omega/ASI** is used only to parse employer language and phrase known facts. Decisions, transitions and financial gates are deterministic (`policies.py`).
+- Personal data (names, phones, IDs) stays off-chain. On-chain: wallet addresses, engagement ids, hashes, statuses, timestamps.
+
+Contract events: `agreement_created`, `agreement_funded`, `work_submitted`, `approval_requested`, `agreement_disputed`, `payment_released`, `agreement_cancelled`, `credential_issued`.
+
+## Remaining limitations
+
+- Live testnet requires a deployed contract id, funded wallets and (for browser signing) Freighter. Without those, the flow is fully usable as labelled DEMO DATA.
+- The Omega MeTTa/Hyperon runtime is not bundled; CareNest talks to the ASI Alliance OpenAI-compatible endpoint the same way Omega's ASICloud provider does.
+- Dispute resolution still needs a CareNest arbiter key (`STELLAR_ARBITER_SECRET`) for the on-chain `resolve_dispute` call.
+- Testnet escrow uses a small XLM amount as a stand-in for a KES stablecoin.
+
+## Original product
+
+Worker job map, profiles, courses, USSD and the existing Django templates remain. New screens: `/agent/`, `/agent/engagements/<id>/`, `/passport/`, `/wallet/connect/`.

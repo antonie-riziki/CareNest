@@ -4,9 +4,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-africastalking.initialize(username="EMID", api_key=os.getenv("AT_API_KEY"))
+_AT_API_KEY = os.getenv("AT_API_KEY")
 
-sms = africastalking.SMS
+if _AT_API_KEY:
+    africastalking.initialize(username=os.getenv("AT_USERNAME", "EMID"), api_key=_AT_API_KEY)
+    sms = africastalking.SMS
+else:
+
+    class _DisabledSMS:
+        def send(self, message, recipients, sender=None):
+            return {"status": "disabled", "reason": "AT_API_KEY unset"}
+
+    sms = _DisabledSMS()
 
 
 def send_message(phone_number, message_context):

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Command Center · {{ engagement.job.title }} | Care Nest{% endblock %}
+
+{% block extra_head %}
+<style>
+    .tone-success { background: #e8f6f6; color: #13696a; }
+    .tone-attention { background: #fff6e5; color: #92400e; }
+    .tone-danger { background: #ffdad6; color: #93000a; }
+    .tone-neutral { background: #ebeef0; color: #43474e; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col bg-surface">
+    <header class="px-6 md:px-10 py-6 border-b border-outline-variant/10 bg-surface/90 backdrop-blur sticky top-0 z-40 space-y-4">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <a href="{% url 'agent-panel' %}" class="text-[10px] font-bold uppercase tracking-widest text-outline">← Agent panel</a>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-primary font-headline tracking-tighter mt-1">{{ engagement.job.title }}</h1>
+                <p class="text-sm text-outline mt-1">{{ engagement.worker.get_full_name|default:engagement.worker.username }} · {{ engagement.currency }} {{ engagement.amount }}</p>
+            </div>
+            <div class="flex flex-col items-end gap-3">
+                {% include 'agent/_chain_banner.html' %}
+                <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full tone-{{ explanation.tone }}">{{ engagement.chain_status }}</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px]">
+            <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">AI recommendation</span><p class="text-primary font-medium mt-1">The agent inspects state and asks you to act.</p></div>
+            <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">Human approval</span><p class="text-primary font-medium mt-1">You sign. Funds never move without this step.</p></div>
+            <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">Blockchain execution</span><p class="text-primary font-medium mt-1">Stellar records the result. CareNest only indexes it.</p></div>
+        </div>
+    </header>
+
+    <main class="p-6 lg:p-10 grid grid-cols-1 xl:grid-cols-3 gap-6 max-w-7xl pb-24">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="xl:col-span-3 bg-secondary-container text-on-secondary-container px-6 py-4 rounded-2xl">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% if last_answer %}
+        <div class="xl:col-span-3 bg-white border border-secondary/20 rounded-[1.5rem] p-6">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Agent answer (from persisted memory)</p>
+            <p class="text-sm font-medium text-primary mt-2">{{ last_answer.answer }}</p>
+            <p class="text-[11px] text-outline mt-2">Source: {{ last_answer.facts.data_source }} · model {{ last_answer.model }}</p>
+        </div>
+        {% endif %}
+
+        <section class="space-y-6">
+            <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-6 space-y-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Contract status</p>
+                <h2 class="text-xl font-extrabold text-primary font-headline">{{ explanation.headline }}</h2>
+                <p class="text-sm text-on-surface-variant">{{ explanation.detail }}</p>
+                <p class="text-sm font-medium text-primary">Next: {% if is_employer %}{{ explanation.next_step_employer }}{% else %}{{ explanation.next_step_worker }}{% endif %}</p>
+                <dl class="text-xs space-y-2 pt-2 border-t border-outline-variant/10">
+                    <div class="flex justify-between gap-3"><dt class="text-outline">On-chain id</dt><dd class="font-mono">{{ engagement.engagement_id|default:"not created" }}</dd></div>
+                    <div class="flex justify-between gap-3"><dt class="text-outline">Escrow</dt><dd>{{ engagement.token_amount_display|default:"—" }}</dd></div>
+                    <div class="flex justify-between gap-3"><dt class="text-outline">Terms hash</dt><dd class="font-mono truncate max-w-[160px]">{{ engagement.terms_hash|default:"—" }}</dd></div>
+                    <div class="flex justify-between gap-3"><dt class="text-outline">Data source</dt><dd class="font-bold">{% if engagement.is_demo %}DEMO DATA{% else %}LIVE TESTNET{% endif %}</dd></div>
+                </dl>
+                {% if tx_links %}
+                <div class="space-y-1">
+                    {% for label, pair in tx_links.items %}
+                    <p class="text-[11px]"><span class="text-outline">{{ label }}:</span>
+                        {% if pair.1 %}<a class="font-mono text-secondary" href="{{ pair.1 }}" target="_blank" rel="noopener">{{ pair.0|slice:":12" }}…</a>
+                        {% else %}<span class="font-mono">{{ pair.0|slice:":12" }}… (demo)</span>{% endif %}
+                    </p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-6 space-y-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Wallet</p>
+                {% if wallet and wallet.is_connected %}
+                <p class="font-mono text-sm">{{ wallet.short_address }}</p>
+                {% else %}
+                <p class="text-sm text-outline">No wallet connected.</p>
+                <a class="text-xs font-bold uppercase tracking-widest text-secondary" href="{% url 'wallet-connect' %}?next={{ request.path }}">Connect wallet</a>
+                {% endif %}
+                <form method="post" action="{% url 'agent-tick' engagement.pk %}">{% csrf_token %}
+                    <button class="mt-2 w-full py-2.5 rounded-xl bg-surface-container-high text-xs font-bold uppercase tracking-widest">Re-evaluate</button>
+                </form>
+                <form method="post" action="{% url 'agent-ingest' %}">{% csrf_token %}
+                    <button class="w-full py-2.5 rounded-xl border border-outline-variant/20 text-xs font-bold uppercase tracking-widest">Ingest Stellar events</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-6 space-y-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Agent memory</p>
+                <p class="text-sm text-primary font-medium">{{ memory.summary|default:"No summary yet." }}</p>
+                <p class="text-[11px] text-outline">Stage {{ memory.workflow_stage }} · v{{ memory.version }} · {{ memory.scope }}</p>
+                {% if memory.unresolved_tasks %}
+                <ul class="text-sm list-disc pl-5 space-y-1">
+                    {% for t in memory.unresolved_tasks %}<li>{{ t }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            {% if latest_decision %}
+            <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-6 space-y-3">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Latest AI recommendation</p>
+                <p class="font-extrabold text-primary">{{ latest_decision.get_decision_type_display }}</p>
+                <p class="text-sm">{{ latest_decision.decision }}</p>
+                {% if latest_decision.evidence %}
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Evidence</p>
+                    <ul class="text-xs text-on-surface-variant space-y-1">
+                        {% for e in latest_decision.evidence %}<li>• {{ e }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <p class="text-[11px] text-outline">Financial executed: {{ latest_decision.financial_action_executed|yesno:"yes,no" }} · approval {{ latest_decision.approval_status }}</p>
+            </div>
+            {% endif %}
+
+            <div class="bg-white rounded-[2rem] border border-amber-200 p-6 space-y-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-amber-800">Pending approvals</p>
+                {% for a in pending_approvals %}
+                <div class="space-y-3 border-b border-outline-variant/10 pb-4 last:border-0 last:pb-0" data-approval>
+                    <p class="font-extrabold text-primary">{{ a.get_approval_type_display }}</p>
+                    <p class="text-sm text-on-surface-variant">{{ a.summary }}</p>
+                    <p class="text-[11px] font-bold uppercase tracking-widest {% if a.is_financial %}text-error{% else %}text-outline{% endif %}">{% if a.is_financial %}Financial — will not run without your signature{% else %}Non-financial on-chain record{% endif %}</p>
+                    {% if is_employer %}
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="js-approve signature-gradient text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest" data-url="{% url 'agent-approve' a.pk %}">Approve &amp; sign</button>
+                        <form method="post" action="{% url 'agent-reject' a.pk %}">{% csrf_token %}
+                            <button class="px-4 py-2 rounded-xl border border-outline-variant/30 text-[10px] font-bold uppercase tracking-widest">Reject</button>
+                        </form>
+                    </div>
+                    <p class="js-status text-[11px] text-outline hidden"></p>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-sm text-outline">Nothing waiting on a human.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-6">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-4">Audit timeline</p>
+                <ol class="space-y-4">
+                    {% for item in timeline %}
+                    <li class="border-l-2 border-outline-variant/30 pl-4">
+                        <p class="text-[10px] font-bold uppercase tracking-widest
+                            {% if item.kind == 'Human approval' %}text-amber-700
+                            {% elif item.kind == 'Blockchain execution' %}text-secondary
+                            {% else %}text-primary{% endif %}">{{ item.kind }}</p>
+                        <p class="font-bold text-sm text-primary">{{ item.title }}</p>
+                        <p class="text-xs text-on-surface-variant">{{ item.detail }}</p>
+                        <p class="text-[10px] text-outline mt-1">{{ item.at|date:"M j, H:i" }}
+                            {% if item.tx_hash %} · tx {{ item.tx_hash|slice:":10" }}…{% endif %}
+                            {% if item.source %} · {{ item.source }}{% endif %}
+                        </p>
+                    </li>
+                    {% empty %}
+                    <li class="text-sm text-outline">No audit records yet.</li>
+                    {% endfor %}
+                </ol>
+            </div>
+            <form method="post" action="{% url 'agent-ask' %}" class="bg-white rounded-[2rem] border border-outline-variant/10 p-6 space-y-3">
+                {% csrf_token %}
+                <input type="hidden" name="engagement_pk" value="{{ engagement.pk }}">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Ask about this engagement</p>
+                <input type="text" name="question" value="What is happening with this contract?" class="w-full rounded-xl border-outline-variant/30 text-sm">
+                <button class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest">Ask</button>
+            </form>
+        </section>
+    </main>
+</div>
+{% csrf_token %}
+{% include 'agent/_wallet_js.html' %}
+<script>
+    document.querySelectorAll(".js-approve").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const box = btn.closest("[data-approval]");
+            const status = box.querySelector(".js-status");
+            status.classList.remove("hidden");
+            status.textContent = "Preparing transaction…";
+            try {
+                const result = await window.carenestWallet.runApproval(btn.dataset.url);
+                if (result.ok) {
+                    status.textContent = (result.data_source === "DEMO_DATA" ? "DEMO DATA · " : "LIVE TESTNET · ") + "tx " + (result.tx_hash || "").slice(0, 12) + "…";
+                    window.location.reload();
+                } else {
+                    status.textContent = result.error || "Did not succeed";
+                }
+            } catch (err) {
+                status.textContent = err.message;
+            }
+        });
+    });
+</script>
+{% endblock %}

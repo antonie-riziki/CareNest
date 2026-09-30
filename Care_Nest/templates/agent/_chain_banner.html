@@ -1,0 +1,17 @@
+{# Shows unmistakably whether blockchain data on this page is LIVE TESTNET or DEMO DATA #}
+<div class="flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
+    {% if chain.is_live %}
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
+            <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span> Live Stellar {{ chain.network }}
+        </span>
+        {% if chain.contract_url %}
+        <a href="{{ chain.contract_url }}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-full bg-surface-container-high text-primary border border-outline-variant/20 hover:bg-primary hover:text-white transition-colors font-mono normal-case tracking-normal">
+            {{ chain.contract_id|slice:":8" }}…{{ chain.contract_id|slice:"-6:" }}
+        </a>
+        {% endif %}
+    {% else %}
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+            <span class="material-symbols-outlined text-sm">science</span> Demo data — not live blockchain
+        </span>
+    {% endif %}
+</div>

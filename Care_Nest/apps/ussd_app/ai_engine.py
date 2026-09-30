@@ -7,10 +7,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+_client = None
+
+
+def _get_client():
+    """Lazily build the Gemini client so importing this module never requires a key."""
+    global _client
+    if _client is None:
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError("GOOGLE_API_KEY is not configured")
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 
 def autogenerate_response(prompt):
+
+    client = _get_client()
 
     response = client.models.generate_content(
         model="gemini-2.0-flash",

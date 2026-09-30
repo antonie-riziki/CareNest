@@ -49,13 +49,13 @@
                 <!-- Main Balance Card -->
                 <div class="lg:col-span-8 flex flex-col justify-between bg-white p-10 lg:p-12 rounded-[2.5rem] border border-outline-variant/10 shadow-2xl shadow-primary/5 group relative overflow-hidden">
                     <div class="relative z-10">
-                        <p class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] mb-4">Liquid Assets Profile</p>
-                        <h2 class="text-5xl lg:text-7xl font-extrabold text-primary tracking-tighter font-headline">KES 12,450.00</h2>
+                            <p class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] mb-4">Confirmed Work Passport earnings</p>
+                        <h2 class="text-5xl lg:text-7xl font-extrabold text-primary tracking-tighter font-headline">KES {{ earned|floatformat:2 }}</h2>
                         <div class="flex items-center gap-4 mt-8">
-                            <button class="signature-gradient text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest">
+                            <a href="{% url 'wallet-connect' %}" class="signature-gradient text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest">
                                 <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
-                                Initiate Withdrawal
-                            </button>
+                                Connect Stellar wallet
+                            </a>
                         </div>
                     </div>
                     <div class="mt-12 flex items-center gap-6 text-[10px] font-bold text-outline uppercase tracking-widest relative z-10">
@@ -77,7 +77,7 @@
                     <div class="relative z-10 space-y-6">
                         <div>
                             <p class="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-[0.3em] mb-3">Escrow Obligations</p>
-                            <h3 class="text-4xl font-extrabold tracking-tighter font-headline">KES 3,000</h3>
+                            <h3 class="text-4xl font-extrabold tracking-tighter font-headline">KES {{ escrowed|floatformat:0 }}</h3>
                         </div>
                         <p class="text-sm text-primary-fixed-dim font-medium leading-relaxed opacity-80">Funds currently protected by Care Nest Escrow. Released upon milestone verification.</p>
                     </div>

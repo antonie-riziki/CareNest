@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}My Engagements | Care Nest{% endblock %}
+
+{% block content %}
+{% include 'worker_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col bg-surface">
+    <header class="px-6 md:px-10 py-6 border-b border-outline-variant/10 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Worker WorkOS</h2>
+            <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Active engagements</h1>
+        </div>
+        {% include 'agent/_chain_banner.html' %}
+    </header>
+    <main class="p-6 lg:p-10 space-y-6 max-w-5xl pb-32">
+        {% if last_answer %}
+        <div class="bg-white border border-secondary/20 rounded-[1.5rem] p-6">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Agent</p>
+            <p class="text-sm mt-2">{{ last_answer.answer }}</p>
+        </div>
+        {% endif %}
+        <form method="post" action="{% url 'agent-ask' %}" class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-5 flex flex-col md:flex-row gap-3">
+            {% csrf_token %}
+            <input type="text" name="question" placeholder="Ask about your engagement" class="flex-1 rounded-xl border-outline-variant/30 text-sm">
+            <button class="px-5 py-3 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest">Ask</button>
+        </form>
+        {% for card in cards %}
+        <article class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-5">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">{{ card.engagement.job.job_type }}</p>
+                    <h2 class="text-2xl font-extrabold text-primary font-headline">{{ card.engagement.job.title }}</h2>
+                    <p class="text-sm text-outline">{{ card.engagement.employer.get_full_name|default:card.engagement.employer.username }} · {{ card.engagement.currency }} {{ card.engagement.amount }}</p>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-surface-container-high">{{ card.engagement.chain_status }}</span>
+            </div>
+            <p class="text-sm">{{ card.explanation.headline }} — {{ card.explanation.next_step_worker }}</p>
+            <p class="text-[11px] text-outline">Memory: {{ card.memory.summary }}</p>
+            <div class="flex flex-wrap gap-2" data-engagement="{{ card.engagement.pk }}">
+                {% if card.can_start %}
+                <button class="js-worker-action px-4 py-2 rounded-xl bg-secondary text-white text-[10px] font-bold uppercase tracking-widest" data-action="start_work" data-url="{% url 'worker-action' card.engagement.pk %}">Start work</button>
+                {% endif %}
+                {% if card.can_submit %}
+                <button class="js-worker-action px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest" data-action="submit_work" data-url="{% url 'worker-action' card.engagement.pk %}">Submit completion</button>
+                {% endif %}
+                {% if card.can_request_approval %}
+                <button class="js-worker-action px-4 py-2 rounded-xl border border-outline-variant/30 text-[10px] font-bold uppercase tracking-widest" data-action="request_approval" data-url="{% url 'worker-action' card.engagement.pk %}">Request review</button>
+                {% endif %}
+                {% if card.can_dispute %}
+                <button class="js-worker-action px-4 py-2 rounded-xl text-error border border-error/20 text-[10px] font-bold uppercase tracking-widest" data-action="dispute" data-url="{% url 'worker-action' card.engagement.pk %}">Open dispute</button>
+                {% endif %}
+                {% if card.credential %}
+                <a href="{% url 'work-passport' %}" class="px-4 py-2 rounded-xl bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-widest">View in Work Passport</a>
+                {% endif %}
+            </div>
+            <p class="js-status text-[11px] text-outline hidden"></p>
+            {% if card.engagement.release_tx_hash %}
+            <p class="font-mono text-[11px] text-outline">Payment tx {{ card.engagement.release_tx_hash }}</p>
+            {% endif %}
+        </article>
+        {% empty %}
+        <p class="text-sm text-outline">No engagements yet. When an employer funds escrow, the work appears here.</p>
+        {% endfor %}
+    </main>
+    {% include 'worker_bottom_nav.html' %}
+</div>
+{% csrf_token %}
+{% include 'agent/_wallet_js.html' %}
+<script>
+    document.querySelectorAll(".js-worker-action").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const article = btn.closest("article");
+            const status = article.querySelector(".js-status");
+            status.classList.remove("hidden");
+            status.textContent = "Submitting…";
+            const form = new FormData();
+            form.append("action", btn.dataset.action);
+            if (btn.dataset.action === "submit_work") form.append("report", "Work completed as agreed");
+            if (btn.dataset.action === "dispute") form.append("report", "Dispute raised by worker");
+            try {
+                const response = await fetch(btn.dataset.url, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": window.carenestWallet.csrf(), "X-Requested-With": "fetch" },
+                    body: form,
+                });
+                let data = await response.json();
+                if (data.needs_signature) {
+                    const signed = await window.carenestWallet.signXdr(data.xdr, data.network_passphrase);
+                    data = await window.carenestWallet.postJson(data.submit_url, { signed_xdr: signed });
+                }
+                if (data.ok) {
+                    status.textContent = (data.data_source === "DEMO_DATA" ? "DEMO DATA · " : "LIVE TESTNET · ") + "tx " + (data.tx_hash || "").slice(0, 12);
+                    window.location.reload();
+                } else {
+                    status.textContent = data.error || "Did not succeed";
+                }
+            } catch (err) {
+                status.textContent = err.message;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}WorkOS Agent | Care Nest{% endblock %}
+
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen flex flex-col relative bg-surface">
+    <header class="flex items-center justify-between px-6 md:px-10 py-6 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-sm sticky top-0 z-40">
+        <div>
+            <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">CareNest WorkOS</h2>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-primary tracking-tighter font-headline">Agent panel</h1>
+        </div>
+        {% include 'agent/_chain_banner.html' %}
+    </header>
+
+    <main class="flex-1 p-6 lg:p-10 space-y-8 max-w-6xl pb-24">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-secondary-container text-on-secondary-container px-6 py-4 rounded-2xl border border-secondary/10 flex items-center gap-4">
+                    <span class="material-symbols-outlined">info</span>
+                    <p class="font-bold text-sm">{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <section class="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm space-y-6">
+                <div>
+                    <p class="text-[10px] font-bold text-secondary uppercase tracking-widest">Describe the work</p>
+                    <h2 class="text-xl font-extrabold text-primary font-headline mt-1">The agent prepares the engagement. You approve anything that moves money.</h2>
+                </div>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <textarea name="requirement" rows="4" required placeholder="{{ example_requirement }}" class="w-full rounded-2xl border-outline-variant/30 bg-surface-container-low text-sm font-medium focus:ring-secondary focus:border-secondary">{{ proposal.requirement.raw_text|default:"" }}</textarea>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="submit" class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Parse requirement</button>
+                        <p class="text-[11px] text-outline">Example: {{ example_requirement }}</p>
+                    </div>
+                </form>
+
+                {% if proposal %}
+                <div class="rounded-2xl bg-surface-container-low p-6 space-y-4 border border-outline-variant/10">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">AI recommendation</p>
+                            <p class="font-bold text-primary">{{ proposal.summary }}</p>
+                        </div>
+                        {% if proposal.requirement.parser %}
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-white border border-outline-variant/20">{{ proposal.requirement.parser }}</span>
+                        {% endif %}
+                    </div>
+                    <dl class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Role</dt><dd class="font-bold text-primary">{{ proposal.requirement.job_type }}</dd></div>
+                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Location</dt><dd class="font-bold text-primary">{{ proposal.requirement.location|default:"—" }}</dd></div>
+                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Pay</dt><dd class="font-bold text-primary">{{ proposal.requirement.pay_currency }} {{ proposal.requirement.pay_amount }} / {{ proposal.requirement.pay_period }}</dd></div>
+                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Schedule</dt><dd class="font-bold text-primary">{{ proposal.requirement.schedule }}</dd></div>
+                    </dl>
+                </div>
+                {% endif %}
+
+                {% if proposal.candidates %}
+                <form method="post" action="{% url 'agent-prepare' %}" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="job_id" value="{{ proposal.job.job_id }}">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Choose a worker — this only prepares terms</p>
+                    <div class="space-y-3">
+                        {% for c in proposal.candidates %}
+                        <label class="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/20 hover:border-secondary/40 bg-white cursor-pointer">
+                            <input type="radio" name="worker_id" value="{{ c.user_id }}" required class="mt-1 text-secondary focus:ring-secondary" {% if forloop.first %}checked{% endif %}>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="font-extrabold text-primary">{{ c.display_name }}</p>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-secondary">Score {{ c.score }}</span>
+                                </div>
+                                <p class="text-xs text-outline mt-1">{{ c.skills|join:", " }}</p>
+                                <p class="text-[11px] text-on-surface-variant mt-2">{{ c.reasons|join:" · " }}</p>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Prepare engagement</button>
+                </form>
+                {% elif proposal %}
+                <p class="text-sm text-outline">No matching workers yet. Seed demo profiles or register a worker, then parse again.</p>
+                {% endif %}
+            </section>
+
+            <aside class="space-y-6">
+                <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 space-y-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Wallet</p>
+                    {% if wallet and wallet.is_connected %}
+                        <p class="font-mono text-sm text-primary">{{ wallet.short_address }}</p>
+                        <p class="text-[11px] text-outline">{{ wallet.get_wallet_provider_display }}</p>
+                    {% else %}
+                        <p class="text-sm text-outline">Connect a Stellar wallet before creating an on-chain agreement.</p>
+                    {% endif %}
+                    <a href="{% url 'wallet-connect' %}?next={% url 'agent-panel' %}" class="inline-flex text-xs font-bold uppercase tracking-widest text-secondary">Manage wallet</a>
+                </div>
+
+                <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 space-y-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Session persistence</p>
+                    <p class="text-sm text-on-surface-variant">Ask about an engagement after a reload. The agent answers from saved memory and on-chain events — never invented state.</p>
+                    <form method="post" action="{% url 'agent-ask' %}" class="space-y-3">
+                        {% csrf_token %}
+                        <input type="text" name="question" value="What is happening with Mary's contract?" class="w-full rounded-xl border-outline-variant/30 text-sm">
+                        <button class="w-full py-3 rounded-xl bg-surface-container-high text-primary text-xs font-bold uppercase tracking-widest">Ask the agent</button>
+                    </form>
+                    {% if memory.summary %}
+                    <p class="text-[11px] text-outline">Memory v{{ memory.version }}: {{ memory.summary }}</p>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+
+        {% if pending_approvals %}
+        <section class="space-y-4">
+            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Pending human approvals</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for a in pending_approvals %}
+                <a href="{% url 'agent-command-center' a.engagement_id %}" class="bg-white p-6 rounded-[1.5rem] border border-amber-200 hover:border-secondary/40">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-amber-700">Needs your signature</p>
+                    <p class="font-extrabold text-primary mt-1">{{ a.get_approval_type_display }}</p>
+                    <p class="text-sm text-outline mt-2">{{ a.summary }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Your engagements</h3>
+                <a href="{% url 'employer-contracts' %}" class="text-[10px] font-bold text-secondary uppercase tracking-widest">View all</a>
+            </div>
+            {% if engagements %}
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for e in engagements %}
+                <a href="{% url 'agent-command-center' e.pk %}" class="bg-white p-6 rounded-[1.5rem] border border-outline-variant/10 hover:border-secondary/30">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="font-extrabold text-primary">{{ e.job.title }}</p>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full {% if e.is_demo %}bg-amber-100 text-amber-800{% else %}bg-secondary/10 text-secondary{% endif %}">{{ e.chain_status }}</span>
+                    </div>
+                    <p class="text-sm text-outline mt-2">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.currency }} {{ e.amount }}</p>
+                    {% if e.latest_tx_hash %}<p class="font-mono text-[11px] text-outline mt-2">tx {{ e.latest_tx_hash|slice:":12" }}…</p>{% endif %}
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-outline">No engagements yet. Describe a requirement above.</p>
+            {% endif %}
+        </section>
+    </main>
+</div>
+{% endblock %}

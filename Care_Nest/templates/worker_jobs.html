@@ -178,87 +178,33 @@
                 <!-- Swipeable Job Cards -->
                 <div
                     class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
-                    <!-- Card 1 -->
-                    <div
+                    {% for job in jobs %}
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}"
                         class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-on-secondary-container"
-                                    data-icon="cleaning_services">cleaning_services</span>
+                                <span class="material-symbols-outlined text-on-secondary-container">work</span>
                             </div>
                             <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="text-xs font-bold text-on-surface">4.8</span>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-outline">{{ job.job_type }}</span>
                             </div>
                         </div>
-                        <h3 class="font-headline text-lg font-bold text-primary mb-1">General Cleaning</h3>
-                        <p class="text-sm text-outline mb-4">Kilimani, Nairobi</p>
+                        <h3 class="font-headline text-lg font-bold text-primary mb-1">{{ job.title }}</h3>
+                        <p class="text-sm text-outline mb-4">{{ job.location }}</p>
                         <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
                             <div>
                                 <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                                <p class="font-headline font-bold text-secondary">KES 1,500</p>
+                                <p class="font-headline font-bold text-secondary">KES {{ job.pay }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                                <p class="font-headline font-bold text-primary">2.5km</p>
+                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Posted</p>
+                                <p class="font-headline font-bold text-primary">{{ job.created_at|date:"M j" }}</p>
                             </div>
                         </div>
-                    </div>
-                    <!-- Card 2 -->
-                    <div
-                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-on-secondary-container"
-                                    data-icon="garden_cart">garden_cart</span>
-                            </div>
-                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="text-xs font-bold text-on-surface">4.9</span>
-                            </div>
-                        </div>
-                        <h3 class="font-headline text-lg font-bold text-primary mb-1">Garden Maintenance</h3>
-                        <p class="text-sm text-outline mb-4">Lavington, Nairobi</p>
-                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                                <p class="font-headline font-bold text-secondary">KES 1,800</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                                <p class="font-headline font-bold text-primary">3.1km</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card 3 -->
-                    <div
-                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-on-secondary-container"
-                                    data-icon="electric_bolt">electric_bolt</span>
-                            </div>
-                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                                <span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="star"
-                                    data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="text-xs font-bold text-on-surface">4.7</span>
-                            </div>
-                        </div>
-                        <h3 class="font-headline text-lg font-bold text-primary mb-1">Culinary - Nigerian Cuisine</h3>
-                        <p class="text-sm text-outline mb-4">Westlands, Nairobi</p>
-                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                                <p class="font-headline font-bold text-secondary">KES 2,200</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Distance</p>
-                                <p class="font-headline font-bold text-primary">1.2km</p>
-                            </div>
-                        </div>
-                    </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-outline">No jobs posted yet. Employers create work through the WorkOS agent.</p>
+                    {% endfor %}
                 </div>
                 <!-- Recommendations Section (Editorial Layout) -->
                 <section class="mt-4 pb-12 lg:pb-0">
@@ -372,60 +318,23 @@
         let userLocation = null;
         let currentRadius = 5; // Default 5km
 
-        // Dummy jobs data generator
-        function generateDummyJobs(lat, lon, count = 15) {
-            const jobTitles = [
-                'Move-out Deep Clean', 'Garden Maintenance', 'Professional Cooking', 'Elderly Care Support',
-                'Laundry & Ironing', 'Baby Sitting', 'Housekeeping', 'Window Cleaning',
-                'Home Nursing', 'Pet Grooming', 'Meal Preparation', 'Floor Polishing',
-                'Carpet Cleaning', 'Weekly Grocery Shopping', 'After-school Tutoring'
-            ];
+        const CARENEST_JOBS = {{ jobs_json|safe }};
 
-            const categories = {
-                'Move-out Deep Clean': { cat: 'Housekeeping', icon: 'cleaning_services' },
-                'Garden Maintenance': { cat: 'Gardening', icon: 'garden_cart' },
-                'Professional Cooking': { cat: 'Cooking', icon: 'restaurant' },
-                'Elderly Care Support': { cat: 'Caregiving', icon: 'elderly' },
-                'Laundry & Ironing': { cat: 'Laundry', icon: 'local_laundry_service' },
-                'Baby Sitting': { cat: 'Childcare', icon: 'child_care' },
-                'Housekeeping': { cat: 'Housekeeping', icon: 'home' },
-                'Window Cleaning': { cat: 'Maintenance', icon: 'window' },
-                'Home Nursing': { cat: 'Healthcare', icon: 'medical_services' },
-                'Pet Grooming': { cat: 'Pet Care', icon: 'pets' },
-                'Meal Preparation': { cat: 'Cooking', icon: 'soup_kitchen' },
-                'Floor Polishing': { cat: 'Maintenance', icon: 'format_paint' },
-                'Carpet Cleaning': { cat: 'Cleaning', icon: 'dry_cleaning' },
-                'Weekly Grocery Shopping': { cat: 'Errands', icon: 'shopping_cart' },
-                'After-school Tutoring': { cat: 'Education', icon: 'menu_book' }
-            };
-
-            const jobs = [];
-
-            for (let i = 0; i < count; i++) {
-                const title = jobTitles[i % jobTitles.length];
-                const info = categories[title] || { cat: 'General', icon: 'work' };
-
-                // Generate random location within ~5km radius
-                const offsetLat = (Math.random() - 0.5) * 0.05;
-                const offsetLon = (Math.random() - 0.5) * 0.05;
-
-                jobs.push({
-                    id: i + 1,
-                    title: title,
-                    category: info.cat,
-                    icon: info.icon,
-                    lat: lat + offsetLat,
-                    lon: lon + offsetLon,
-                    pay: Math.floor(Math.random() * 3000) + 1000, // KShs 1000-4000
-                    duration: (Math.floor(Math.random() * 5) + 2) + " hours",
-                    rating: (Math.random() * 1.5 + 3.5).toFixed(1),
-                    total_reviews: Math.floor(Math.random() * 50) + 5,
-                    is_verified: Math.random() > 0.3,
-                    distance: (Math.random() * 5).toFixed(1)
-                });
-            }
-
-            return jobs;
+        function loadJobs() {
+            return (CARENEST_JOBS || []).map((job) => ({
+                id: job.id,
+                title: job.title,
+                category: job.category || job.job_type,
+                icon: job.icon || "work",
+                lat: job.lat,
+                lon: job.lon,
+                pay: job.pay,
+                duration: job.duration || "as agreed",
+                rating: job.rating || "4.8",
+                total_reviews: job.total_reviews || 0,
+                is_verified: true,
+                distance: job.distance || "—",
+            }));
         }
 
         // Initialize map
@@ -461,7 +370,7 @@
             }).addTo(map);
 
             // Generate and add job markers
-            const jobs = generateDummyJobs(lat, lon);
+            const jobs = loadJobs();
             addJobMarkers(jobs);
 
             // Update counts
@@ -565,13 +474,7 @@
 
         // View job details
         function viewJobDetails(jobId) {
-            // This would normally open a modal or navigate to a job detail page
-            console.log("Viewing job:", jobId);
-            // Example: show the job overlay if it exists
-            const overlay = document.getElementById('job-overlay');
-            if (overlay) {
-                overlay.classList.remove('hidden');
-            }
+            window.location.href = "{% url 'worker-job-details' %}?id=" + jobId;
         }
 
         // Close job overlay

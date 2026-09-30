@@ -5,7 +5,7 @@ from apps.accounts.models import User
 # Create your models here.
 class WorkerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    skills = models.TextField()
+    skills = models.TextField(blank=True, default="")
     rating = models.FloatField(default=0)
     verified = models.BooleanField(default=False)
 

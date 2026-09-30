@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title|default:"Job" }} | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10">
+    {% if job %}
+    <h1 class="text-3xl font-extrabold text-primary font-headline">{{ job.title }}</h1>
+    <p class="text-sm text-outline mt-2">{{ job.location }} · KES {{ job.pay }} · {{ job.job_type }}</p>
+    <p class="mt-6 text-sm">{{ job.description }}</p>
+    <h2 class="mt-8 text-[10px] font-bold uppercase tracking-widest text-outline">Applicants</h2>
+    <ul class="mt-3 space-y-2">
+        {% for a in applicants %}
+        <li class="bg-white rounded-xl border border-outline-variant/10 p-4">{{ a.worker.get_full_name|default:a.worker.username }} · {{ a.status }}</li>
+        {% empty %}
+        <li class="text-sm text-outline">No applicants yet.</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Job not found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<aside class="hidden md:flex flex-col w-64 h-screen bg-surface border-r border-outline-variant/10 fixed left-0 top-0 z-50">
+    <div class="px-8 py-8 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl signature-gradient flex items-center justify-center text-white shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined text-2xl">waves</span>
+        </div>
+        <div>
+            <h2 class="text-xl font-extrabold text-primary tracking-tighter font-headline leading-none">Care Nest</h2>
+            <p class="text-[10px] font-bold text-secondary uppercase tracking-widest mt-1">Employer Panel</p>
+        </div>
+    </div>
+
+    <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+        <a href="{% url 'employer-dashboard' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'employer-dashboard' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">dashboard</span>
+            <span class="font-bold text-sm">Dashboard</span>
+        </a>
+        <a href="{% url 'agent-panel' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'agent-panel' or request.resolver_match.url_name == 'agent-command-center' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">smart_toy</span>
+            <span class="font-bold text-sm">WorkOS Agent</span>
+        </a>
+        <a href="{% url 'employer-jobs' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'employer-jobs' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">work_outline</span>
+            <span class="font-bold text-sm">Job Postings</span>
+        </a>
+        <a href="{% url 'employer-contracts' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'employer-contracts' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">people</span>
+            <span class="font-bold text-sm">Engagements</span>
+        </a>
+        <a href="{% url 'wallet-connect' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'wallet-connect' or request.resolver_match.url_name == 'employer-wallet' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">account_balance_wallet</span>
+            <span class="font-bold text-sm">Wallet</span>
+        </a>
+        <div class="pt-8 pb-2">
+            <p class="px-4 text-[10px] font-bold text-outline uppercase tracking-widest">Account</p>
+        </div>
+        <a href="{% url 'employer-settings' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group text-outline hover:text-primary hover:bg-surface-container-low">
+            <span class="material-icons-round text-2xl">settings</span>
+            <span class="font-bold text-sm">Settings</span>
+        </a>
+    </nav>
+
+    <div class="px-6 py-8">
+        <div class="bg-surface-container-low rounded-3xl p-5 border border-outline-variant/10">
+            <p class="text-xs font-bold text-primary mb-2">Need help?</p>
+            <p class="text-[10px] text-on-surface-variant font-medium mb-4 leading-relaxed">Reach our dedicated support team.</p>
+            <button class="w-full py-2.5 bg-white text-primary text-[10px] font-bold rounded-xl border border-outline-variant/20 shadow-sm hover:bg-surface-container-high transition-colors">Contact Support</button>
+        </div>
+    </div>
+</aside>

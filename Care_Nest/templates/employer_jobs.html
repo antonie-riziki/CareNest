@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Job Postings | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Job postings</h1>
+        <a href="{% url 'agent-panel' %}" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">New via Agent</a>
+    </div>
+    {% for job in jobs %}
+    <article class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
+        <div class="flex flex-wrap justify-between gap-3">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">{{ job.job_type }}</p>
+                <h2 class="text-xl font-extrabold text-primary">{{ job.title }}</h2>
+                <p class="text-sm text-outline">{{ job.location }} · KES {{ job.pay }}</p>
+            </div>
+            <p class="text-xs text-outline">{{ job.created_at|date:"M j" }}</p>
+        </div>
+        <p class="text-sm mt-3">{{ job.description|truncatewords:30 }}</p>
+    </article>
+    {% empty %}
+    <p class="text-sm text-outline">No jobs yet. Describe a requirement in the WorkOS agent.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -20,13 +20,16 @@ from .messaging_engine import send_message
 
 # @app.route("/ussd", methods=["POST"])
 def handle_ussd():
-    # Read the variables sent via POST from our API
+    # Flask standalone entry (apps/ussd_app/main_app.py). Django uses handle_ussd_menu.
     session_id = request.values.get("sessionId", None)
-    serviceCode = request.values.get("serviceCode", None)
     phone_number = request.values.get("phoneNumber", None)
     text = request.values.get("text", "")
+    return handle_ussd_menu(text, phone_number, session_id)
 
-    user_response = text.split("*")
+
+def handle_ussd_menu(text, phone_number=None, session_id=None):
+    text = text or ""
+    user_response = text.split("*") if text else []
 
     # ======================
     # MAIN MENU
@@ -39,6 +42,7 @@ def handle_ussd():
         response += "2. Worker\n"
         response += "3. Check Contract\n"
         response += "4. Help\n"
+        response += "5. WorkOS Agent\n"
 
     # ======================
     # EMPLOYER FLOW

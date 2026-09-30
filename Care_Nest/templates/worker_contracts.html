@@ -45,137 +45,40 @@
 
                 <!-- Section: Active Contract Summary -->
                 <section class="space-y-8">
-                    <div class="flex justify-between items-end">
-                        <div class="space-y-1">
-                            <span class="text-secondary font-bold tracking-[0.3em] text-[10px] uppercase">Current Engagement</span>
-                            <h2 class="text-4xl font-extrabold text-primary tracking-tighter font-headline">Active Contract</h2>
-                        </div>
-                        <div class="hidden sm:flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-xl text-xs font-bold border border-secondary/20">
-                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
-                            Verified Provider
-                        </div>
-                    </div>
-
-                    <!-- Primary Active Card -->
-                    <div class="relative overflow-hidden bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-outline-variant/10">
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 -mr-32 -mt-32 rounded-full blur-3xl"></div>
-                        
+                    {% for card in cards %}
+                    <a href="{% url 'worker-engagements' %}" class="relative overflow-hidden bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-outline-variant/10 block">
                         <div class="relative z-10 flex flex-col lg:flex-row lg:items-start justify-between gap-10">
                             <div class="flex-1 space-y-8">
                                 <div class="flex items-center gap-4">
                                     <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
-                                        <span class="material-symbols-outlined text-4xl" data-icon="home_work">home_work</span>
+                                        <span class="material-symbols-outlined text-4xl">home_work</span>
                                     </div>
                                     <div>
-                                        <h3 class="text-2xl font-bold text-primary font-headline">Household Management</h3>
-                                        <p class="text-on-surface-variant font-medium">Westlands Estate, Nairobi</p>
+                                        <h3 class="text-2xl font-bold text-primary font-headline">{{ card.engagement.job.title }}</h3>
+                                        <p class="text-on-surface-variant font-medium">{{ card.engagement.job.location }}</p>
                                     </div>
                                 </div>
-
                                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-8">
                                     <div class="space-y-1">
-                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Commencement</p>
-                                        <p class="font-bold text-primary text-lg">Jan 12, 2026</p>
+                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Status</p>
+                                        <p class="font-bold text-primary text-lg">{{ card.engagement.chain_status }}</p>
                                     </div>
                                     <div class="space-y-1">
-                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Remuneration</p>
-                                        <p class="font-bold text-secondary text-lg">KES 45,000 / mo</p>
+                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Pay</p>
+                                        <p class="font-bold text-primary text-lg">{{ card.engagement.currency }} {{ card.engagement.amount }}</p>
                                     </div>
-                                    <div class="space-y-1 col-span-2 lg:col-span-1">
-                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Contract Status</p>
-                                        <div class="flex items-center gap-2 mt-1">
-                                            <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
-                                            <span class="text-amber-600 font-bold text-sm tracking-tight">Active Engagement</span>
-                                        </div>
+                                    <div class="space-y-1">
+                                        <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Employer</p>
+                                        <p class="font-bold text-primary text-lg">{{ card.engagement.employer.get_full_name|default:card.engagement.employer.username }}</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="flex flex-col gap-3 shrink-0">
-                                <button class="w-full lg:w-max px-10 py-5 signature-gradient text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-                                    <span class="material-symbols-outlined" data-icon="description">description</span>
-                                    Legal Document
-                                </button>
-                                <button class="w-full lg:w-max px-10 py-5 bg-surface-container-high text-primary rounded-2xl font-bold text-sm hover:bg-surface-container-highest transition-all flex items-center justify-center gap-3 border border-outline-variant/10">
-                                    <span class="material-symbols-outlined" data-icon="history">history</span>
-                                    Logs & Hours
-                                </button>
+                                <p class="text-sm text-outline">{{ card.explanation.headline }} — {{ card.explanation.next_step_worker }}</p>
                             </div>
                         </div>
-
-                        <!-- Structured Scope of Work -->
-                        <div class="mt-12 pt-10 border-t border-outline-variant/10">
-                            <h4 class="font-bold text-outline uppercase tracking-[0.2em] text-[10px] mb-8">Contractual Scope of Work</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group">
-                                    <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-                                        <span class="material-symbols-outlined text-xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-primary">Comprehensive Laundry</p>
-                                        <p class="text-xs text-on-surface-variant font-medium">Washing, ironing, and sorting weekly</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group">
-                                    <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-                                        <span class="material-symbols-outlined text-xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-primary">Daily Cleaning</p>
-                                        <p class="text-xs text-on-surface-variant font-medium">Surface sanitization and floor care</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group">
-                                    <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-                                        <span class="material-symbols-outlined text-xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-primary">Nutritional Cooking</p>
-                                        <p class="text-xs text-on-surface-variant font-medium">Meal prep for family of four (Mon-Fri)</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl border border-transparent opacity-50 grayscale group">
-                                    <div class="w-10 h-10 rounded-full bg-outline/10 flex items-center justify-center text-outline group-hover:scale-110 transition-transform">
-                                        <span class="material-symbols-outlined text-xl">radio_button_unchecked</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-primary">Grocery Procurement</p>
-                                        <p class="text-xs text-on-surface-variant font-medium">Bi-weekly stock replenishment</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section: Contract History -->
-                <section class="mt-20">
-                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] mb-10 flex items-center gap-3">
-                        <span class="w-4 h-[2px] bg-primary"></span>
-                        Engagement History
-                    </h3>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {% for i in "123" %}
-                        <div class="group bg-surface-container-low hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 hover:border-primary/20 p-6 rounded-2xl border border-outline-variant/10 transition-all flex items-center justify-between gap-6 cursor-pointer">
-                            <div class="flex gap-5">
-                                <div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
-                                    <span class="material-symbols-outlined text-3xl">{% cycle 'event_available' 'verified_user' 'cleaning_services' %}</span>
-                                </div>
-                                <div class="space-y-1">
-                                    <h4 class="font-bold text-primary group-hover:text-secondary transition-colors font-headline">{% cycle 'Garden Landscape & Maintenance' 'Private Security & Gate Mgmt' 'Bi-Weekly Deep Clean' %}</h4>
-                                    <p class="text-xs text-on-surface-variant font-medium">{% cycle 'Karen Estates' 'Lavington Heights' 'Kilimani Apts' %} • 2025</p>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end gap-2 shrink-0">
-                                <div class="flex items-center gap-1.5 bg-white px-3 py-1 rounded-lg border border-outline-variant/10 shadow-sm">
-                                    <span class="material-symbols-outlined text-amber-500 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span class="font-bold text-primary text-xs">{% cycle '4.9' '5.0' '4.7' %}</span>
-                                </div>
-                                <span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-outline">No contracts yet.</p>
+                    {% endfor %}
                 </section>
             </div>
         </main>

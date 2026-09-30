@@ -61,7 +61,7 @@ def worker_signup(request):
         user.save()
 
         # Create Worker Profile
-        WorkerProfile.objects.create(user=user)
+        WorkerProfile.objects.create(user=user, skills="")
 
         # Log in the user automatically
         login(request, user)

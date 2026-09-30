@@ -1,12 +1,29 @@
 import africastalking
 import os
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 
-africastalking.initialize(username="EMID", api_key=os.getenv("AT_API_KEY"))
+logger = logging.getLogger("carenest.comms")
 
-sms = africastalking.SMS
+
+class _DisabledSMS:
+    """Fallback used when AT_API_KEY is not configured so the app still boots."""
+
+    def send(self, message, recipients, sender=None):
+        logger.info("SMS disabled (AT_API_KEY unset). Would send to %s", recipients)
+        return {"status": "disabled"}
+
+
+_AT_USERNAME = os.getenv("AT_USERNAME", "EMID")
+_AT_API_KEY = os.getenv("AT_API_KEY")
+
+if _AT_API_KEY:
+    africastalking.initialize(username=_AT_USERNAME, api_key=_AT_API_KEY)
+    sms = africastalking.SMS
+else:
+    sms = _DisabledSMS()
 
 
 # User New Account Welcome Notification

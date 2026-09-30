@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Settings | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10">
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Settings</h1>
+    <p class="text-sm text-outline mt-2">{{ request.user.get_full_name|default:request.user.username }} · {{ request.user.email }}</p>
+    <a href="{% url 'wallet-connect' %}" class="inline-flex mt-6 text-xs font-bold uppercase tracking-widest text-secondary">Stellar wallet</a>
+</div>
+{% endblock %}

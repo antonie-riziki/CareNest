@@ -1,0 +1,12 @@
+{
+  "description": "Recorded CareNest WorkContract lifecycle used only when LIVE TESTNET is unavailable. UI must label this DEMO DATA.",
+  "events": [
+    "agreement_created",
+    "agreement_funded",
+    "work_started",
+    "work_submitted",
+    "approval_requested",
+    "payment_released",
+    "credential_issued"
+  ]
+}

@@ -25,6 +25,18 @@
             <span class="font-bold text-sm">Find Jobs</span>
         </a>
 
+        <a href="{% url 'worker-engagements' %}"
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-engagements' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">handshake</span>
+            <span class="font-bold text-sm">Engagements</span>
+        </a>
+
+        <a href="{% url 'work-passport' %}"
+           class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'work-passport' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
+            <span class="material-icons-round text-2xl">badge</span>
+            <span class="font-bold text-sm">Work Passport</span>
+        </a>
+
         <a href="{% url 'worker-contracts' %}" 
            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group hover:bg-surface-container-low {% if request.resolver_match.url_name == 'worker-contracts' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary{% endif %}">
             <span class="material-icons-round text-2xl">description</span>

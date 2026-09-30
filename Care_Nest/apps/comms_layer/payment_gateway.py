@@ -6,21 +6,15 @@ import base64
 # Load environment variables from .env file
 load_dotenv()
 
-# Your API username and password
-api_username = os.getenv("PAYHERO_USERNAME")
-api_password = os.getenv("PAYHERO_PASSWORD")
 
-# Concatenate username and password with a colon
-credentials = f"{api_username}:{api_password}"
-
-# Base64 encode the credentials
-encoded_credentials = base64.b64encode(credentials.encode()).decode()
-
-# Create the Basic Auth token
-basic_auth_token = f"Basic {encoded_credentials}"
-
-# Output the token
-print(basic_auth_token)
+def _basic_auth_token():
+    """Build the PayHero Basic auth header from env vars (never logged)."""
+    api_username = os.getenv("PAYHERO_USERNAME", "")
+    api_password = os.getenv("PAYHERO_PASSWORD", "")
+    if not api_username or not api_password:
+        return os.getenv("PAYHERO_AUTH", "")
+    encoded = base64.b64encode(f"{api_username}:{api_password}".encode()).decode()
+    return f"Basic {encoded}"
 
 
 def initiate_payment(phone_number):
@@ -31,7 +25,7 @@ def initiate_payment(phone_number):
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"{os.getenv('PAYHERO_AUTH')}",
+        "Authorization": _basic_auth_token(),
     }
 
     payload = {

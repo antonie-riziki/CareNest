@@ -1,0 +1,83 @@
+<script>
+    function carenestCsrf() {
+        const match = document.cookie.match(/csrftoken=([^;]+)/);
+        if (match) return decodeURIComponent(match[1]);
+        const input = document.querySelector("[name=csrfmiddlewaretoken]");
+        return input ? input.value : "";
+    }
+
+    function carenestFreighterAvailable() {
+        return Boolean(window.freighterApi);
+    }
+
+    async function carenestConnectFreighter() {
+        if (!carenestFreighterAvailable()) {
+            throw new Error("Freighter is not installed. Install the Freighter browser extension, or paste a public key.");
+        }
+        await window.freighterApi.setAllowed();
+        const result = await window.freighterApi.getAddress();
+        return result.address || result;
+    }
+
+    async function carenestSignXdr(xdr, networkPassphrase) {
+        if (!carenestFreighterAvailable()) {
+            throw new Error("Freighter is not installed — cannot sign this transaction in the browser.");
+        }
+        const signed = await window.freighterApi.signTransaction(xdr, { networkPassphrase });
+        return signed.signedTxXdr || signed;
+    }
+
+    async function carenestPostJson(url, body) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": carenestCsrf(),
+                "X-Requested-With": "fetch",
+            },
+            body: JSON.stringify(body || {}),
+        });
+        const data = await response.json().catch(() => ({ ok: false, error: "Unexpected response" }));
+        if (!response.ok && !data.needs_signature) {
+            throw new Error(data.error || "Request failed");
+        }
+        return data;
+    }
+
+    async function carenestPostForm(url, fields) {
+        const form = new FormData();
+        Object.entries(fields || {}).forEach(([key, value]) => form.append(key, value));
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": carenestCsrf(),
+                "X-Requested-With": "fetch",
+            },
+            body: form,
+        });
+        const data = await response.json().catch(() => ({ ok: false, error: "Unexpected response" }));
+        if (!response.ok && !data.needs_signature) {
+            throw new Error(data.error || "Request failed");
+        }
+        return data;
+    }
+
+    async function carenestRunApproval(approveUrl) {
+        const first = await carenestPostForm(approveUrl, {});
+        if (first.needs_signature) {
+            const signed = await carenestSignXdr(first.xdr, first.network_passphrase);
+            return carenestPostJson(first.submit_url, { signed_xdr: signed });
+        }
+        return first;
+    }
+
+    window.carenestWallet = {
+        csrf: carenestCsrf,
+        connectFreighter: carenestConnectFreighter,
+        signXdr: carenestSignXdr,
+        postJson: carenestPostJson,
+        postForm: carenestPostForm,
+        runApproval: carenestRunApproval,
+        freighterAvailable: carenestFreighterAvailable,
+    };
+</script>

@@ -13,20 +13,44 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load a local .env file if present (never committed; see .env.example).
+load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR.parent / ".env")
+
+
+def env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0l3s)mz1!$&^&#4qn0#ud89akl89cr)48d7z#kj8uapvtu0jt%"
+# The key is read from the environment. A development-only fallback is used
+# when DJANGO_SECRET_KEY is not set so the project still boots locally.
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or (
+    "dev-only-insecure-key-set-DJANGO_SECRET_KEY-in-production"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = env_bool("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",") if h.strip()
+]
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if o.strip()
+]
 
 
 # Application definition
@@ -47,6 +71,8 @@ INSTALLED_APPS = [
     "apps.wallet",
     "apps.dashboard",
     "apps.core",
+    "apps.ussd_app",
+    "apps.agentic_core.apps.AgenticCoreConfig",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -138,3 +164,62 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_URL = "role-selection"
+
+# ---------------------------------------------------------------------------
+# Stellar / Soroban (trust & settlement layer)
+# ---------------------------------------------------------------------------
+STELLAR_NETWORK = os.getenv("STELLAR_NETWORK", "testnet")  # testnet | futurenet | public
+STELLAR_RPC_URL = os.getenv("STELLAR_RPC_URL", "https://soroban-testnet.stellar.org")
+STELLAR_HORIZON_URL = os.getenv("STELLAR_HORIZON_URL", "https://horizon-testnet.stellar.org")
+STELLAR_NETWORK_PASSPHRASE = os.getenv(
+    "STELLAR_NETWORK_PASSPHRASE", "Test SDF Network ; September 2015"
+)
+STELLAR_FRIENDBOT_URL = os.getenv("STELLAR_FRIENDBOT_URL", "https://friendbot.stellar.org")
+# Deployed CareNest WorkContract id (C...). Empty => on-chain actions are unavailable
+# and the UI falls back to clearly-labelled DEMO DATA.
+CARENEST_CONTRACT_ID = os.getenv("CARENEST_CONTRACT_ID", "")
+# SAC address of the settlement token (defaults to native XLM SAC on testnet).
+CARENEST_TOKEN_CONTRACT_ID = os.getenv(
+    "CARENEST_TOKEN_CONTRACT_ID",
+    "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+)
+CARENEST_TOKEN_SYMBOL = os.getenv("CARENEST_TOKEN_SYMBOL", "XLM")
+CARENEST_TOKEN_DECIMALS = int(os.getenv("CARENEST_TOKEN_DECIMALS", "7"))
+# Optional server-held testnet signing keys used ONLY for the guided demo when a
+# browser wallet is not available. Never use funded mainnet keys here.
+STELLAR_DEMO_EMPLOYER_SECRET = os.getenv("STELLAR_DEMO_EMPLOYER_SECRET", "")
+STELLAR_DEMO_WORKER_SECRET = os.getenv("STELLAR_DEMO_WORKER_SECRET", "")
+STELLAR_ARBITER_SECRET = os.getenv("STELLAR_ARBITER_SECRET", "")
+# When true, blockchain calls are never attempted and recorded fixtures are used.
+CARENEST_FORCE_DEMO_MODE = env_bool("CARENEST_FORCE_DEMO_MODE", default=False)
+STELLAR_EXPLORER_BASE = os.getenv(
+    "STELLAR_EXPLORER_BASE", "https://stellar.expert/explorer/testnet"
+)
+
+# ---------------------------------------------------------------------------
+# Omega / ASI Alliance inference (AI infrastructure layer)
+# ---------------------------------------------------------------------------
+# Omega (singnet/Omega) uses the `ASI_API_KEY` convention for its ASICloud
+# provider. CareNest talks to the same OpenAI-compatible inference endpoint
+# through apps.agentic_core.omega_adapter so the rest of the app never depends
+# on a specific vendor SDK.
+OMEGA_LLM_BASE_URL = os.getenv("OMEGA_LLM_BASE_URL", "https://llm.c.singularitynet.io/v1")
+OMEGA_LLM_MODEL = os.getenv("OMEGA_LLM_MODEL", "asi1-mini")
+OMEGA_LLM_TIMEOUT = float(os.getenv("OMEGA_LLM_TIMEOUT", "40"))
+OMEGA_LLM_ENABLED = env_bool("OMEGA_LLM_ENABLED", default=bool(os.getenv("ASI_API_KEY")))
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+    },
+    "loggers": {
+        "carenest": {"handlers": ["console"], "level": os.getenv("CARENEST_LOG_LEVEL", "INFO")},
+    },
+}

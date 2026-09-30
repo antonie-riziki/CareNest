@@ -69,4 +69,6 @@ urlpatterns = [
     path("api/dashboard/", include("apps.dashboard.urls")),
     # USSD
     path("ussd/callback/", ussd_callback, name="ussd_callback"),
+    # CareNest WorkOS (agent, command center, Work Passport, Stellar wallet)
+    path("", include("apps.agentic_core.urls")),
 ]

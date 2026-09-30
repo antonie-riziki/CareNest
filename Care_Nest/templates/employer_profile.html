@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Profile | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10">
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ request.user.get_full_name|default:request.user.username }}</h1>
+    <p class="text-sm text-outline mt-2">{{ request.user.email }}</p>
+</div>
+{% endblock %}

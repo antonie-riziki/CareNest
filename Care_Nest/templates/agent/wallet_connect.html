@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Connect Stellar wallet | Care Nest{% endblock %}
+
+{% block content %}
+{% if role == 'employer' %}{% include 'employer_sidebar.html' %}{% else %}{% include 'worker_sidebar.html' %}{% endif %}
+<div class="{% if role %}md:ml-64{% endif %} min-h-screen bg-surface p-6 md:p-10 max-w-3xl">
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Stellar wallet</h1>
+    <p class="text-sm text-outline mt-2">Only the public address is stored. CareNest never asks for a secret key, seed phrase or Freighter password.</p>
+    <div class="mt-4">{% include 'agent/_chain_banner.html' %}</div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="mt-6 bg-secondary-container px-5 py-3 rounded-2xl text-sm font-bold">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-6">
+        {% if wallet and wallet.is_connected %}
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Connected</p>
+            <p class="font-mono text-lg text-primary mt-1">{{ wallet.stellar_address }}</p>
+            <p class="text-xs text-outline mt-1">{{ wallet.get_wallet_provider_display }} · {{ wallet.connected_at|date:"M j, Y H:i" }}</p>
+        </div>
+        <form method="post" action="{% url 'wallet-disconnect' %}">{% csrf_token %}
+            <button class="text-xs font-bold uppercase tracking-widest text-error">Disconnect</button>
+        </form>
+        {% else %}
+        <p class="text-sm">Connect Freighter for live testnet signing, or paste a G… public key.</p>
+        <button type="button" id="js-freighter" class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Connect Freighter</button>
+        <form method="post" class="space-y-3" id="wallet-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <input type="hidden" name="provider" id="provider" value="manual">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Public key</label>
+            <input name="public_key" id="public_key" required placeholder="G..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm" value="{{ demo_key }}">
+            {% if demo_key %}
+            <p class="text-[11px] text-amber-800">A demo signer public key is pre-filled for the guided testnet demo. It is not a secret.</p>
+            {% endif %}
+            <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save address</button>
+        </form>
+        {% endif %}
+        {% if friendbot %}
+        <p class="text-[11px] text-outline">Testnet accounts can be funded at friendbot.stellar.org. Never use a funded mainnet key here.</p>
+        {% endif %}
+    </div>
+</div>
+{% include 'agent/_wallet_js.html' %}
+<script>
+    const btn = document.getElementById("js-freighter");
+    if (btn) {
+        btn.addEventListener("click", async () => {
+            try {
+                const address = await window.carenestWallet.connectFreighter();
+                document.getElementById("public_key").value = address;
+                document.getElementById("provider").value = "freighter";
+                document.getElementById("wallet-form").submit();
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+    }
+</script>
+{% endblock %}

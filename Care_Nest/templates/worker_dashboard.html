@@ -55,21 +55,37 @@
 
         <!-- Welcome Alert (Transactional Focus) -->
         <section>
-            <div
-                class="bg-secondary-container text-on-secondary-container px-5 py-4 rounded-3xl flex items-center justify-between shadow-sm border border-secondary/10 hover:shadow-md transition-shadow cursor-pointer">
+            {% if latest_engagement %}
+            <a href="{% url 'worker-engagements' %}"
+                class="bg-secondary-container text-on-secondary-container px-5 py-4 rounded-3xl flex items-center justify-between shadow-sm border border-secondary/10 hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                         <span class="material-symbols-outlined" data-icon="auto_awesome"
                             style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
                     </div>
                     <div>
-                        <p class="font-bold text-sm tracking-tight">Priority Job Invitation</p>
-                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">High Match in
-                            Kilimani Area</p>
+                        <p class="font-bold text-sm tracking-tight">{{ latest_engagement.job.title }}</p>
+                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ latest_engagement.chain_status }} · {{ latest_engagement.job.location }}</p>
                     </div>
                 </div>
                 <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
-            </div>
+            </a>
+            {% elif open_jobs %}
+            <a href="{% url 'worker-jobs' %}"
+                class="bg-secondary-container text-on-secondary-container px-5 py-4 rounded-3xl flex items-center justify-between shadow-sm border border-secondary/10 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined" data-icon="auto_awesome"
+                            style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm tracking-tight">{{ open_jobs.0.title }}</p>
+                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ open_jobs.0.location }} · KES {{ open_jobs.0.pay }}</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
+            </a>
+            {% endif %}
         </section>
 
         <!-- Top Grid: Earnings and Active Job -->
@@ -83,7 +99,7 @@
                         <p
                             class="font-label text-[10px] uppercase font-bold tracking-[0.3em] text-primary-fixed/60 mb-4">
                             Cumulative Revenue Today</p>
-                        <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES 4,250
+                        <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES {{ earned|floatformat:0 }}
                         </h2>
                         <div class="flex items-center gap-4">
                             <a href="{% url 'worker-wallet' %}"
