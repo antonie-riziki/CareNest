@@ -1,4 +1,4 @@
-# CareNest WorkOS
+# CareNest 
 
 CareNest is a Django marketplace that connects domestic workers and employers. This branch adds **CareNest WorkOS**: a persistent agent that manages the engagement lifecycle, with Stellar/Soroban as the settlement and audit layer.
 
