@@ -27,6 +27,9 @@ def worker_wallet(request):
     remaining = sum((e.amount_remaining for e in enrollments), start=0)
     payouts = PayoutMethod.objects.filter(user=request.user)
     prices = get_price_service().dashboard()
+    from apps.contracts.models import ServiceInvoice
+
+    invoices = ServiceInvoice.objects.filter(worker=request.user).select_related("engagement", "engagement__job")[:8]
     return render(
         request,
         "workers_wallet.html",
@@ -40,6 +43,7 @@ def worker_wallet(request):
             "payout_methods": payouts,
             "preferred_payout": preferred_payout_method(request.user),
             "prices": prices,
+            "invoices": invoices,
         },
     )
 

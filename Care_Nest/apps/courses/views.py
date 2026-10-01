@@ -16,7 +16,7 @@ def worker_courses(request):
     return render(
         request,
         "worker_courses.html",
-        {"courses": courses, "enrollments": enrollments, "enrollment_list": list(enrollments.values())},
+        {"courses": courses, "enrollments": enrollments, "enrollment_list": list(enrollments.values()), "enrolled_ids": list(enrollments.keys())},
     )
 
 

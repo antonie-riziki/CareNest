@@ -106,7 +106,7 @@ class CareNestAgent:
             action=f"intake: parsed '{text[:60]}' -> {parsed.title}",
             decision={"type": "PARSE_REQUIREMENT", "decision_id": str(parse_decision.decision_id)},
             context_updates={"pending_requirement": parsed.to_dict(), "pending_job_id": draft.data.get("job_id"), "candidates": candidates},
-            add_tasks=["employer: choose a worker and approve contract preparation"],
+            add_tasks=["employer: choose a worker or publish the job offer"],
             summary=f"Employer is hiring a {parsed.title}.",
         )
         return {
@@ -122,7 +122,7 @@ class CareNestAgent:
         pay = f"{parsed.pay_currency} {parsed.pay_amount:,.0f}/{parsed.pay_period}" if parsed.pay_amount else "pay to be confirmed"
         head = f"You need a {parsed.schedule} {parsed.job_type}" + (f" in {parsed.location}" if parsed.location else "") + f" at {pay}."
         if candidates:
-            return head + f" I found {len(candidates)} suitable worker(s); {candidates[0]['display_name']} is the strongest match. Choose one and I will prepare the engagement terms for your approval."
+            return head + f" I found {len(candidates)} suitable worker(s); {candidates[0]['display_name']} is the strongest match. Attach an image, add your terms, and publish the job — or invite a worker. They still add their own terms before you bind the contract."
         return head + " I could not find a matching worker yet; you can still prepare terms once a worker registers."
 
     # ------------------------------------------------------------------ engagement preparation
@@ -153,7 +153,7 @@ class CareNestAgent:
             mem,
             action="prepared engagement terms",
             decision={"type": "PREPARE_CONTRACT", "decision_id": str(decision.decision_id)},
-            summary=f"Terms prepared for {contract.job.title}; awaiting employer approval to create the on-chain agreement.",
+            summary=f"Draft offer prepared for {contract.job.title}. Waiting for the worker to add their terms before you can bind the contract.",
         )
         user_mem = memory_mod.load_for_user(self.user)
         memory_mod.remember(user_mem, action=f"engagement #{contract.pk} prepared", resolve_tasks=["employer: choose a worker and approve contract preparation"], context_updates={"active_engagement_pk": contract.pk})

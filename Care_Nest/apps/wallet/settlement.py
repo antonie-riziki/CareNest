@@ -235,6 +235,10 @@ def capture_settled_commission(contract, *, reference: str = "") -> None:
     settlement.breakdown = breakdown.to_dict()
     settlement.save()
 
+    from apps.contracts.agreement import mark_invoice_settled
+
+    mark_invoice_settled(contract)
+
     from apps.wallet.models import Transaction
     from apps.wallet.models import Wallet
 

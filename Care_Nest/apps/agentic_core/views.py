@@ -95,6 +95,29 @@ def employer_agent_panel(request):
             proposal = agent.intake(request.POST["requirement"])
         finally:
             agent.end()
+        job_id = (proposal.get("job") or {}).get("job_id")
+        if job_id:
+            from apps.jobs.images import ImageUploadError, attach_primary_image
+            from apps.jobs.models import Job
+            from apps.contracts.agreement import ensure_employer_terms
+
+            job = Job.objects.filter(pk=job_id, employer=request.user).first()
+            if job:
+                terms = (request.POST.get("employer_terms") or "").strip()
+                if terms:
+                    job.employer_terms = terms
+                    job.save(update_fields=["employer_terms", "updated_at"])
+                else:
+                    ensure_employer_terms(job)
+                upload = request.FILES.get("image")
+                if upload:
+                    try:
+                        attach_primary_image(job, upload)
+                    except ImageUploadError as exc:
+                        messages.error(request, str(exc))
+                proposal["job"]["image_url"] = job.image_url
+                proposal["job"]["cover_image"] = job.cover_image
+                proposal["job"]["employer_terms"] = job.employer_terms
         user_mem.refresh_from_db()
     elif user_mem.engagement_context.get("pending_requirement") and user_mem.engagement_context.get("candidates") is not None and not user_mem.engagement_context.get("active_engagement_pk"):
         proposal = {
@@ -104,6 +127,22 @@ def employer_agent_panel(request):
             "summary": user_mem.summary,
             "decisions": [],
         }
+
+    pending_job = None
+    pending_job_id = None
+    if proposal and proposal.get("job"):
+        pending_job_id = proposal["job"].get("job_id")
+    elif user_mem.engagement_context.get("pending_job_id"):
+        pending_job_id = user_mem.engagement_context.get("pending_job_id")
+    if pending_job_id:
+        from apps.jobs.models import Job
+
+        pending_job = Job.objects.filter(pk=pending_job_id, employer=request.user).first()
+        if pending_job and proposal:
+            proposal.setdefault("job", {})
+            proposal["job"]["cover_image"] = pending_job.cover_image
+            proposal["job"]["image_url"] = pending_job.image_url
+            proposal["job"]["employer_terms"] = pending_job.employer_terms
 
     engagements = _employer_engagements(request.user)
     pending = AgentApproval.objects.filter(requested_from=request.user, status=AgentApproval.Status.PENDING).select_related("engagement", "engagement__worker", "engagement__job")
@@ -118,6 +157,7 @@ def employer_agent_panel(request):
         "recent_decisions": recent_decisions,
         "memory": memory_mod.snapshot(user_mem),
         "example_requirement": "I need a full-time nanny in Westlands, KES 45,000/month.",
+        "pending_job": pending_job,
     }
     return render(request, "agent/employer_agent_panel.html", context)
 
@@ -165,8 +205,44 @@ def prepare_engagement(request):
         return redirect("agent-panel")
     finally:
         agent.end()
-    messages.success(request, "Engagement terms prepared. Review and approve contract creation.")
-    return redirect("agent-command-center", pk=contract.pk)
+    messages.success(request, "Draft offer prepared. The worker still adds their terms before you can bind the contract.")
+    return redirect("employer-engagement-review", pk=contract.pk)
+
+
+@login_required(login_url="employer-signin")
+@require_POST
+def publish_job_offer(request):
+    if not _is_employer(request.user):
+        return HttpResponseForbidden("Employer account required")
+    from django.utils import timezone
+
+    from apps.contracts.agreement import ensure_employer_terms
+    from apps.jobs.images import ImageUploadError, attach_primary_image
+    from apps.jobs.models import Job
+
+    job_id = request.POST.get("job_id")
+    job = get_object_or_404(Job, pk=job_id, employer=request.user)
+    if job.locked:
+        messages.error(request, "This job is already locked.")
+        return redirect("agent-panel")
+    terms = (request.POST.get("employer_terms") or "").strip()
+    if terms:
+        job.employer_terms = terms
+        job.save(update_fields=["employer_terms", "updated_at"])
+    else:
+        ensure_employer_terms(job)
+    upload = request.FILES.get("image")
+    if upload:
+        try:
+            attach_primary_image(job, upload)
+        except ImageUploadError as exc:
+            messages.error(request, str(exc))
+            return redirect("agent-panel")
+    job.status = Job.Status.ACTIVE
+    job.published_at = job.published_at or timezone.now()
+    job.save(update_fields=["status", "published_at", "updated_at"])
+    messages.success(request, "Job posted. Workers can review your terms, add theirs, and send them back for your approval.")
+    return redirect(f"/employer-job-details/?id={job.pk}")
 
 
 # ---------------------------------------------------------------------------
@@ -326,6 +402,9 @@ def worker_engagements(request):
                 "can_request_approval": c.chain_status == EngagementStatus.SUBMITTED and c.engagement_id is not None,
                 "can_dispute": c.chain_status in EngagementStatus.FUNDS_IN_ESCROW - {EngagementStatus.DISPUTED} and c.engagement_id is not None,
                 "credential": WorkCredential.objects.filter(engagement=c).first(),
+                "can_check_in": c.is_bound and c.job.locked and not c.shifts.filter(checked_out_at__isnull=True).exists(),
+                "can_check_out": c.shifts.filter(checked_out_at__isnull=True).exists(),
+                "open_shift": c.shifts.filter(checked_out_at__isnull=True).first(),
             }
         )
     return render(

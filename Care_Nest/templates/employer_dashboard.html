@@ -117,7 +117,7 @@
 
         {% if pending_engagements %}
         <section class="space-y-3">
-            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Pending engagement approvals</h3>
+            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Waiting for your decision</h3>
             {% for e in pending_engagements %}
             <a href="{% url 'employer-engagement-review' e.pk %}" class="block bg-white p-5 rounded-2xl border border-secondary/30">
                 <p class="font-bold text-primary">{{ e.job.title }}</p>

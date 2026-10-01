@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from apps.jobs.images import ImageUploadError, store_upload
+from apps.jobs.images import ImageUploadError, attach_primary_image, store_upload
 from apps.jobs.maps import public_config as map_config
 from apps.jobs.models import Application, Job, JobImage
 from apps.jobs.scheduling import ScheduleError, refresh_job_status, refresh_queryset, validate_schedule
@@ -47,6 +47,7 @@ def _job_payload(job: Job) -> dict:
         "image": job.cover_image,
         "has_custom_image": job.has_custom_image,
         "is_verified": job.is_verified,
+        "locked": job.locked,
         "description": job.description,
         "directions_url": f"https://www.openstreetmap.org/directions?from=&to={lat}%2C{lon}",
     }
@@ -99,7 +100,7 @@ def _parse_job_form(request) -> dict:
 @login_required(login_url="worker-signin")
 def worker_jobs(request):
     jobs = Job.objects.select_related("employer").order_by("-created_at")
-    jobs = [j for j in refresh_queryset(jobs) if j.status == Job.Status.ACTIVE]
+    jobs = [j for j in refresh_queryset(jobs) if j.is_live]
     payload = [_job_payload(j) for j in jobs]
     return render(
         request,
@@ -155,6 +156,7 @@ def save_employer_job(request, pk=None):
         "currency": request.POST.get("currency") or "KES",
         "job_type": request.POST.get("job_type") or "housekeeper",
         "is_verified": request.POST.get("is_verified") in {"on", "true", "1"},
+        "employer_terms": (request.POST.get("employer_terms") or "").strip(),
         **schedule,
     }
     if pk:
@@ -164,14 +166,15 @@ def save_employer_job(request, pk=None):
         job.save()
     else:
         job = Job.objects.create(employer=request.user, **fields)
+    if not job.employer_terms:
+        from apps.contracts.agreement import ensure_employer_terms
+
+        ensure_employer_terms(job)
 
     upload = request.FILES.get("image")
     if upload:
         try:
-            url = store_upload(upload)
-            job.image_url = url
-            job.save(update_fields=["image_url", "updated_at"])
-            JobImage.objects.update_or_create(job=job, is_primary=True, defaults={"image_url": url, "sort_order": 0})
+            attach_primary_image(job, upload)
         except ImageUploadError as exc:
             messages.error(request, str(exc))
 
@@ -204,7 +207,20 @@ def worker_job_details(request):
         refresh_job_status(job)
     applied = bool(job and Application.objects.filter(job=job, worker=request.user).exists())
     quote = get_price_service().convert(job.pay, job.currency, "XLM") if job else None
-    return render(request, "worker_job_details.html", {"job": job, "applied": applied, "fx": quote})
+    from apps.contracts.models import Contract
+
+    contract = None
+    if job:
+        contract = (
+            Contract.objects.filter(job=job, worker=request.user)
+            .exclude(approval_status=Contract.ApprovalStatus.REJECTED)
+            .first()
+        )
+    return render(
+        request,
+        "worker_job_details.html",
+        {"job": job, "applied": applied, "fx": quote, "contract": contract},
+    )
 
 
 @login_required(login_url="employer-signin")
@@ -220,8 +236,11 @@ def employer_job_details(request):
 @require_POST
 def apply_to_job(request, pk):
     job = get_object_or_404(Job, pk=pk, status=Job.Status.ACTIVE)
+    if job.locked:
+        messages.error(request, "This job is locked. A contract is already bound.")
+        return redirect(f"/worker-job-details/?id={job.pk}")
     Application.objects.get_or_create(worker=request.user, job=job, defaults={"status": Application.Status.SUBMITTED})
-    messages.success(request, "Application sent. The employer will review it separately from the job posting.")
+    messages.success(request, "Application sent. Add your terms on this page so the employer can review them.")
     return redirect(f"/worker-job-details/?id={job.pk}")
 
 

@@ -16,6 +16,7 @@ class Job(models.Model):
         EXPIRED = "EXPIRED", "Expired"
         CANCELLED = "CANCELLED", "Cancelled"
         COMPLETED = "COMPLETED", "Completed"
+        LOCKED = "LOCKED", "Locked"
 
     employer = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -41,6 +42,16 @@ class Job(models.Model):
     scheduled_publish_at = models.DateTimeField(null=True, blank=True)
     published_at = models.DateTimeField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
+    employer_terms = models.TextField(blank=True, default="")
+    locked = models.BooleanField(default=False, db_index=True)
+    locked_at = models.DateTimeField(null=True, blank=True)
+    locked_contract = models.ForeignKey(
+        "contracts.Contract",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -84,7 +95,11 @@ class Job(models.Model):
 
     @property
     def is_live(self) -> bool:
-        return self.status == self.Status.ACTIVE
+        return self.status == self.Status.ACTIVE and not self.locked
+
+    @property
+    def is_filled(self) -> bool:
+        return self.locked or self.status == self.Status.LOCKED
 
     def public_point(self) -> tuple[float, float]:
         from apps.jobs.maps import approximate_coordinates

@@ -114,11 +114,23 @@
                     <p class="text-xs text-outline">No M-Pesa method saved.</p>
                     {% endfor %}
                 </div>
+                {% if invoices %}
+                <div class="bg-white p-8 rounded-[2rem] border border-outline-variant/10 space-y-4">
+                    <h3 class="text-[10px] font-bold uppercase tracking-widest text-secondary">CareNest service invoices</h3>
+                    <p class="text-xs text-outline">These invoices are between you and CareNest. Employers never see them.</p>
+                    {% for inv in invoices %}
+                    <a href="{% url 'worker-service-invoice' inv.pk %}" class="block border border-outline-variant/10 rounded-2xl p-4">
+                        <p class="font-bold text-primary">{{ inv.invoice_number }}</p>
+                        <p class="text-sm text-outline">{{ inv.description }} · {{ inv.currency }} {{ inv.recovery_amount }} · {{ inv.get_status_display }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 {% if enrollments %}
                 <div class="bg-white p-8 rounded-[2rem] border border-outline-variant/10">
                     <h3 class="text-[10px] font-bold uppercase tracking-widest text-secondary">Upskilling balance</h3>
                     {% for e in enrollments %}
-                    <div class="mt-4 text-sm">
+                    <div class="mt-4 text-sm text-primary">
                         <p class="font-bold">{{ e.course.title }}</p>
                         <p>Total {{ e.course.currency }} {{ e.total_fee }} · Recovered {{ e.commission_recovered }} · Remaining {{ e.amount_remaining }}</p>
                         <p>Recovery 20% of eligible earnings until remaining is 0.</p>

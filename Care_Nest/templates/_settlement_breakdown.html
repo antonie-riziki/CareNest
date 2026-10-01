@@ -1,11 +1,19 @@
 {% if breakdown %}
 <div class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
-    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Settlement breakdown</p>
-    <div class="flex justify-between text-sm"><span>Employer payment</span><strong>{{ breakdown.currency }} {{ breakdown.gross_amount }}</strong></div>
-    <div class="flex justify-between text-sm"><span>CareNest fee ({{ breakdown.platform_fee_percentage }}%)</span><strong>{{ breakdown.currency }} {{ breakdown.platform_fee_amount }}</strong></div>
-    <div class="flex justify-between text-sm"><span>Worker earnings</span><strong>{{ breakdown.currency }} {{ breakdown.worker_net_amount }}</strong></div>
-    <div class="flex justify-between text-sm"><span>Upskilling recovery</span><strong>{{ breakdown.currency }} {{ breakdown.upskilling_recovery_amount }}</strong></div>
-    <div class="flex justify-between text-base pt-3 border-t border-outline-variant/10"><span class="font-bold">Final payout</span><strong class="text-secondary">{{ breakdown.currency }} {{ breakdown.worker_payout_amount }}</strong></div>
+    {% if audience == "employer" %}
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">What you pay</p>
+    <div class="flex justify-between text-sm text-primary"><span>Your payment</span><strong>{{ breakdown.currency }} {{ breakdown.gross_amount }}</strong></div>
+    <div class="flex justify-between text-sm text-primary"><span>CareNest platform fee ({{ breakdown.platform_fee_percentage }}%)</span><strong>{{ breakdown.currency }} {{ breakdown.platform_fee_amount }}</strong></div>
+    <div class="flex justify-between text-base pt-3 border-t border-outline-variant/10 text-primary"><span class="font-bold">Worker receives</span><strong class="text-secondary">{{ breakdown.currency }} {{ breakdown.worker_net_amount }}</strong></div>
+    <p class="text-[11px] text-outline">Training fees are billed privately between CareNest and the worker. They are not part of this engagement.</p>
+    {% else %}
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Your payout</p>
+    <div class="flex justify-between text-sm text-primary"><span>Employer payment</span><strong>{{ breakdown.currency }} {{ breakdown.gross_amount }}</strong></div>
+    <div class="flex justify-between text-sm text-primary"><span>CareNest platform fee ({{ breakdown.platform_fee_percentage }}%)</span><strong>{{ breakdown.currency }} {{ breakdown.platform_fee_amount }}</strong></div>
+    <div class="flex justify-between text-sm text-primary"><span>Eligible earnings</span><strong>{{ breakdown.currency }} {{ breakdown.worker_net_amount }}</strong></div>
+    <div class="flex justify-between text-sm text-primary"><span>CareNest upskilling invoice ({{ breakdown.upskilling_recovery_percentage }}%)</span><strong>{{ breakdown.currency }} {{ breakdown.upskilling_recovery_amount }}</strong></div>
+    <div class="flex justify-between text-base pt-3 border-t border-outline-variant/10 text-primary"><span class="font-bold">Paid to you</span><strong class="text-secondary">{{ breakdown.currency }} {{ breakdown.worker_payout_amount }}</strong></div>
+    {% endif %}
     {% if fx %}
     <p class="text-[11px] text-outline pt-2">Market estimate: {{ fx.amount }} {{ fx.base }} ≈ {{ fx.converted }} {{ fx.quote }}{% if fx.stale %} · stale ({{ fx.source }}){% else %} · {{ fx.source }}{% endif %}. Not the settlement amount.</p>
     {% endif %}

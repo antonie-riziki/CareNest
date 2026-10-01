@@ -28,7 +28,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px]">
             <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">AI recommendation</span><p class="text-primary font-medium mt-1">The agent inspects state and asks you to act.</p></div>
-            <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">Human approval</span><p class="text-primary font-medium mt-1">You sign. Funds never move without this step.</p></div>
+            <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">Both parties agree</span><p class="text-primary font-medium mt-1">Worker terms + employer terms bind the job. Then you sign on-chain.</p></div>
             <div class="rounded-2xl bg-white border border-outline-variant/10 px-4 py-3"><span class="font-bold text-outline uppercase tracking-widest">Blockchain execution</span><p class="text-primary font-medium mt-1">Stellar records the result. CareNest only indexes it.</p></div>
         </div>
     </header>
@@ -80,10 +80,10 @@
                 <a class="text-xs font-bold uppercase tracking-widest text-secondary" href="{% url 'wallet-connect' %}?next={{ request.path }}">Connect wallet</a>
                 {% endif %}
                 <form method="post" action="{% url 'agent-tick' engagement.pk %}">{% csrf_token %}
-                    <button class="mt-2 w-full py-2.5 rounded-xl bg-surface-container-high text-xs font-bold uppercase tracking-widest">Re-evaluate</button>
+                    <button class="mt-2 w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest">Re-evaluate</button>
                 </form>
                 <form method="post" action="{% url 'agent-ingest' %}">{% csrf_token %}
-                    <button class="w-full py-2.5 rounded-xl border border-outline-variant/20 text-xs font-bold uppercase tracking-widest">Ingest Stellar events</button>
+                    <button class="w-full py-2.5 rounded-xl bg-secondary text-white text-xs font-bold uppercase tracking-widest">Ingest Stellar events</button>
                 </form>
             </div>
         </section>
@@ -128,7 +128,7 @@
                     <div class="flex flex-wrap gap-2">
                         <button type="button" class="js-approve signature-gradient text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest" data-url="{% url 'agent-approve' a.pk %}">Approve &amp; sign</button>
                         <form method="post" action="{% url 'agent-reject' a.pk %}">{% csrf_token %}
-                            <button class="px-4 py-2 rounded-xl border border-outline-variant/30 text-[10px] font-bold uppercase tracking-widest">Reject</button>
+                            <button class="px-4 py-2 rounded-xl bg-error text-white text-[10px] font-bold uppercase tracking-widest">Reject</button>
                         </form>
                     </div>
                     <p class="js-status text-[11px] text-outline hidden"></p>

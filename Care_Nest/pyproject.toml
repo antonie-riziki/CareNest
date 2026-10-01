@@ -1,0 +1,20 @@
+[project]
+name = "carenest"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.0",
+    "python-dotenv",
+    "djangorestframework",
+    "django-filter",
+    "openai>=1.40.0",
+    "stellar-sdk>=13.0.0",
+    "httpx",
+    "psycopg[binary]>=3.2",
+]
+
+[tool.vercel]
+entrypoint = "Care_Nest.wsgi:application"
+
+[tool.vercel.scripts]
+build = "python build.py"

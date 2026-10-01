@@ -37,6 +37,17 @@
             <p class="text-sm">{{ card.explanation.headline }} — {{ card.explanation.next_step_worker }}</p>
             <p class="text-[11px] text-outline">Memory: {{ card.memory.summary }}</p>
             <div class="flex flex-wrap gap-2" data-engagement="{{ card.engagement.pk }}">
+                {% if card.can_check_in %}
+                <form method="post" action="{% url 'engagement-check-in' card.engagement.pk %}">{% csrf_token %}
+                    <button class="px-4 py-2 rounded-xl bg-secondary text-white text-[10px] font-bold uppercase tracking-widest">Check in</button>
+                </form>
+                {% endif %}
+                {% if card.can_check_out %}
+                <form method="post" action="{% url 'engagement-check-out' card.engagement.pk %}">{% csrf_token %}
+                    <button class="px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest">Check out</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'worker-engagement-review' card.engagement.pk %}" class="px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest">View terms</a>
                 {% if card.can_start %}
                 <button class="js-worker-action px-4 py-2 rounded-xl bg-secondary text-white text-[10px] font-bold uppercase tracking-widest" data-action="start_work" data-url="{% url 'worker-action' card.engagement.pk %}">Start work</button>
                 {% endif %}
@@ -44,7 +55,7 @@
                 <button class="js-worker-action px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-bold uppercase tracking-widest" data-action="submit_work" data-url="{% url 'worker-action' card.engagement.pk %}">Submit completion</button>
                 {% endif %}
                 {% if card.can_request_approval %}
-                <button class="js-worker-action px-4 py-2 rounded-xl border border-outline-variant/30 text-[10px] font-bold uppercase tracking-widest" data-action="request_approval" data-url="{% url 'worker-action' card.engagement.pk %}">Request review</button>
+                <button class="js-worker-action px-4 py-2 rounded-xl border-2 border-primary text-primary bg-white text-[10px] font-bold uppercase tracking-widest" data-action="request_approval" data-url="{% url 'worker-action' card.engagement.pk %}">Request review</button>
                 {% endif %}
                 {% if card.can_dispute %}
                 <button class="js-worker-action px-4 py-2 rounded-xl text-error border border-error/20 text-[10px] font-bold uppercase tracking-widest" data-action="dispute" data-url="{% url 'worker-action' card.engagement.pk %}">Open dispute</button>

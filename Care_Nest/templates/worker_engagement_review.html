@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Engagement | Care Nest{% endblock %}
+{% block content %}
+{% include 'worker_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-6 pb-32">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Your terms and attendance</p>
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ engagement.job.title }}</h1>
+    <p class="text-sm text-outline">{{ engagement.employer.get_full_name|default:engagement.employer.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.chain_status }}</p>
+    {% if messages %}{% for message in messages %}<div class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-xl text-sm font-medium">{{ message }}</div>{% endfor %}{% endif %}
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
+            <h2 class="text-lg font-extrabold text-primary">Employer terms</h2>
+            <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ engagement.employer_terms|default:engagement.job.employer_terms }}</pre>
+        </section>
+        <section class="bg-white rounded-[1.5rem] border border-secondary/30 p-6 space-y-3">
+            <h2 class="text-lg font-extrabold text-primary">Your terms</h2>
+            <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ engagement.worker_terms|default:"Not submitted yet." }}</pre>
+            {% if engagement.worker_hours_note %}<p class="text-sm text-primary"><strong>Hours:</strong> {{ engagement.worker_hours_note }}</p>{% endif %}
+            {% if engagement.change_request %}<p class="text-sm text-error"><strong>Employer asked:</strong> {{ engagement.change_request }}</p>{% endif %}
+        </section>
+    </div>
+
+    {% if engagement.needs_worker_terms %}
+    <form method="post" action="{% url 'job-submit-terms' engagement.job_id %}" class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
+        {% csrf_token %}
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Revise your terms</label>
+        <textarea name="worker_terms" rows="5" required class="w-full rounded-xl border-outline-variant/30 text-sm text-primary">{{ engagement.worker_terms }}</textarea>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Hours / schedule you need reviewed</label>
+        <input name="hours_note" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" value="{{ engagement.worker_hours_note }}">
+        <button class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Send to employer</button>
+    </form>
+    {% endif %}
+
+    {% include '_settlement_breakdown.html' with audience='worker' %}
+
+    {% for inv in invoices %}
+    <a href="{% url 'worker-service-invoice' inv.pk %}" class="block bg-white rounded-[1.5rem] border border-primary/20 p-5">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">CareNest service invoice</p>
+        <p class="font-extrabold text-primary">{{ inv.invoice_number }} · {{ inv.currency }} {{ inv.recovery_amount }}</p>
+        <p class="text-sm text-outline">{{ inv.get_status_display }} — not visible to the employer</p>
+    </a>
+    {% endfor %}
+
+    {% if engagement.is_bound %}
+    <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-4">
+        <h2 class="text-lg font-extrabold text-primary">Check in / check out</h2>
+        {% if open_shift %}
+        <p class="text-sm text-primary">Checked in at {{ open_shift.checked_in_at|date:"M j, H:i" }}</p>
+        <form method="post" action="{% url 'engagement-check-out' engagement.pk %}">{% csrf_token %}
+            <button class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Check out</button>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'engagement-check-in' engagement.pk %}">{% csrf_token %}
+            <button class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Check in</button>
+        </form>
+        {% endif %}
+        {% for s in shifts %}
+        <p class="text-sm text-outline">{{ s.checked_in_at|date:"M j, H:i" }}{% if s.checked_out_at %} → {{ s.checked_out_at|date:"H:i" }} ({{ s.duration_minutes }} min){% else %} · open{% endif %}</p>
+        {% endfor %}
+    </section>
+    {% endif %}
+    <a href="{% url 'worker-engagements' %}" class="inline-block bg-secondary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">WorkOS engagements</a>
+</div>
+{% include 'worker_bottom_nav.html' %}
+{% endblock %}
