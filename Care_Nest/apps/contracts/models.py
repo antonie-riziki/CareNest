@@ -53,6 +53,11 @@ class Contract(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True, default="")
     change_request = models.TextField(blank=True, default="")
+    employer_terms = models.TextField(blank=True, default="")
+    worker_terms = models.TextField(blank=True, default="")
+    worker_hours_note = models.TextField(blank=True, default="")
+    worker_responded_at = models.DateTimeField(null=True, blank=True)
+    bound_at = models.DateTimeField(null=True, blank=True)
 
     platform_fee_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=5)
     platform_fee_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
@@ -117,11 +122,18 @@ class Contract(models.Model):
 
     @property
     def needs_employer_approval(self) -> bool:
+        return self.approval_status == self.ApprovalStatus.PENDING_REVIEW
+
+    @property
+    def needs_worker_terms(self) -> bool:
         return self.approval_status in (
             self.ApprovalStatus.DRAFT,
-            self.ApprovalStatus.PENDING_REVIEW,
             self.ApprovalStatus.CHANGES_REQUESTED,
         )
+
+    @property
+    def is_bound(self) -> bool:
+        return self.approval_status == self.ApprovalStatus.APPROVED
 
     def latest_tx_hash(self) -> str:
         for field in (
@@ -135,3 +147,65 @@ class Contract(models.Model):
             if value:
                 return value
         return ""
+
+
+class ShiftAttendance(models.Model):
+    engagement = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name="shifts")
+    worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shift_logs")
+    checked_in_at = models.DateTimeField(default=timezone.now)
+    checked_out_at = models.DateTimeField(null=True, blank=True)
+    check_in_note = models.CharField(max_length=255, blank=True, default="")
+    check_out_note = models.CharField(max_length=255, blank=True, default="")
+
+    class Meta:
+        ordering = ["-checked_in_at"]
+
+    def __str__(self):
+        return f"Shift #{self.pk} engagement {self.engagement_id}"
+
+    @property
+    def is_open(self) -> bool:
+        return self.checked_out_at is None
+
+    @property
+    def duration_minutes(self) -> int | None:
+        if not self.checked_out_at:
+            return None
+        return int((self.checked_out_at - self.checked_in_at).total_seconds() // 60)
+
+
+class ServiceInvoice(models.Model):
+    """CareNest → worker training-recovery invoice. Never shown to employers."""
+
+    class Status(models.TextChoices):
+        ISSUED = "issued", "Issued"
+        SETTLED = "settled", "Settled"
+        VOID = "void", "Void"
+
+    worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name="service_invoices")
+    engagement = models.ForeignKey(
+        Contract, on_delete=models.CASCADE, related_name="service_invoices", null=True, blank=True
+    )
+    invoice_number = models.CharField(max_length=32, unique=True, blank=True, default="")
+    description = models.CharField(max_length=255, default="CareNest upskilling recovery")
+    eligible_earnings = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    recovery_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=20)
+    recovery_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    remaining_training_after = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    currency = models.CharField(max_length=8, default="KES")
+    line_items = models.JSONField(default=list, blank=True)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.ISSUED)
+    issued_at = models.DateTimeField(default=timezone.now)
+    settled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-issued_at"]
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.invoice_number:
+            self.invoice_number = f"CN-INV-{self.issued_at.year}-{self.pk:05d}"
+            super().save(update_fields=["invoice_number"])
+
+    def __str__(self):
+        return self.invoice_number or f"Invoice {self.pk}"

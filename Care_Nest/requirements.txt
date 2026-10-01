@@ -9,3 +9,4 @@ django-filter
 openai>=1.40.0
 stellar-sdk>=13.0.0
 httpx
+psycopg[binary]>=3.2

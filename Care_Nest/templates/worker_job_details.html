@@ -83,8 +83,8 @@
                                 <span class="material-symbols-outlined text-3xl">payments</span>
                             </div>
                             <div>
-                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Daily Compensation</p>
-                                <p class="font-headline font-extrabold text-2xl text-primary tracking-tight">KES 3,500</p>
+                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Compensation</p>
+                                <p class="font-headline font-extrabold text-2xl text-primary tracking-tight">{{ job.currency }} {{ job.pay }}</p>
                             </div>
                         </div>
                         
@@ -94,7 +94,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Zone Reference</p>
-                                <p class="font-headline font-extrabold text-xl text-primary tracking-tight">Kilimani, NRB</p>
+                                <p class="font-headline font-extrabold text-xl text-primary tracking-tight">{{ job.location }}</p>
                             </div>
                         </div>
 
@@ -113,7 +113,7 @@
                     <section class="space-y-4">
                         <h3 class="font-headline font-extrabold text-2xl text-primary tracking-tighter">About the Opportunity</h3>
                         <p class="text-on-surface-variant leading-relaxed text-lg font-medium opacity-90">
-                            We are seeking a highly meticulous professional for a 4-bedroom executive residence in Kilimani. This role requires an individual who understands premium fabric care, delicate surface treatment, and maintains the highest standards of residential hygiene. This is a recurring, long-term placement for those seeking stability and professional respect.
+                            {{ job.description }}
                         </p>
                     </section>
 
@@ -160,7 +160,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <h3 class="font-headline font-extrabold text-xl text-primary tracking-tighter">Sarah Wambui</h3>
+                                <h3 class="font-headline font-extrabold text-xl text-primary tracking-tighter">{{ job.employer.get_full_name|default:job.employer.username }}</h3>
                                     <span class="material-symbols-outlined text-secondary text-base" style="font-variation-settings: 'FILL' 1;">verified</span>
                                 </div>
                                 <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Verified Host • 5 ★</p>
@@ -176,7 +176,7 @@
                         <div class="space-y-4">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-white/60 font-bold uppercase tracking-widest text-[9px]">Weekdays</span>
-                                <span class="font-bold">08:00 — 17:00</span>
+                                <span class="font-bold">{{ job.schedule_label }}</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-white/60 font-bold uppercase tracking-widest text-[9px]">Saturdays</span>
@@ -191,12 +191,25 @@
 
                 </div>
             </div>
-                    {% if job and not applied %}
-            <form method="post" action="{% url 'job-apply' job.pk %}" class="mt-6">{% csrf_token %}
-                <button class="signature-gradient text-white px-8 py-4 rounded-xl font-bold">Apply for this job</button>
-            </form>
-            {% elif applied %}
-            <p class="mt-6 text-sm font-bold text-secondary">Application submitted. Engagement approval is a separate employer step.</p>
+                    {% if job and job.is_filled %}
+            <p class="mt-6 text-sm font-bold text-primary">This role is filled. A bound contract is already in place.</p>
+            {% elif contract and contract.needs_employer_approval %}
+            <p class="mt-6 text-sm font-bold text-secondary">Your terms are with the employer for approval or disapproval.</p>
+            <a href="{% url 'worker-engagement-review' contract.pk %}" class="inline-block mt-3 bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">View submitted terms</a>
+            {% elif job %}
+            <section id="terms" class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-4">
+                <h3 class="font-headline font-extrabold text-2xl text-primary">Employer terms</h3>
+                <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ job.employer_terms|default:job.description }}</pre>
+                {% if contract.change_request %}<p class="text-sm text-error">Employer asked: {{ contract.change_request }}</p>{% endif %}
+                <form method="post" action="{% url 'job-submit-terms' job.pk %}" class="space-y-3">
+                    {% csrf_token %}
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of service</label>
+                    <textarea name="worker_terms" rows="5" required class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Agree, and add hours, duties, or conditions you need reviewed">{{ contract.worker_terms|default:'' }}</textarea>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Hours you need reviewed</label>
+                    <input name="hours_note" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="e.g. Weekdays 8:00–16:00, no Sundays" value="{{ contract.worker_hours_note|default:'' }}">
+                    <button class="signature-gradient text-white px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest">Agree and send terms</button>
+                </form>
+            </section>
             {% endif %}
         </main>
     </div>
@@ -205,16 +218,16 @@
     <div class="fixed bottom-0 md:left-64 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-outline-variant/15 px-6 py-5 z-50">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-8">
             <div class="hidden sm:block">
-                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Projected Monthly Yield</p>
+            <p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Offered pay</p>
                 <div class="flex items-baseline gap-2">
-                    <span class="font-headline font-extrabold text-3xl text-secondary tracking-tight">KES 84,000</span>
+                    <span class="font-headline font-extrabold text-3xl text-secondary tracking-tight">{{ job.currency }} {{ job.pay }}</span>
                     <span class="text-[10px] font-bold text-outline uppercase leading-none">+ Bonuses</span>
                 </div>
             </div>
-            <button class="flex-1 max-w-md signature-gradient text-white font-headline font-extrabold py-5 px-10 rounded-[1.5rem] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em]">
-                Initialize Application
+            <a href="#terms" class="flex-1 max-w-md signature-gradient text-white font-headline font-extrabold py-5 px-10 rounded-[1.5rem] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em]">
+                Review terms
                 <span class="material-symbols-outlined text-xl">bolt</span>
-            </button>
+            </a>
         </div>
     </div>
 

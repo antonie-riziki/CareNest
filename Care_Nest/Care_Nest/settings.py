@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import urllib.parse
 
 from dotenv import load_dotenv
 
@@ -21,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load a local .env file if present (never committed; see .env.example).
 load_dotenv(BASE_DIR / ".env")
 load_dotenv(BASE_DIR.parent / ".env")
+load_dotenv(BASE_DIR / ".env.local")
+load_dotenv(BASE_DIR / ".vercel" / ".env.development.local")
 
 
 def env_bool(name: str, default: bool = False) -> bool:
@@ -44,13 +47,34 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or (
 DEBUG = env_bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",") if h.strip()
+    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.vercel.app").split(",") if h.strip()
 ]
 CSRF_TRUSTED_ORIGINS = [
     o.strip()
-    for o in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    for o in os.getenv(
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        "http://127.0.0.1:8000,http://localhost:8000,https://*.vercel.app",
+    ).split(",")
     if o.strip()
 ]
+vercel_host = os.getenv("VERCEL_URL", "").replace("https://", "").replace("http://", "").strip()
+if vercel_host:
+    ALLOWED_HOSTS.append(vercel_host)
+    origin = f"https://{vercel_host}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+for extra in ("carenest.vercel.app", "care-nest.vercel.app"):
+    if extra not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(extra)
+    origin = f"https://{extra}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+
+if os.getenv("VERCEL"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
 
 # Application definition
@@ -125,6 +149,22 @@ DATABASES = {
     }
 }
 
+_database_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("POSTGRES_PRISMA_URL")
+if _database_url:
+    url = urllib.parse.urlparse(_database_url)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": urllib.parse.unquote(url.path.lstrip("/")),
+            "USER": urllib.parse.unquote(url.username or ""),
+            "PASSWORD": urllib.parse.unquote(url.password or ""),
+            "HOST": url.hostname,
+            "PORT": str(url.port or "5432"),
+            "CONN_MAX_AGE": 0,
+            "OPTIONS": {"sslmode": os.getenv("POSTGRES_SSLMODE", "require")},
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -162,6 +202,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 

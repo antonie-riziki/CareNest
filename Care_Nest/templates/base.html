@@ -2,8 +2,18 @@
 <html class="scroll-smooth" lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport" />
+    <meta name="theme-color" content="#002045" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CareNest" />
+    <meta name="application-name" content="CareNest" />
+    <meta name="description" content="Hire and work with trusted home-care professionals." />
     <title>{% block title %}Care Nest{% endblock %}</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/pwa/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/static/pwa/apple-touch-icon.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -91,7 +101,18 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-surface font-body text-on-surface antialiased {% block body_class %}{% endblock %}">
+    <div id="pwa-install-bar" class="hidden fixed top-3 inset-x-3 z-[80] bg-primary text-white rounded-2xl px-4 py-3 shadow-xl flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <p class="text-sm font-extrabold">Install CareNest</p>
+            <p id="pwa-ios-hint" class="hidden text-[11px] text-secondary-container">On iPhone: Share → Add to Home Screen</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <button id="pwa-install-btn" type="button" class="bg-secondary text-white px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Install</button>
+            <button id="pwa-install-dismiss" type="button" class="text-white/80 text-lg leading-none px-1" aria-label="Dismiss">×</button>
+        </div>
+    </div>
     {% block content %}{% endblock %}
     {% block extra_body %}{% endblock %}
+    <script src="/static/pwa/pwa.js" defer></script>
 </body>
 </html>

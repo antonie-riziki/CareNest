@@ -83,6 +83,21 @@ def validate_upload(uploaded) -> None:
         raise ImageUploadError("Images must be 5 MB or smaller")
 
 
+def attach_primary_image(job, uploaded) -> str:
+    """Store an upload and put it in the job card image slot."""
+    from apps.jobs.models import JobImage
+
+    url = store_upload(uploaded)
+    job.image_url = url
+    job.save(update_fields=["image_url", "updated_at"])
+    JobImage.objects.update_or_create(
+        job=job,
+        is_primary=True,
+        defaults={"image_url": url, "sort_order": 0},
+    )
+    return url
+
+
 def store_upload(uploaded, *, folder: str = "jobs") -> str:
     validate_upload(uploaded)
     ext = Path(uploaded.name).suffix.lower() or ".jpg"

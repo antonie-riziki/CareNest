@@ -127,32 +127,33 @@
                     </div>
 
                                         <div class="space-y-6">
-                        {% if enrollment_list %}
-                        <div class="bg-white rounded-3xl p-6 border border-outline-variant/10">
-                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-secondary">Upskilling balance</h4>
-                            {% for enr in enrollment_list %}
-                            <div class="mt-4 text-sm">
-                                <p class="font-bold">{{ enr.course.title }}</p>
-                                <p>Total {{ enr.course.currency }} {{ enr.total_fee }} · Recovered {{ enr.commission_recovered }} · Remaining {{ enr.amount_remaining }}</p>
-                                <p>Recovery rate {{ enr.commission_percentage }}% of eligible earnings · {{ enr.status }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {% for course in courses %}
-                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm flex flex-col">
-                            <div class="h-32 bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-5xl text-primary">school</span>
+                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 flex flex-col">
+                            <div class="h-48 overflow-hidden relative">
+                                {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail }}" alt="{{ course.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-sky-100 to-teal-100"></div>
+                                {% endif %}
+                                <div class="absolute top-4 left-4">
+                                    <span class="px-3 py-1 bg-white/90 backdrop-blur text-primary text-[10px] font-bold uppercase tracking-widest rounded-full">{{ course.get_level_display }}</span>
+                                </div>
                             </div>
-                            <div class="p-6 space-y-3 flex-grow flex flex-col">
-                                <h4 class="text-xl font-bold text-primary font-headline">{{ course.title }}</h4>
-                                <p class="text-xs text-on-surface-variant">{{ course.description|truncatewords:18 }}</p>
-                                <p class="font-extrabold text-secondary">Fee: {{ course.currency }} {{ course.fee }}</p>
-                                <p class="text-[10px] uppercase tracking-widest text-outline">{{ course.duration_hours }} hours · {{ course.level }}</p>
+                            <div class="p-6 space-y-4 flex flex-col flex-grow">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-outline uppercase tracking-widest">{{ course.duration_label }}</span>
+                                    <span class="text-[10px] font-bold text-secondary uppercase tracking-widest">{{ course.lessons }} Lessons</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-primary font-headline leading-tight">{{ course.title }}</h4>
+                                <p class="text-sm font-extrabold text-secondary">Fee: {{ course.currency }} {{ course.fee }}</p>
+                                {% if course.pk in enrolled_ids %}
+                                <p class="text-xs font-bold text-primary">Enrolled</p>
+                                {% else %}
                                 <form method="post" action="{% url 'course-enroll' course.pk %}">{% csrf_token %}
-                                    <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs">Enroll</button>
+                                    <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs uppercase tracking-widest">Enroll</button>
                                 </form>
+                                {% endif %}
                             </div>
                         </div>
                         {% empty %}

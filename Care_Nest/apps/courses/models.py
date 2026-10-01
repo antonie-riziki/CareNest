@@ -30,6 +30,20 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def duration_label(self) -> str:
+        hours = self.duration_hours or 8
+        weeks = max(1, int(round(hours / 8)))
+        return "1 Week" if weeks == 1 else f"{weeks} Weeks"
+
+    @property
+    def lessons(self) -> int:
+        return max(8, int(self.duration_hours or 8))
+
+    @property
+    def image_url(self) -> str:
+        return self.thumbnail
+
     def save(self, *args, **kwargs):
         if not self.slug:
             from django.utils.text import slugify

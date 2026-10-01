@@ -15,6 +15,7 @@ JOB_STATUSES = (
     "EXPIRED",
     "CANCELLED",
     "COMPLETED",
+    "LOCKED",
 )
 
 RECURRENCE = ("", "daily", "weekly", "weekdays", "custom")
@@ -97,7 +98,7 @@ def validate_schedule(payload: dict) -> dict:
 
     if status == "DRAFT":
         resolved = "DRAFT"
-    elif status in ("PAUSED", "EXPIRED", "CANCELLED", "COMPLETED"):
+    elif status in ("PAUSED", "EXPIRED", "CANCELLED", "COMPLETED", "LOCKED"):
         resolved = status
     elif scheduled_publish_at and scheduled_publish_at > now:
         resolved = "SCHEDULED"
@@ -125,7 +126,7 @@ def validate_schedule(payload: dict) -> dict:
 def refresh_job_status(job, *, now=None):
     """Activate scheduled jobs and expire ended ones. Persistence, not a label."""
     now = now or timezone.now()
-    if job.status in ("CANCELLED", "COMPLETED", "PAUSED", "DRAFT"):
+    if job.status in ("CANCELLED", "COMPLETED", "PAUSED", "DRAFT", "LOCKED") or getattr(job, "locked", False):
         return job
     publish_at = job.scheduled_publish_at
     if job.status == "SCHEDULED" and publish_at and publish_at <= now:

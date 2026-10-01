@@ -1,33 +1,57 @@
 {% extends 'base.html' %}
-{% block title %}Review engagement | Care Nest{% endblock %}
+{% block title %}Review terms | Care Nest{% endblock %}
 {% block content %}
 {% include 'employer_sidebar.html' %}
-<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl space-y-6">
-    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Employer approval — not a job posting</p>
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-6">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Bilateral terms — both parties must agree</p>
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ engagement.job.title }}</h1>
-    <p class="text-sm text-outline">Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }} · Contract {{ engagement.chain_status }} · Approval {{ engagement.approval_status }}</p>
-    <div class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-2 text-sm">
-        <p><strong>Proposed pay:</strong> {{ engagement.currency }} {{ engagement.amount }}</p>
-        <p><strong>Schedule:</strong> {{ engagement.job.schedule_label }}</p>
-        <p><strong>Duration:</strong> {{ engagement.duration_text|default:"as agreed" }}</p>
-        <p><strong>Work scope:</strong></p>
-        <pre class="whitespace-pre-wrap text-outline">{{ engagement.scope }}</pre>
-        <p><strong>Escrow:</strong> {{ engagement.token_amount_display|default:"—" }} (Stellar settlement)</p>
+    <p class="text-sm text-outline">Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.chain_status }}</p>
+    {% if messages %}{% for message in messages %}<div class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-xl text-sm font-medium">{{ message }}</div>{% endfor %}{% endif %}
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
+            <h2 class="text-lg font-extrabold text-primary">Your terms</h2>
+            <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ engagement.employer_terms|default:"No employer terms yet." }}</pre>
+            <p class="text-sm text-primary"><strong>Pay:</strong> {{ engagement.currency }} {{ engagement.amount }}</p>
+            <p class="text-sm text-primary"><strong>Schedule:</strong> {{ engagement.job.schedule_label }}</p>
+        </section>
+        <section class="bg-white rounded-[1.5rem] border border-secondary/30 p-6 space-y-3">
+            <h2 class="text-lg font-extrabold text-primary">Worker terms</h2>
+            {% if engagement.worker_terms %}
+            <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ engagement.worker_terms }}</pre>
+            {% if engagement.worker_hours_note %}<p class="text-sm text-primary"><strong>Hours / schedule note:</strong> {{ engagement.worker_hours_note }}</p>{% endif %}
+            {% else %}
+            <p class="text-sm text-outline">Waiting for the worker to send their terms of service.</p>
+            {% endif %}
+        </section>
     </div>
-    {% include '_settlement_breakdown.html' %}
+
+    {% include '_settlement_breakdown.html' with audience='employer' %}
+
+    {% if shifts %}
+    <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
+        <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-3">Attendance</h2>
+        {% for s in shifts %}
+        <p class="text-sm text-primary">In {{ s.checked_in_at|date:"M j, H:i" }} · {% if s.checked_out_at %}Out {{ s.checked_out_at|date:"M j, H:i" }} ({{ s.duration_minutes }} min){% else %}Open shift{% endif %}</p>
+        {% endfor %}
+    </section>
+    {% endif %}
+
     {% if engagement.needs_employer_approval %}
-    <form method="post" action="{% url 'employer-engagement-decide' engagement.pk %}" class="space-y-3">
+    <form method="post" action="{% url 'employer-engagement-decide' engagement.pk %}" class="space-y-3 bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
         {% csrf_token %}
-        <textarea name="reason" rows="2" class="w-full rounded-xl border-outline-variant/30" placeholder="Reason for rejection or change request"></textarea>
+        <textarea name="reason" rows="2" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Reason if you reject or ask for changes"></textarea>
         <div class="flex flex-wrap gap-3">
-            <button name="action" value="approve" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Approve engagement</button>
-            <button name="action" value="request_changes" class="bg-surface-container-high px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Request changes</button>
-            <button name="action" value="reject" class="text-error px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Reject</button>
+            <button name="action" value="approve" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Approve and bind contract</button>
+            <button name="action" value="request_changes" class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Request changes</button>
+            <button name="action" value="reject" class="bg-error text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Disapprove</button>
         </div>
-        <p class="text-[11px] text-outline">The WorkOS agent can recommend this approval. It cannot approve financial commitments for you.</p>
+        <p class="text-[11px] text-outline">Approving locks the job and stores the agreed terms. The WorkOS agent can then create the on-chain agreement — it cannot approve this for you.</p>
     </form>
-    {% else %}
+    {% elif engagement.is_bound %}
     <a href="{% url 'agent-command-center' engagement.pk %}" class="inline-block signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Open command center</a>
+    {% else %}
+    <p class="text-sm text-outline">Nothing to approve yet.</p>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,14 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.agentic_core.state import EngagementStatus, explain
-from apps.contracts.models import Contract
+from apps.contracts.agreement import (
+    AgreementError,
+    bind_agreement,
+    check_in,
+    check_out,
+    open_shift_for,
+    submit_worker_terms,
+)
+from apps.contracts.models import Contract, ServiceInvoice
 from apps.jobs.models import Application, Job
 from apps.wallet.pricing import get_price_service
-from apps.wallet.settlement import compute_waterfall, ensure_settlement, remaining_training_for
+from apps.wallet.settlement import compute_waterfall
 
 
 @login_required(login_url="worker-signin")
@@ -21,7 +28,7 @@ def worker_contracts(request):
 @login_required(login_url="employer-signin")
 def employer_contracts(request):
     engagements = Contract.objects.filter(employer=request.user).select_related("job", "worker").order_by("-updated_at")
-    pending = engagements.filter(approval_status__in=[Contract.ApprovalStatus.PENDING_REVIEW, Contract.ApprovalStatus.CHANGES_REQUESTED, Contract.ApprovalStatus.DRAFT])
+    pending = engagements.filter(approval_status=Contract.ApprovalStatus.PENDING_REVIEW)
     return render(
         request,
         "employer_contracts.html",
@@ -32,17 +39,24 @@ def employer_contracts(request):
 @login_required(login_url="employer-signin")
 def employer_engagement_review(request, pk):
     engagement = get_object_or_404(Contract, pk=pk, employer=request.user)
-    remaining = remaining_training_for(engagement.worker)
-    breakdown = compute_waterfall(engagement.amount, remaining_training_balance=remaining, currency=engagement.currency)
     fx = get_price_service().convert(engagement.amount, engagement.currency, "XLM")
+    employer_breakdown = {
+        "currency": engagement.currency,
+        "gross_amount": engagement.amount,
+        "platform_fee_percentage": engagement.platform_fee_percentage,
+        "platform_fee_amount": engagement.platform_fee_amount,
+        "worker_net_amount": engagement.worker_net_amount,
+    }
+    shifts = engagement.shifts.all()[:12]
     return render(
         request,
         "employer_engagement_review.html",
         {
             "engagement": engagement,
-            "breakdown": breakdown,
+            "breakdown": employer_breakdown,
             "fx": fx,
-            "remaining_training": remaining,
+            "shifts": shifts,
+            "audience": "employer",
         },
     )
 
@@ -52,37 +66,20 @@ def employer_engagement_review(request, pk):
 def employer_engagement_decide(request, pk):
     engagement = get_object_or_404(Contract, pk=pk, employer=request.user)
     action = request.POST.get("action")
+    try:
+        bind_agreement(engagement, employer=request.user, action=action, reason=request.POST.get("reason") or "")
+    except AgreementError as exc:
+        messages.error(request, str(exc))
+        return redirect("employer-engagement-review", pk=pk)
+    engagement.refresh_from_db()
     if action == "approve":
-        remaining = remaining_training_for(engagement.worker)
-        breakdown = compute_waterfall(engagement.amount, remaining_training_balance=remaining, currency=engagement.currency)
-        engagement.approval_status = Contract.ApprovalStatus.APPROVED
-        engagement.approved_by = request.user
-        engagement.approved_at = timezone.now()
-        engagement.rejection_reason = ""
-        engagement.change_request = ""
-        engagement.platform_fee_percentage = breakdown.platform_fee_percentage
-        engagement.platform_fee_amount = breakdown.platform_fee_amount
-        engagement.worker_net_amount = breakdown.worker_net_amount
-        engagement.upskilling_recovery_amount = breakdown.upskilling_recovery_amount
-        engagement.worker_payout_amount = breakdown.worker_payout_amount
-        engagement.save()
-        ensure_settlement(engagement, status="PENDING")
-        messages.success(request, "Engagement approved. You can now create the on-chain contract from the WorkOS command center.")
+        messages.success(request, "Both parties agreed. The contract is bound, the job is locked, and the on-chain agreement can be created.")
         return redirect("agent-command-center", pk=engagement.pk)
     if action == "reject":
-        engagement.approval_status = Contract.ApprovalStatus.REJECTED
-        engagement.rejection_reason = request.POST.get("reason") or "Rejected by employer"
-        engagement.save(update_fields=["approval_status", "rejection_reason", "updated_at"])
-        messages.info(request, "Engagement rejected. No funds will move.")
+        messages.info(request, "Terms declined. No contract was bound and no funds will move.")
         return redirect("employer-contracts")
-    if action == "request_changes":
-        engagement.approval_status = Contract.ApprovalStatus.CHANGES_REQUESTED
-        engagement.change_request = request.POST.get("reason") or "Please revise the terms."
-        engagement.save(update_fields=["approval_status", "change_request", "updated_at"])
-        messages.info(request, "Change request sent. The agent can prepare a revision; it cannot approve it.")
-        return redirect("employer-contracts")
-    messages.error(request, "Unknown action")
-    return redirect("employer-engagement-review", pk=pk)
+    messages.info(request, "Change request sent to the worker. They can revise their terms.")
+    return redirect("employer-contracts")
 
 
 @login_required(login_url="employer-signin")
@@ -91,7 +88,9 @@ def start_engagement_from_application(request, application_id):
     application = get_object_or_404(Application, pk=application_id, job__employer=request.user)
     job = application.job
     from apps.agentic_core.agent import CareNestAgent
+    from apps.contracts.agreement import ensure_employer_terms
 
+    ensure_employer_terms(job)
     agent = CareNestAgent.start(request.user)
     contract = agent.prepare_engagement(
         worker_id=application.worker_id,
@@ -107,7 +106,81 @@ def start_engagement_from_application(request, application_id):
         },
     )
     agent.end()
-    application.status = Application.Status.ENGAGED
-    application.save(update_fields=["status"])
-    messages.success(request, "Engagement draft prepared. Review and approve it before funding.")
+    messages.success(request, "Draft offer prepared with your terms. The worker still adds theirs before you can bind the contract.")
     return redirect("employer-engagement-review", pk=contract.pk)
+
+
+@login_required(login_url="worker-signin")
+@require_POST
+def submit_job_terms(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+    try:
+        contract = submit_worker_terms(
+            job=job,
+            worker=request.user,
+            worker_terms=request.POST.get("worker_terms") or "",
+            hours_note=request.POST.get("hours_note") or "",
+        )
+    except AgreementError as exc:
+        messages.error(request, str(exc))
+        return redirect(f"/worker-job-details/?id={job.pk}")
+    messages.success(request, "Your terms were sent to the employer. The job stays open until they approve.")
+    return redirect("worker-engagement-review", pk=contract.pk)
+
+
+@login_required(login_url="worker-signin")
+def worker_engagement_review(request, pk):
+    engagement = get_object_or_404(Contract, pk=pk, worker=request.user)
+    remaining = None
+    worker_breakdown = None
+    invoices = engagement.service_invoices.filter(worker=request.user)
+    if engagement.is_bound:
+        from apps.wallet.settlement import remaining_training_for
+
+        remaining = remaining_training_for(request.user)
+        worker_breakdown = compute_waterfall(engagement.amount, remaining_training_balance=remaining, currency=engagement.currency)
+    open_shift = open_shift_for(engagement)
+    return render(
+        request,
+        "worker_engagement_review.html",
+        {
+            "engagement": engagement,
+            "breakdown": worker_breakdown,
+            "audience": "worker",
+            "invoices": invoices,
+            "open_shift": open_shift,
+            "shifts": engagement.shifts.all()[:12],
+            "explanation": explain(engagement.chain_status),
+        },
+    )
+
+
+@login_required(login_url="worker-signin")
+@require_POST
+def check_in_shift(request, pk):
+    engagement = get_object_or_404(Contract, pk=pk, worker=request.user)
+    try:
+        check_in(contract=engagement, worker=request.user, note=request.POST.get("note") or "")
+        messages.success(request, "Checked in. Your shift is open.")
+    except AgreementError as exc:
+        messages.error(request, str(exc))
+    return redirect("worker-engagement-review", pk=pk)
+
+
+@login_required(login_url="worker-signin")
+@require_POST
+def check_out_shift(request, pk):
+    engagement = get_object_or_404(Contract, pk=pk, worker=request.user)
+    try:
+        shift = check_out(contract=engagement, worker=request.user, note=request.POST.get("note") or "")
+        minutes = shift.duration_minutes or 0
+        messages.success(request, f"Checked out. Shift logged ({minutes} min).")
+    except AgreementError as exc:
+        messages.error(request, str(exc))
+    return redirect("worker-engagement-review", pk=pk)
+
+
+@login_required(login_url="worker-signin")
+def worker_service_invoice(request, pk):
+    invoice = get_object_or_404(ServiceInvoice, pk=pk, worker=request.user)
+    return render(request, "worker_service_invoice.html", {"invoice": invoice})

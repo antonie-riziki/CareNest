@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ invoice.invoice_number }} | Care Nest{% endblock %}
+{% block content %}
+{% include 'worker_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl space-y-6 pb-32">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">CareNest → Worker</p>
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Service invoice {{ invoice.invoice_number }}</h1>
+    <p class="text-sm text-outline">This invoice is between you and CareNest. Your employer does not see this fee.</p>
+    <div class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-8 space-y-4">
+        <p class="text-sm text-primary"><strong>Service:</strong> {{ invoice.description }}</p>
+        <p class="text-sm text-primary"><strong>Engagement:</strong> {{ invoice.engagement.job.title|default:"—" }}</p>
+        <p class="text-sm text-primary"><strong>Status:</strong> {{ invoice.get_status_display }}</p>
+        <p class="text-sm text-primary"><strong>Issued:</strong> {{ invoice.issued_at|date:"M j, Y" }}</p>
+        <div class="divide-y divide-outline-variant/10 pt-2">
+            {% for line in invoice.line_items %}
+            <div class="flex justify-between py-3 text-sm text-primary">
+                <span>{{ line.label }}</span>
+                <strong>{{ invoice.currency }} {{ line.amount }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-between text-lg font-extrabold text-primary pt-2">
+            <span>Amount due to CareNest</span>
+            <span class="text-secondary">{{ invoice.currency }} {{ invoice.recovery_amount }}</span>
+        </div>
+        <p class="text-[11px] text-outline">{{ invoice.recovery_percentage }}% of eligible earnings, capped at your remaining training balance. Remaining after this invoice: {{ invoice.currency }} {{ invoice.remaining_training_after }}.</p>
+    </div>
+</div>
+{% include 'worker_bottom_nav.html' %}
+{% endblock %}

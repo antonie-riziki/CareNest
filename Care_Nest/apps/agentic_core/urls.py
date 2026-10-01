@@ -7,6 +7,7 @@ urlpatterns = [
     path("agent/", views.employer_agent_panel, name="agent-panel"),
     path("agent/ask/", views.ask_agent, name="agent-ask"),
     path("agent/prepare/", views.prepare_engagement, name="agent-prepare"),
+    path("agent/publish/", views.publish_job_offer, name="agent-publish-job"),
     path("agent/engagements/<int:pk>/", views.command_center, name="agent-command-center"),
     path("agent/engagements/<int:pk>/tick/", views.tick_engagement, name="agent-tick"),
     path("agent/approvals/<int:pk>/approve/", views.approve_action, name="agent-approve"),

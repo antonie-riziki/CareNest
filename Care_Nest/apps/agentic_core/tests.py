@@ -115,6 +115,12 @@ class AgentFlowTests(TestCase):
         )
         Wallet.objects.create(user=self.mary, balance=0, stellar_address="G" + "B" * 55)
 
+    def test_agent_panel_loads_without_proposal(self):
+        self.client.force_login(self.employer)
+        response = self.client.get("/agent/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Parse requirement")
+
     def test_intake_search_and_persistent_memory(self):
         agent = CareNestAgent.start(self.employer)
         result = agent.intake("I need a full-time nanny in Westlands, KES 45,000/month.")
@@ -144,7 +150,7 @@ class AgentFlowTests(TestCase):
         )
         agent.end()
         self.assertEqual(contract.chain_status, EngagementStatus.DRAFT)
-        self.assertEqual(contract.approval_status, contract.ApprovalStatus.PENDING_REVIEW)
+        self.assertEqual(contract.approval_status, contract.ApprovalStatus.DRAFT)
         self.assertFalse(AgentApproval.objects.filter(engagement=contract, approval_type=AgentApproval.Type.CREATE_AGREEMENT).exists())
 
         contract.approval_status = contract.ApprovalStatus.APPROVED

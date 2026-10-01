@@ -4,7 +4,7 @@
 {% include 'employer_sidebar.html' %}
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl">
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{% if job %}Edit job{% else %}New job posting{% endif %}</h1>
-    <p class="text-sm text-outline mt-2">Images are optional. Scheduling is stored on the job record, not as a label.</p>
+    <p class="text-sm text-outline mt-2">Primary image appears on the job card. Add your terms of hire so workers can review them.</p>
     {% if messages %}{% for message in messages %}<div class="mt-4 bg-secondary-container px-4 py-3 rounded-xl text-sm">{{ message }}</div>{% endfor %}{% endif %}
     <form method="post" enctype="multipart/form-data" action="{% if job %}{% url 'employer-job-save' job.pk %}{% else %}{% url 'employer-jobs' %}{% endif %}" class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-5">
         {% csrf_token %}
@@ -79,25 +79,15 @@
             <option value="PAUSED">Paused</option>
         </select>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="publish_now"> Publish immediately if start is today</label>
-        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Primary image (optional)</label>
-        <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="w-full text-sm" onchange="previewJobImage(this)">
-        <img id="job-preview" class="hidden h-40 w-full object-cover rounded-2xl" alt="Preview">
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of hire</label>
+        <textarea name="employer_terms" rows="5" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Hours, duties, house rules, what you expect from the worker">{{ job.employer_terms|default:'' }}</textarea>
+        {% include '_image_dropzone.html' with input_id='job-image' input_name='image' current_url=job.image_url dropzone_label='Primary image (shown on the job card)' %}
         {% if job and job.has_custom_image %}
-        <img src="{{ job.cover_image }}" class="h-40 w-full object-cover rounded-2xl" alt="">
-        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remove_image"> Remove current image</label>
+        <label class="flex items-center gap-2 text-sm text-primary"><input type="checkbox" name="remove_image"> Remove current image</label>
         {% endif %}
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Secondary images</label>
         <input name="gallery" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="w-full text-sm">
         <button class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save job</button>
     </form>
 </div>
-<script>
-function previewJobImage(input) {
-    const img = document.getElementById("job-preview");
-    if (input.files && input.files[0]) {
-        img.src = URL.createObjectURL(input.files[0]);
-        img.classList.remove("hidden");
-    }
-}
-</script>
 {% endblock %}

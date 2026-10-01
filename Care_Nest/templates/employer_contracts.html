@@ -20,7 +20,7 @@
         <div class="flex flex-wrap justify-between gap-3">
             <div>
                 <h2 class="font-extrabold text-primary">{{ e.job.title }}</h2>
-                <p class="text-sm text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · Employer pays {{ e.currency }} {{ e.amount }} · Worker net {{ e.currency }} {{ e.worker_net_amount }}</p>
+                <p class="text-sm text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · Employer pays {{ e.currency }} {{ e.amount }}</p>
             </div>
             <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-surface-container-high">{{ e.approval_status }} · {{ e.chain_status }}</span>
         </div>

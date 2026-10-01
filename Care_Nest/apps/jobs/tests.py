@@ -41,6 +41,14 @@ class JobVisibilityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, job.title)
 
+    def test_locked_job_is_not_listed(self):
+        job = self._job(status=Job.Status.ACTIVE, published_at=timezone.now(), locked=True)
+        job.status = Job.Status.LOCKED
+        job.save()
+        self.client.force_login(self.worker)
+        response = self.client.get("/worker-jobs/")
+        self.assertNotContains(response, job.title)
+
     def test_active_job_is_listed(self):
         job = self._job(status=Job.Status.ACTIVE, published_at=timezone.now())
         self.client.force_login(self.worker)

@@ -41,9 +41,46 @@ WORKERS = [
 ]
 
 COURSES = [
-    {"title": "Childcare Fundamentals", "description": "Daily childcare, nutrition, and safety.", "fee": Decimal("8000"), "category": "nanny", "slug": "childcare-fundamentals"},
-    {"title": "Elder Care", "description": "Personal care and wellbeing support for older adults.", "fee": Decimal("6500"), "category": "caregiver", "slug": "elder-care"},
-    {"title": "Housekeeping Professional", "description": "Residential cleaning and home organisation.", "fee": Decimal("5000"), "category": "housekeeper", "slug": "housekeeping-professional"},
+    {
+        "title": "Advanced Housekeeping",
+        "description": "Residential cleaning and premium fabric care.",
+        "fee": Decimal("5000"),
+        "category": "housekeeper",
+        "slug": "housekeeping-professional",
+        "level": "advanced",
+        "duration_hours": 12,
+        "thumbnail": "https://lodgingmagazine.com/wp-content/uploads/2025/01/BoH-Winter_Housekeeping1.jpg",
+    },
+    {
+        "title": "Professional Childcare",
+        "description": "Daily childcare, nutrition, and safety.",
+        "fee": Decimal("8000"),
+        "category": "nanny",
+        "slug": "childcare-fundamentals",
+        "level": "advanced",
+        "duration_hours": 18,
+        "thumbnail": "https://thebesanamail.com/wp-content/uploads/2025/03/Kenya.Lucy-plays-with-child.Kate-Holt.2016.cropped.jpg",
+    },
+    {
+        "title": "International Culinary",
+        "description": "Home cooking and meal prep to professional standard.",
+        "fee": Decimal("7000"),
+        "category": "chef",
+        "slug": "international-culinary",
+        "level": "intermediate",
+        "duration_hours": 24,
+        "thumbnail": "https://c8.alamy.com/comp/2GW8X7J/african-woman-cooking-traditional-food-at-street-2GW8X7J.jpg",
+    },
+    {
+        "title": "Home Safety & First Aid",
+        "description": "Household emergency response and first aid.",
+        "fee": Decimal("4500"),
+        "category": "caregiver",
+        "slug": "home-safety-first-aid",
+        "level": "beginner",
+        "duration_hours": 8,
+        "thumbnail": "https://caromonthealth.org/media/j4gg5kbz/first-aid_gettyimages-1386276499_website-banner.jpg",
+    },
 ]
 
 
@@ -149,12 +186,18 @@ class Command(BaseCommand):
                     "published_at": now if spec["status"] == Job.Status.ACTIVE else None,
                     "scheduled_publish_at": now + timedelta(days=3) if spec["status"] == Job.Status.SCHEDULED else now,
                     "is_verified": True,
+                    "employer_terms": spec["description"],
                 },
             )
             Application.objects.get_or_create(worker=spec["worker"], job=job, defaults={"status": Application.Status.SUBMITTED})
 
         for spec in COURSES:
-            Course.objects.get_or_create(slug=spec["slug"], defaults=spec)
+            course, created = Course.objects.get_or_create(slug=spec["slug"], defaults=spec)
+            if not created:
+                for key, value in spec.items():
+                    setattr(course, key, value)
+                course.save()
+        Course.objects.filter(slug="elder-care").update(is_active=False)
         childcare = Course.objects.get(slug="childcare-fundamentals")
         Enrollment.objects.get_or_create(
             course=childcare,
@@ -178,10 +221,11 @@ class Command(BaseCommand):
                 scope="Daily childcare and supervision\nMeal preparation for children",
                 status="draft",
                 chain_status="DRAFT",
-                approval_status=Contract.ApprovalStatus.PENDING_REVIEW,
+                approval_status=Contract.ApprovalStatus.DRAFT,
                 duration_text="1 month",
                 amount=nanny_job.pay,
                 currency="KES",
+                employer_terms=nanny_job.employer_terms or nanny_job.description,
             )
             apply_breakdown_to_contract(contract, breakdown)
             contract.save()

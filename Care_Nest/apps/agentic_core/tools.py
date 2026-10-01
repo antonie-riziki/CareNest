@@ -265,8 +265,10 @@ def create_job_draft(*, employer_id: int, requirement: dict[str, Any]) -> ToolRe
         job_type=parsed.job_type,
         status=Job.Status.DRAFT,
         timezone="Africa/Nairobi",
+        employer_terms=requirement.get("employer_terms") or parsed.raw_text or parsed.title,
+        image_url=requirement.get("image_url") or "",
     )
-    return ToolResult(ok=True, data={"job_id": job.pk, "title": job.title, "job_type": job.job_type, "location": job.location, "pay": str(job.pay)})
+    return ToolResult(ok=True, data={"job_id": job.pk, "title": job.title, "job_type": job.job_type, "location": job.location, "pay": str(job.pay), "image_url": job.image_url})
 
 
 @tool("prepare_contract_terms")
@@ -279,6 +281,29 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         return ToolResult(ok=False, error="employer, worker or job missing")
     if employer.pk == worker.pk:
         return ToolResult(ok=False, error="employer and worker must differ")
+
+    if job.locked:
+        return ToolResult(ok=False, error="job is already locked")
+    existing = (
+        Contract.objects.filter(job=job, worker=worker)
+        .exclude(approval_status=Contract.ApprovalStatus.REJECTED)
+        .first()
+    )
+    if existing:
+        return ToolResult(
+            ok=True,
+            data={
+                "engagement_pk": existing.pk,
+                "terms": {
+                    "job_type": job.job_type,
+                    "pay_amount": str(existing.amount),
+                    "pay_currency": existing.currency,
+                },
+                "terms_hash": existing.terms_hash,
+                "needs_employer_approval": existing.needs_employer_approval,
+                "already_existed": True,
+            },
+        )
 
     cfg = stellar.get_config()
     pay_amount = Decimal(str(requirement.get("pay_amount") or job.pay or 0))
@@ -315,7 +340,7 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         scope="\n".join(scope),
         status="draft",
         chain_status=EngagementStatus.DRAFT,
-        approval_status=Contract.ApprovalStatus.PENDING_REVIEW,
+        approval_status=Contract.ApprovalStatus.DRAFT,
         duration_text=requirement.get("duration", "1 month"),
         amount=pay_amount,
         currency=terms.pay_currency,
@@ -327,6 +352,8 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         contract_address=cfg.contract_id,
         data_source=cfg.data_source,
         start_date=timezone.now(),
+        employer_terms=(job.employer_terms or requirement.get("employer_terms") or "\n".join(scope)),
+        worker_terms="",
     )
     apply_breakdown_to_contract(contract, breakdown)
     contract.save()
@@ -339,7 +366,8 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
             "escrow_amount_base_units": escrow_units,
             "token_symbol": cfg.token_symbol,
             "data_source": contract.data_source,
-            "needs_employer_approval": True,
+            "needs_employer_approval": False,
+            "needs_worker_terms": True,
             "breakdown": breakdown.to_dict(),
         },
     )

@@ -26,7 +26,7 @@ def worker_dashboard(request):
     credentials = WorkCredential.objects.filter(worker=request.user)
     earned = credentials.aggregate(total=Sum("amount"))["total"] or 0
     latest = active.order_by("-updated_at").first()
-    open_jobs = [j for j in refresh_queryset(Job.objects.exclude(employer=request.user).order_by("-created_at")[:12]) if j.status == Job.Status.ACTIVE][:5]
+    open_jobs = [j for j in refresh_queryset(Job.objects.exclude(employer=request.user).order_by("-created_at")[:12]) if j.is_live][:5]
     enrollments = Enrollment.objects.filter(worker=request.user).select_related("course")
     training_remaining = sum((e.amount_remaining for e in enrollments), start=0)
     wallet = Wallet.objects.filter(user=request.user).first()
@@ -53,9 +53,7 @@ def employer_dashboard(request):
     engagements = Contract.objects.filter(employer=request.user).select_related("job", "worker")
     active = engagements.filter(chain_status__in=EngagementStatus.FUNDS_IN_ESCROW | {EngagementStatus.CREATED, EngagementStatus.DRAFT})
     pending = AgentApproval.objects.filter(requested_from=request.user, status=AgentApproval.Status.PENDING)
-    pending_engagements = engagements.filter(
-        approval_status__in=[Contract.ApprovalStatus.PENDING_REVIEW, Contract.ApprovalStatus.CHANGES_REQUESTED, Contract.ApprovalStatus.DRAFT]
-    )
+    pending_engagements = engagements.filter(approval_status=Contract.ApprovalStatus.PENDING_REVIEW)
     month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     spent = (
         engagements.filter(chain_status=EngagementStatus.RELEASED, updated_at__gte=month_start).aggregate(total=Sum("amount"))["total"]
