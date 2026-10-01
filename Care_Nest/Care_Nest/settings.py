@@ -63,7 +63,7 @@ if vercel_host:
     origin = f"https://{vercel_host}"
     if origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(origin)
-for extra in ("carenest.vercel.app", "care-nest.vercel.app", "care-nest-sigma.vercel.app", "127.0.0.1", "localhost", "testserver"):
+for extra in ("carenest.vercel.app", "care-nest.vercel.app"):
     if extra not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(extra)
     origin = f"https://{extra}"
@@ -74,10 +74,7 @@ if os.getenv("VERCEL"):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
-    ALLOWED_HOSTS.append(".vercel.app")
-    if "*" not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append("*")
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
 
 # Application definition
@@ -167,9 +164,6 @@ if _database_url:
             "OPTIONS": {"sslmode": os.getenv("POSTGRES_SSLMODE", "require")},
         }
     }
-elif os.getenv("VERCEL"):
-    # Serverless filesystem is read-only except /tmp. Build-time SQLite is not writable at runtime.
-    DATABASES["default"]["NAME"] = Path("/tmp") / "carenest.sqlite3"
 
 
 # Password validation
