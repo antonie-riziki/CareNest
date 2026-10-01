@@ -1,30 +1,6 @@
-from django.shortcuts import render
-
 from django.http import HttpResponse
 
-# Create your views here.
-
-import os
-import sys
-from flask import Flask, request
-
-from dotenv import load_dotenv
-
-sys.path.insert(1, "/ussd_response")
-
-from .ai_engine import autogenerate_response
 from .messaging_engine import send_message
-
-# app = Flask(__name__)
-
-
-# @app.route("/ussd", methods=["POST"])
-def handle_ussd():
-    # Flask standalone entry (apps/ussd_app/main_app.py). Django uses handle_ussd_menu.
-    session_id = request.values.get("sessionId", None)
-    phone_number = request.values.get("phoneNumber", None)
-    text = request.values.get("text", "")
-    return handle_ussd_menu(text, phone_number, session_id)
 
 
 def handle_ussd_menu(text, phone_number=None, session_id=None):

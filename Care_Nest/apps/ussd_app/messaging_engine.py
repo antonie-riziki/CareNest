@@ -1,19 +1,25 @@
-import africastalking
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 _AT_API_KEY = os.getenv("AT_API_KEY")
+sms = None
 
 if _AT_API_KEY:
-    africastalking.initialize(username=os.getenv("AT_USERNAME", "EMID"), api_key=_AT_API_KEY)
-    sms = africastalking.SMS
-else:
+    try:
+        import africastalking
+
+        africastalking.initialize(username=os.getenv("AT_USERNAME", "EMID"), api_key=_AT_API_KEY)
+        sms = africastalking.SMS
+    except Exception:
+        sms = None
+
+if sms is None:
 
     class _DisabledSMS:
         def send(self, message, recipients, sender=None):
-            return {"status": "disabled", "reason": "AT_API_KEY unset"}
+            return {"status": "disabled", "reason": "Africa's Talking is not configured"}
 
     sms = _DisabledSMS()
 
