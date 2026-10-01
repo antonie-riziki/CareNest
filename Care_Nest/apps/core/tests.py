@@ -14,3 +14,9 @@ class PwaTests(TestCase):
         home = self.client.get("/")
         self.assertContains(home, "manifest.webmanifest")
         self.assertContains(home, "/static/pwa/pwa.js")
+
+    def test_urlconf_imports_without_flask(self):
+        from importlib import import_module
+        from django.conf import settings
+
+        import_module(settings.ROOT_URLCONF)

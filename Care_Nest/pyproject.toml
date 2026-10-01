@@ -11,6 +11,9 @@ dependencies = [
     "stellar-sdk>=13.0.0",
     "httpx",
     "psycopg[binary]>=3.2",
+    "Flask",
+    "africastalking",
+    "google-genai",
 ]
 
 [tool.vercel]
