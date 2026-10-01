@@ -179,78 +179,20 @@
                 <div
                     class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
                     {% for job in jobs %}
-                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}"
-                        class="snap-center min-w-[280px] lg:min-w-0 bg-surface-container-lowest rounded-lg p-5 shadow-[0_20px_40px_rgba(24,28,30,0.04)] border border-outline-variant/10">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-                                <span class="material-symbols-outlined text-on-secondary-container">work</span>
-                            </div>
-                            <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-outline">{{ job.job_type }}</span>
-                            </div>
-                        </div>
-                        <h3 class="font-headline text-lg font-bold text-primary mb-1">{{ job.title }}</h3>
-                        <p class="text-sm text-outline mb-4">{{ job.location }}</p>
-                        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Payment</p>
-                                <p class="font-headline font-bold text-secondary">KES {{ job.pay }}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider text-outline font-medium">Posted</p>
-                                <p class="font-headline font-bold text-primary">{{ job.created_at|date:"M j" }}</p>
-                            </div>
-                        </div>
-                    </a>
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" class="snap-center min-w-[280px] lg:min-w-0">{% include '_job_card.html' %}</a>
                     {% empty %}
-                    <p class="text-sm text-outline">No jobs posted yet. Employers create work through the WorkOS agent.</p>
+                    <p class="text-sm text-outline">No live jobs yet. Scheduled and draft postings stay hidden until they are active.</p>
                     {% endfor %}
                 </div>
                 <!-- Recommendations Section (Editorial Layout) -->
                 <section class="mt-4 pb-12 lg:pb-0">
-                    <h3 class="font-headline text-xl font-bold text-primary mb-6">Top Rated For You</h3>
-                    <div class="grid grid-cols-1 gap-6">
-                        <div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col md:flex-row">
-                            <div class="h-48 md:w-1/3 relative">
-                                <img class="w-full h-full object-cover"
-                                    data-alt="Modern clean bathroom interior with professional cleaning supplies on a marble counter, soft bright natural lighting"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMWahs2xTX-MOYUgVw7qxweaSWlMNFaHTcDwAEOUGwwl2O7kf3x2icryNM0-aWBLSoAJv45aBA-z9xSJdhV9fLyZmu6OAmwemozYbdxzm_xfLYzRaVHEEWspO2KmKB_k6ImcNSXTpDgn-9YLLZy23rZnUXVqieR6hYF4cBnFg6BWENvKftyMNV1lqVjvvlzTWKbzvQ0tUfFHNoMBQZDJMlIc6OJ0wqdLzLR5UnFrwlgZ3ZFstQOqUWTIk5rcL8O0aZ3RHBvpj2Qtsc" />
-                                <div class="absolute top-4 left-4">
-                                    <span
-                                        class="bg-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Verified
-                                        Host</span>
-                                </div>
-                            </div>
-                            <div class="p-6 md:w-2/3 flex flex-col justify-between">
-                                <div>
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="font-headline text-xl font-bold text-primary">Move-out Deep Clean
-                                        </h4>
-                                        <p class="text-secondary font-bold">KES 3,500</p>
-                                    </div>
-                                    <p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">Require
-                                        a
-                                        comprehensive deep clean for a 3-bedroom apartment before handover. All supplies
-                                        provided onsite.</p>
-                                    <div class="flex gap-4 mb-6">
-                                        <div class="flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-secondary text-lg"
-                                                data-icon="schedule">schedule</span>
-                                            <span class="text-xs text-on-surface font-medium">Today, 2 PM</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-secondary text-lg"
-                                                data-icon="location_on">location_on</span>
-                                            <span class="text-xs text-on-surface font-medium">Kilimani Area</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button
-                                    class="kenyan-gradient text-white font-bold py-3 px-6 rounded-xl w-full md:w-max">Apply
-                                    Now</button>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="font-headline text-xl font-bold text-primary mb-6">Nearby live jobs</h3>
+                    <p class="text-[11px] text-outline mb-4">Pins use approximate coordinates. Exact residential locations are never shown publicly. If a map tile returns 403, OpenStreetMap is used as fallback.</p>
+                    {% for job in jobs %}
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" class="block mb-4">{% include '_job_card.html' %}</a>
+                    {% empty %}
+                    <p class="text-sm text-outline">No active jobs in range.</p>
+                    {% endfor %}
                 </section>
             </div>
         </main>
@@ -319,6 +261,8 @@
         let currentRadius = 5; // Default 5km
 
         const CARENEST_JOBS = {{ jobs_json|safe }};
+        const CARENEST_MAP = {{ map_config_json|safe }};
+
 
         function loadJobs() {
             return (CARENEST_JOBS || []).map((job) => ({
@@ -342,10 +286,15 @@
             map = L.map('map').setView([lat, lon], 13);
 
             // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
+            const tiles = L.tileLayer((CARENEST_MAP && CARENEST_MAP.tile_url) || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: (CARENEST_MAP && CARENEST_MAP.tile_attribution) || '© OpenStreetMap contributors',
                 maxZoom: 19
-            }).addTo(map);
+            });
+            tiles.on('tileerror', function () {
+                const status = document.getElementById('location-status');
+                if (status) status.textContent = 'Map tiles unavailable — retrying OpenStreetMap';
+            });
+            tiles.addTo(map);
 
             // Add user location marker
             const userIcon = L.divIcon({

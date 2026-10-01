@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.core",
     "apps.ussd_app",
+    "apps.courses.apps.CoursesConfig",
     "apps.agentic_core.apps.AgenticCoreConfig",
 ]
 
@@ -120,6 +121,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        "TEST": {"NAME": ":memory:"},
     }
 }
 
@@ -159,6 +161,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
@@ -209,6 +214,31 @@ OMEGA_LLM_BASE_URL = os.getenv("OMEGA_LLM_BASE_URL", "https://llm.c.singularityn
 OMEGA_LLM_MODEL = os.getenv("OMEGA_LLM_MODEL", "asi1-mini")
 OMEGA_LLM_TIMEOUT = float(os.getenv("OMEGA_LLM_TIMEOUT", "40"))
 OMEGA_LLM_ENABLED = env_bool("OMEGA_LLM_ENABLED", default=bool(os.getenv("ASI_API_KEY")))
+
+# ---------------------------------------------------------------------------
+# CareNest commercial rules (authoritative server-side)
+# ---------------------------------------------------------------------------
+from decimal import Decimal
+
+CARENEST_PLATFORM_FEE_PERCENT = Decimal(os.getenv("CARENEST_PLATFORM_FEE_PERCENT", "5"))
+CARENEST_UPSKILLING_RECOVERY_PERCENT = Decimal(os.getenv("CARENEST_UPSKILLING_RECOVERY_PERCENT", "20"))
+
+# Maps — browser key only, never a secret. Empty => Leaflet/OSM.
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
+MAP_PROVIDER = os.getenv("MAP_PROVIDER", "leaflet")
+
+# Market prices
+PRICE_FEED_URL = os.getenv("PRICE_FEED_URL", "https://api.coingecko.com/api/v3/simple/price")
+FX_FALLBACK_URL = os.getenv("FX_FALLBACK_URL", "https://api.frankfurter.app/latest")
+PRICE_CACHE_SECONDS = int(os.getenv("PRICE_CACHE_SECONDS", "60"))
+PRICE_STALE_SECONDS = int(os.getenv("PRICE_STALE_SECONDS", "300"))
+
+# Supabase (optional mirror + storage). Secret key is server-side only.
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY", "")
+SUPABASE_JWKS_URL = os.getenv("SUPABASE_JWKS_URL", "")
+SUPABASE_EXPOSE_PUBLISHABLE = env_bool("SUPABASE_EXPOSE_PUBLISHABLE", default=False)
 
 LOGGING = {
     "version": 1,

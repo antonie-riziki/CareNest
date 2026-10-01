@@ -41,7 +41,38 @@ def initiate_payment(phone_number):
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
-        # return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error initiating payment: {e}")
+        return response.json()
+    except requests.exceptions.RequestException:
+        return None
+
+
+def initiate_payout(phone_number, amount, *, reference=""):
+    """
+    Optional M-Pesa B2C/payout. Returns None when credentials are missing or
+    the provider fails — callers must record FAILED, never fake COMPLETED.
+    """
+    token = _basic_auth_token()
+    if not token:
+        return None
+    url = os.getenv("PAYHERO_PAYOUT_URL", "https://backend.payhero.co.ke/api/v2/payouts")
+    payload = {
+        "amount": float(amount or 0),
+        "phone_number": str(phone_number),
+        "channel": "mpesa",
+        "external_reference": reference or "CARENEST-PAYOUT",
+    }
+    try:
+        response = requests.post(
+            url,
+            json=payload,
+            headers={"Content-Type": "application/json", "Authorization": token},
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "status": data.get("status") or "PROCESSING",
+            "reference": data.get("reference") or data.get("CheckoutRequestID") or reference,
+        }
+    except requests.exceptions.RequestException:
         return None

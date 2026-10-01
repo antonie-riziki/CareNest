@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Review engagement | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl space-y-6">
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Employer approval — not a job posting</p>
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ engagement.job.title }}</h1>
+    <p class="text-sm text-outline">Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }} · Contract {{ engagement.chain_status }} · Approval {{ engagement.approval_status }}</p>
+    <div class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-2 text-sm">
+        <p><strong>Proposed pay:</strong> {{ engagement.currency }} {{ engagement.amount }}</p>
+        <p><strong>Schedule:</strong> {{ engagement.job.schedule_label }}</p>
+        <p><strong>Duration:</strong> {{ engagement.duration_text|default:"as agreed" }}</p>
+        <p><strong>Work scope:</strong></p>
+        <pre class="whitespace-pre-wrap text-outline">{{ engagement.scope }}</pre>
+        <p><strong>Escrow:</strong> {{ engagement.token_amount_display|default:"—" }} (Stellar settlement)</p>
+    </div>
+    {% include '_settlement_breakdown.html' %}
+    {% if engagement.needs_employer_approval %}
+    <form method="post" action="{% url 'employer-engagement-decide' engagement.pk %}" class="space-y-3">
+        {% csrf_token %}
+        <textarea name="reason" rows="2" class="w-full rounded-xl border-outline-variant/30" placeholder="Reason for rejection or change request"></textarea>
+        <div class="flex flex-wrap gap-3">
+            <button name="action" value="approve" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Approve engagement</button>
+            <button name="action" value="request_changes" class="bg-surface-container-high px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Request changes</button>
+            <button name="action" value="reject" class="text-error px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Reject</button>
+        </div>
+        <p class="text-[11px] text-outline">The WorkOS agent can recommend this approval. It cannot approve financial commitments for you.</p>
+    </form>
+    {% else %}
+    <a href="{% url 'agent-command-center' engagement.pk %}" class="inline-block signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Open command center</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -268,6 +268,8 @@ def execute_contract_call(
 
     if function in FINANCIAL_FUNCTIONS and approval and approval.requested_from_id != getattr(actor, "pk", None):
         raise PolicyViolation("Only the user the approval was requested from may execute it")
+    if function in {"create_agreement", "fund", "approve_and_release"} and contract.approval_status != contract.ApprovalStatus.APPROVED:
+        raise PolicyViolation("Employer engagement approval is required before any on-chain financial commitment")
 
     cfg = stellar.get_config()
 
@@ -340,6 +342,17 @@ def _record_success(contract: Contract, function: str, tx: stellar.SubmittedTran
     if function == "approve_and_release":
         contract.end_date = timezone.now()
     contract.save()
+    try:
+        from apps.wallet import settlement as settlement_mod
+
+        if function == "fund":
+            settlement_mod.mark_settlement_funded(contract, reference=tx.tx_hash)
+        elif function == "approve_and_release":
+            settlement_mod.capture_settled_commission(contract, reference=tx.tx_hash)
+        elif function in {"cancel", "cancel_agreement"}:
+            settlement_mod.refund_settlement(contract, reason="agreement cancelled")
+    except Exception:  # noqa: BLE001
+        logger.exception("settlement accounting failed after %s", function)
 
     if approval:
         audit.mark_approval(approval, status=AgentApproval.Status.EXECUTED, decided_by=actor, tx_hash=tx.tx_hash, note=f"signed by {signed_by}")
@@ -394,18 +407,15 @@ def _record_success(contract: Contract, function: str, tx: stellar.SubmittedTran
 # ---------------------------------------------------------------------------
 
 
-def connect_wallet(user, public_key: str, provider: str) -> Wallet:
-    public_key = stellar.validate_public_key(public_key)
+def connect_wallet(user, public_key: str, provider: str, *, chain: str | None = None, network: str = "") -> Wallet:
+    from apps.wallet.providers import persist_connection
+
     provider = provider if provider in dict(Wallet.PROVIDER_CHOICES) else "manual"
-    wallet, _ = Wallet.objects.get_or_create(user=user, defaults={"balance": 0})
-    wallet.stellar_address = public_key
-    wallet.wallet_provider = provider
-    wallet.connected_at = timezone.now()
-    wallet.save()
-    # keep draft engagements in sync
-    Contract.objects.filter(employer=user, chain_status=EngagementStatus.DRAFT).update(employer_wallet=public_key)
-    Contract.objects.filter(worker=user, chain_status=EngagementStatus.DRAFT).update(worker_wallet=public_key)
-    return wallet
+    if (chain or "stellar") == "stellar" or provider in {"freighter", "xbull", "albedo", "lobstr", "hana", "demo", "manual"}:
+        if (public_key or "").startswith("G"):
+            public_key = stellar.validate_public_key(public_key)
+            chain = "stellar"
+    return persist_connection(user, address=public_key, provider_name=provider, chain=chain, network=network)
 
 
 def demo_signer_public_keys() -> dict[str, str]:

@@ -259,10 +259,12 @@ def create_job_draft(*, employer_id: int, requirement: dict[str, Any]) -> ToolRe
         title=parsed.title,
         description=parsed.raw_text or parsed.title,
         location=parsed.location or "Nairobi",
-        latitude=-1.2634,  # Westlands default; refined later in the UI
+        latitude=-1.2634,
         longitude=36.8036,
         pay=parsed.pay_amount or Decimal("0"),
         job_type=parsed.job_type,
+        status=Job.Status.DRAFT,
+        timezone="Africa/Nairobi",
     )
     return ToolResult(ok=True, data={"job_id": job.pk, "title": job.title, "job_type": job.job_type, "location": job.location, "pay": str(job.pay)})
 
@@ -299,6 +301,13 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         escrow_amount_base_units=escrow_units,
     )
     terms_hash = stellar.sha256_hex(terms.to_dict())
+    from apps.wallet.settlement import compute_waterfall, remaining_training_for, apply_breakdown_to_contract
+
+    breakdown = compute_waterfall(
+        pay_amount,
+        remaining_training_balance=remaining_training_for(worker),
+        currency=terms.pay_currency,
+    )
     contract = Contract.objects.create(
         job=job,
         worker=worker,
@@ -306,6 +315,8 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         scope="\n".join(scope),
         status="draft",
         chain_status=EngagementStatus.DRAFT,
+        approval_status=Contract.ApprovalStatus.PENDING_REVIEW,
+        duration_text=requirement.get("duration", "1 month"),
         amount=pay_amount,
         currency=terms.pay_currency,
         token_amount=escrow_units,
@@ -317,6 +328,8 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
         data_source=cfg.data_source,
         start_date=timezone.now(),
     )
+    apply_breakdown_to_contract(contract, breakdown)
+    contract.save()
     return ToolResult(
         ok=True,
         data={
@@ -326,6 +339,8 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
             "escrow_amount_base_units": escrow_units,
             "token_symbol": cfg.token_symbol,
             "data_source": contract.data_source,
+            "needs_employer_approval": True,
+            "breakdown": breakdown.to_dict(),
         },
     )
 
@@ -393,7 +408,27 @@ def get_wallet_state(*, user_id: int) -> ToolResult:
     w = Wallet.objects.filter(user_id=user_id).first()
     if not w:
         return ToolResult(ok=True, data={"connected": False})
-    return ToolResult(ok=True, data={"connected": w.is_connected, "address": w.stellar_address, "provider": w.wallet_provider, "connected_at": w.connected_at.isoformat() if w.connected_at else None})
+    from apps.wallet.payouts import preferred_payout_method
+
+    payout = preferred_payout_method(User.objects.filter(pk=user_id).first())
+    return ToolResult(
+        ok=True,
+        data={
+            "connected": w.is_connected,
+            "stellar_connected": w.stellar_connected,
+            "evm_connected": w.evm_connected,
+            "address": w.stellar_address or w.evm_address,
+            "stellar_address": w.stellar_address,
+            "evm_address": w.evm_address,
+            "provider": w.wallet_provider,
+            "chain": w.chain,
+            "status": w.connection_status,
+            "connected_at": w.connected_at.isoformat() if w.connected_at else None,
+            "payout_method": None
+            if not payout
+            else {"type": payout.method_type, "masked": payout.masked_identifier, "status": payout.status},
+        },
+    )
 
 
 @tool("read_stellar_events")
@@ -495,3 +530,103 @@ def build_audit_record(*, engagement_pk: int) -> ToolResult:
             "events": [{"type": e.event_type, "tx_hash": e.tx_hash, "ledger": e.ledger, "source": e.data_source} for e in events],
         },
     )
+
+
+@tool("explain_engagement_pricing")
+def explain_engagement_pricing(*, engagement_pk: int) -> ToolResult:
+    from apps.wallet.pricing import get_price_service
+    from apps.wallet.settlement import compute_waterfall, remaining_training_for
+
+    c = Contract.objects.filter(pk=engagement_pk).select_related("worker", "job").first()
+    if not c:
+        return ToolResult(ok=False, error="engagement not found")
+    remaining = remaining_training_for(c.worker)
+    breakdown = compute_waterfall(c.amount, remaining_training_balance=remaining, currency=c.currency)
+    fx = get_price_service().convert(c.amount, c.currency, "XLM")
+    return ToolResult(
+        ok=True,
+        data={
+            "engagement_pk": c.pk,
+            "job": c.job.title,
+            "approval_status": c.approval_status,
+            "contract_state": c.chain_status,
+            "breakdown": breakdown.to_dict(),
+            "market_conversion": fx,
+            "note": "Market conversion is an estimate. Settlement amount is the recorded gross/fee/net.",
+        },
+    )
+
+
+@tool("list_pending_employer_approvals")
+def list_pending_employer_approvals(*, employer_id: int) -> ToolResult:
+    pending_engagements = list(
+        Contract.objects.filter(
+            employer_id=employer_id,
+            approval_status__in=[
+                Contract.ApprovalStatus.DRAFT,
+                Contract.ApprovalStatus.PENDING_REVIEW,
+                Contract.ApprovalStatus.CHANGES_REQUESTED,
+            ],
+        ).values("id", "approval_status", "amount", "currency", "chain_status")
+    )
+    pending_gates = list(
+        AgentApproval.objects.filter(requested_from_id=employer_id, status=AgentApproval.Status.PENDING).values(
+            "id", "approval_type", "summary", "engagement_id"
+        )
+    )
+    return ToolResult(ok=True, data={"engagements": pending_engagements, "financial_gates": pending_gates})
+
+
+@tool("list_upcoming_scheduled_jobs")
+def list_upcoming_scheduled_jobs(*, employer_id: int | None = None) -> ToolResult:
+    qs = Job.objects.filter(status__in=[Job.Status.SCHEDULED, Job.Status.ACTIVE])
+    if employer_id:
+        qs = qs.filter(employer_id=employer_id)
+    rows = [
+        {
+            "id": j.pk,
+            "title": j.title,
+            "status": j.status,
+            "schedule": j.schedule_label,
+            "start_date": j.start_date.isoformat() if j.start_date else None,
+            "scheduled_publish_at": j.scheduled_publish_at.isoformat() if j.scheduled_publish_at else None,
+        }
+        for j in qs.order_by("scheduled_publish_at", "start_date")[:20]
+    ]
+    return ToolResult(ok=True, data={"jobs": rows})
+
+
+@tool("get_upskilling_balance")
+def get_upskilling_balance(*, worker_id: int) -> ToolResult:
+    from apps.courses.models import Enrollment
+
+    rows = []
+    for e in Enrollment.objects.filter(worker_id=worker_id).select_related("course"):
+        rows.append(
+            {
+                "course": e.course.title,
+                "total_fee": str(e.total_fee),
+                "recovered": str(e.commission_recovered),
+                "remaining": str(e.amount_remaining),
+                "recovery_percentage": str(e.commission_percentage),
+                "status": e.status,
+            }
+        )
+    return ToolResult(ok=True, data={"enrollments": rows})
+
+
+@tool("list_failed_transactions")
+def list_failed_transactions(*, user_id: int) -> ToolResult:
+    from apps.wallet.models import Settlement, Transaction
+
+    txs = list(
+        Transaction.objects.filter(wallet__user_id=user_id, status__in=["FAILED", Transaction.Status.FAILED]).values(
+            "id", "amount", "status", "memo", "created_at"
+        )[:20]
+    )
+    settlements = list(
+        Settlement.objects.filter(Q(employer_id=user_id) | Q(worker_id=user_id), status__in=["FAILED", "DISPUTED"]).values(
+            "id", "gross_amount", "status", "settlement_reference"
+        )[:20]
+    )
+    return ToolResult(ok=True, data={"transactions": txs, "settlements": settlements})

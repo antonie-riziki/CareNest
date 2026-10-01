@@ -4,16 +4,26 @@
 {% include 'employer_sidebar.html' %}
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 space-y-6">
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Engagements</h1>
+    {% if pending %}
+    <section class="space-y-3">
+        <h2 class="text-[10px] font-bold uppercase tracking-widest text-secondary">Needs your approval</h2>
+        {% for e in pending %}
+        <a href="{% url 'employer-engagement-review' e.pk %}" class="block bg-white rounded-[1.5rem] border border-secondary/30 p-6">
+            <p class="font-extrabold text-primary">{{ e.job.title }}</p>
+            <p class="text-sm text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.approval_status }}</p>
+        </a>
+        {% endfor %}
+    </section>
+    {% endif %}
     {% for e in engagements %}
-    <a href="{% url 'agent-command-center' e.pk %}" class="block bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 hover:border-secondary/30">
+    <a href="{% url 'employer-engagement-review' e.pk %}" class="block bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 hover:border-secondary/30">
         <div class="flex flex-wrap justify-between gap-3">
             <div>
                 <h2 class="font-extrabold text-primary">{{ e.job.title }}</h2>
-                <p class="text-sm text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.currency }} {{ e.amount }}</p>
+                <p class="text-sm text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · Employer pays {{ e.currency }} {{ e.amount }} · Worker net {{ e.currency }} {{ e.worker_net_amount }}</p>
             </div>
-            <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-surface-container-high">{{ e.chain_status }}</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-surface-container-high">{{ e.approval_status }} · {{ e.chain_status }}</span>
         </div>
-        {% if e.latest_tx_hash %}<p class="font-mono text-[11px] text-outline mt-2">tx {{ e.latest_tx_hash|slice:":16" }}…</p>{% endif %}
     </a>
     {% empty %}
     <p class="text-sm text-outline">No engagements yet.</p>

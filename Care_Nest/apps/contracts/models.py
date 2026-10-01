@@ -22,6 +22,13 @@ class Contract(models.Model):
         (DATA_SOURCE_DEMO, "Demo data"),
     ]
 
+    class ApprovalStatus(models.TextChoices):
+        DRAFT = "DRAFT", "Draft"
+        PENDING_REVIEW = "PENDING_REVIEW", "Pending employer review"
+        APPROVED = "APPROVED", "Approved"
+        REJECTED = "REJECTED", "Rejected"
+        CHANGES_REQUESTED = "CHANGES_REQUESTED", "Changes requested"
+
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name="work_contracts")
     employer = models.ForeignKey(
@@ -30,7 +37,28 @@ class Contract(models.Model):
     scope = models.TextField()
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
+    duration_text = models.CharField(max_length=80, blank=True, default="")
     status = models.CharField(max_length=50)
+
+    approval_status = models.CharField(
+        max_length=24, choices=ApprovalStatus.choices, default=ApprovalStatus.DRAFT, db_index=True
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approved_engagements",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True, default="")
+    change_request = models.TextField(blank=True, default="")
+
+    platform_fee_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=5)
+    platform_fee_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    worker_net_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    upskilling_recovery_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    worker_payout_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
 
     # ---- on-chain index (public, non-sensitive) ---------------------------
     engagement_id = models.BigIntegerField(
@@ -61,11 +89,14 @@ class Contract(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["employer", "approval_status"]),
+            models.Index(fields=["worker", "chain_status"]),
+        ]
 
     def __str__(self):
         return f"Engagement #{self.pk} ({self.chain_status})"
 
-    # ---- helpers ------------------------------------------------------------
     @property
     def is_demo(self) -> bool:
         return self.data_source == self.DATA_SOURCE_DEMO
@@ -83,6 +114,14 @@ class Contract(models.Model):
             return ""
         decimals = getattr(settings, "CARENEST_TOKEN_DECIMALS", 7)
         return f"{self.token_amount / (10 ** decimals):,.2f} {self.token_symbol}"
+
+    @property
+    def needs_employer_approval(self) -> bool:
+        return self.approval_status in (
+            self.ApprovalStatus.DRAFT,
+            self.ApprovalStatus.PENDING_REVIEW,
+            self.ApprovalStatus.CHANGES_REQUESTED,
+        )
 
     def latest_tx_hash(self) -> str:
         for field in (

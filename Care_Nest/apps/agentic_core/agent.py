@@ -180,6 +180,7 @@ class CareNestAgent:
             funds_confirmed_on_chain="agreement_funded" in events,
             submission_confirmed_on_chain="work_submitted" in events,
             credential_exists=credential_exists,
+            engagement_approved=contract.approval_status == contract.ApprovalStatus.APPROVED,
         )
 
         # Do not spam identical NO_ACTION decisions on every page load.
@@ -286,16 +287,19 @@ class CareNestAgent:
         pending = list(AgentApproval.objects.filter(engagement=contract, status=AgentApproval.Status.PENDING).values_list("approval_type", flat=True))
         exp = explain(contract.chain_status)
         worker_name = contract.worker.get_full_name() or contract.worker.username
+        pricing = self.runner.run("explain_engagement_pricing", engagement_pk=contract.pk)
 
         facts = {
             "worker_first_name": worker_name.split(" ")[0],
             "job": contract.job.title,
             "status": contract.chain_status,
+            "approval_status": contract.approval_status,
             "status_headline": exp.headline,
             "status_detail": exp.detail,
             "next_step_for_employer": exp.next_step_employer,
             "escrow": contract.token_amount_display,
             "pay": f"{contract.currency} {contract.amount:,.0f}",
+            "pricing": pricing.data if pricing.ok else {},
             "on_chain_events": [f"{e['event_type']} (tx {e['tx_hash'][:8]}…)" for e in events.data.get("events", [])][::-1],
             "pending_human_approvals": pending,
             "memory_summary": mem.summary,
@@ -341,6 +345,14 @@ class CareNestAgent:
     @staticmethod
     def _templated_answer(facts: dict[str, Any]) -> str:
         parts = [f"{facts['worker_first_name']}'s contract for {facts['job']} is currently: {facts['status_headline']}.", facts["status_detail"]]
+        if facts.get("approval_status") and facts["approval_status"] != "APPROVED":
+            parts.append(f"Employer engagement approval is {facts['approval_status']}. The agent cannot approve this.")
+        pricing = facts.get("pricing") or {}
+        breakdown = pricing.get("breakdown") or {}
+        if breakdown:
+            parts.append(
+                f"Employer pays {breakdown.get('currency')} {breakdown.get('gross_amount')}; CareNest fee {breakdown.get('platform_fee_amount')}; worker net {breakdown.get('worker_net_amount')}; upskilling recovery {breakdown.get('upskilling_recovery_amount')}; final payout {breakdown.get('worker_payout_amount')}."
+            )
         if facts["on_chain_events"]:
             parts.append("On-chain so far: " + ", ".join(facts["on_chain_events"][-3:]) + ".")
         if facts["pending_human_approvals"]:

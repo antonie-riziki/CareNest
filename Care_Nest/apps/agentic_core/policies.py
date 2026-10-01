@@ -63,10 +63,21 @@ def recommend(
     funds_confirmed_on_chain: bool,
     submission_confirmed_on_chain: bool,
     credential_exists: bool,
+    engagement_approved: bool = True,
 ) -> Recommendation:
     """Map (state, evidence) -> next recommendation. Pure function; easy to test."""
 
     ev: list[str] = [f"engagement status is {status}"]
+
+    if status == EngagementStatus.DRAFT and not engagement_approved:
+        return Recommendation(
+            decision_type=AgentDecision.Type.NOTIFY,
+            decision="Engagement terms are ready. The employer must review and approve them before any on-chain contract or funds movement. The agent cannot approve this.",
+            action="wait_for_engagement_approval",
+            evidence=ev + ["employer engagement approval is still pending"],
+            rationale="Human approval is required for financial commitments. The agent only recommends.",
+            add_tasks=["employer: review and approve engagement"],
+        )
 
     if status == EngagementStatus.DRAFT:
         ev.append("terms prepared off-chain, nothing on-chain yet")

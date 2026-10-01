@@ -144,6 +144,13 @@ class AgentFlowTests(TestCase):
         )
         agent.end()
         self.assertEqual(contract.chain_status, EngagementStatus.DRAFT)
+        self.assertEqual(contract.approval_status, contract.ApprovalStatus.PENDING_REVIEW)
+        self.assertFalse(AgentApproval.objects.filter(engagement=contract, approval_type=AgentApproval.Type.CREATE_AGREEMENT).exists())
+
+        contract.approval_status = contract.ApprovalStatus.APPROVED
+        contract.approved_by = self.employer
+        contract.save(update_fields=["approval_status", "approved_by", "updated_at"])
+        CareNestAgent.start(self.employer).tick(contract)
         approval = AgentApproval.objects.get(engagement=contract, approval_type=AgentApproval.Type.CREATE_AGREEMENT)
         self.assertEqual(approval.status, AgentApproval.Status.PENDING)
 
@@ -219,6 +226,7 @@ class AgentFlowTests(TestCase):
             terms_hash="ab" * 32,
             engagement_id=7,
             data_source=Contract.DATA_SOURCE_DEMO,
+            approval_status=Contract.ApprovalStatus.APPROVED,
         )
         decision = AgentDecision.objects.create(
             user=self.employer,

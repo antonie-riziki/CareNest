@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}{% if job %}Edit job{% else %}New job{% endif %} | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl">
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{% if job %}Edit job{% else %}New job posting{% endif %}</h1>
+    <p class="text-sm text-outline mt-2">Images are optional. Scheduling is stored on the job record, not as a label.</p>
+    {% if messages %}{% for message in messages %}<div class="mt-4 bg-secondary-container px-4 py-3 rounded-xl text-sm">{{ message }}</div>{% endfor %}{% endif %}
+    <form method="post" enctype="multipart/form-data" action="{% if job %}{% url 'employer-job-save' job.pk %}{% else %}{% url 'employer-jobs' %}{% endif %}" class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-5">
+        {% csrf_token %}
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Title</label>
+        <input name="title" required class="w-full rounded-xl border-outline-variant/30" value="{{ job.title|default:'' }}">
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Category</label>
+        <select name="job_type" class="w-full rounded-xl border-outline-variant/30">
+            <option value="nanny" {% if job.job_type == 'nanny' %}selected{% endif %}>Childcare / Nanny</option>
+            <option value="caregiver" {% if job.job_type == 'caregiver' %}selected{% endif %}>Elder care</option>
+            <option value="housekeeper" {% if job.job_type == 'housekeeper' %}selected{% endif %}>Housekeeping</option>
+            <option value="chef" {% if job.job_type == 'chef' %}selected{% endif %}>Cooking</option>
+            <option value="gardener" {% if job.job_type == 'gardener' %}selected{% endif %}>Gardening</option>
+            <option value="companion" {% if job.job_type == 'companion' %}selected{% endif %}>Companion care</option>
+        </select>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Description</label>
+        <textarea name="description" rows="4" class="w-full rounded-xl border-outline-variant/30">{{ job.description|default:'' }}</textarea>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Location</label>
+                <input name="location" class="w-full rounded-xl border-outline-variant/30" value="{{ job.location|default:'Nairobi' }}">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Pay (KES)</label>
+                <input name="pay" type="number" step="0.01" class="w-full rounded-xl border-outline-variant/30" value="{{ job.pay|default:'' }}">
+            </div>
+        </div>
+        <input type="hidden" name="latitude" value="{{ job.latitude|default:'-1.2634' }}">
+        <input type="hidden" name="longitude" value="{{ job.longitude|default:'36.8036' }}">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Start date</label>
+                <input name="start_date" type="date" class="w-full rounded-xl border-outline-variant/30" value="{% if job.start_date %}{{ job.start_date|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Start time</label>
+                <input name="start_time" type="time" class="w-full rounded-xl border-outline-variant/30" value="{% if job.start_time %}{{ job.start_time|time:'H:i' }}{% endif %}">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">End date (optional)</label>
+                <input name="end_date" type="date" class="w-full rounded-xl border-outline-variant/30" value="{% if job.end_date %}{{ job.end_date|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">End time</label>
+                <input name="end_time" type="time" class="w-full rounded-xl border-outline-variant/30" value="{% if job.end_time %}{{ job.end_time|time:'H:i' }}{% endif %}">
+            </div>
+        </div>
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_recurring" {% if job.is_recurring %}checked{% endif %}> Recurring</label>
+        <select name="recurrence_frequency" class="w-full rounded-xl border-outline-variant/30">
+            <option value="">One-time</option>
+            <option value="daily" {% if job.recurrence_frequency == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if job.recurrence_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="weekdays" {% if job.recurrence_frequency == 'weekdays' %}selected{% endif %}>Weekdays</option>
+        </select>
+        <div class="flex flex-wrap gap-3 text-sm">
+            <label><input type="checkbox" name="recurrence_days" value="mon"> Mon</label>
+            <label><input type="checkbox" name="recurrence_days" value="tue"> Tue</label>
+            <label><input type="checkbox" name="recurrence_days" value="wed"> Wed</label>
+            <label><input type="checkbox" name="recurrence_days" value="thu"> Thu</label>
+            <label><input type="checkbox" name="recurrence_days" value="fri"> Fri</label>
+            <label><input type="checkbox" name="recurrence_days" value="sat"> Sat</label>
+            <label><input type="checkbox" name="recurrence_days" value="sun"> Sun</label>
+        </div>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Timezone</label>
+        <input name="timezone" class="w-full rounded-xl border-outline-variant/30" value="{{ job.timezone|default:'Africa/Nairobi' }}">
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Application deadline</label>
+        <input name="application_deadline" type="datetime-local" class="w-full rounded-xl border-outline-variant/30">
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Status</label>
+        <select name="status" class="w-full rounded-xl border-outline-variant/30">
+            <option value="DRAFT">Draft</option>
+            <option value="SCHEDULED">Scheduled</option>
+            <option value="ACTIVE">Publish now (Active)</option>
+            <option value="PAUSED">Paused</option>
+        </select>
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="publish_now"> Publish immediately if start is today</label>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Primary image (optional)</label>
+        <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="w-full text-sm" onchange="previewJobImage(this)">
+        <img id="job-preview" class="hidden h-40 w-full object-cover rounded-2xl" alt="Preview">
+        {% if job and job.has_custom_image %}
+        <img src="{{ job.cover_image }}" class="h-40 w-full object-cover rounded-2xl" alt="">
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remove_image"> Remove current image</label>
+        {% endif %}
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Secondary images</label>
+        <input name="gallery" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="w-full text-sm">
+        <button class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save job</button>
+    </form>
+</div>
+<script>
+function previewJobImage(input) {
+    const img = document.getElementById("job-preview");
+    if (input.files && input.files[0]) {
+        img.src = URL.createObjectURL(input.files[0]);
+        img.classList.remove("hidden");
+    }
+}
+</script>
+{% endblock %}

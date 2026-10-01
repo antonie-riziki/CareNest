@@ -459,11 +459,15 @@ def credential_verify(request, credential_id):
 def wallet_connect(request):
     wallet = _wallet(request.user)
     if request.method == "POST":
-        public_key = request.POST.get("public_key", "")
+        public_key = request.POST.get("public_key") or request.POST.get("address") or ""
         provider = request.POST.get("provider", "manual")
+        chain = request.POST.get("chain") or ""
+        network = request.POST.get("network") or ""
         try:
-            wallet = services.connect_wallet(request.user, public_key, provider)
-        except stellar.InvalidStellarIdentifier as exc:
+            from apps.wallet.providers import persist_connection
+
+            wallet = persist_connection(request.user, address=public_key, provider_name=provider, chain=chain or None, network=network)
+        except Exception as exc:  # noqa: BLE001
             messages.error(request, str(exc))
         else:
             messages.success(request, f"Wallet connected: {wallet.short_address}")
@@ -472,6 +476,10 @@ def wallet_connect(request):
                 return redirect(next_url)
     demo_keys = services.demo_signer_public_keys()
     role = getattr(request.user, "role", "")
+    from apps.wallet.pricing import get_price_service
+    from apps.wallet.payouts import preferred_payout_method
+    from apps.wallet.models import PayoutMethod
+
     return render(
         request,
         "agent/wallet_connect.html",
@@ -482,6 +490,9 @@ def wallet_connect(request):
             "role": role,
             "next": request.GET.get("next", ""),
             "friendbot": stellar.get_config().network == "testnet",
+            "prices": get_price_service().dashboard(),
+            "payout_methods": PayoutMethod.objects.filter(user=request.user),
+            "preferred_payout": preferred_payout_method(request.user),
         },
     )
 
@@ -489,7 +500,9 @@ def wallet_connect(request):
 @login_required
 @require_POST
 def wallet_disconnect(request):
-    Wallet.objects.filter(user=request.user).update(stellar_address="", wallet_provider="", connected_at=None)
+    from apps.wallet.providers import disconnect_wallet
+
+    disconnect_wallet(request.user, chain=request.POST.get("chain") or None)
     messages.info(request, "Wallet disconnected.")
     return redirect("wallet-connect")
 

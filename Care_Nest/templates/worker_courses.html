@@ -126,107 +126,41 @@
                         </div>
                     </div>
 
+                                        <div class="space-y-6">
+                        {% if enrollment_list %}
+                        <div class="bg-white rounded-3xl p-6 border border-outline-variant/10">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-secondary">Upskilling balance</h4>
+                            {% for enr in enrollment_list %}
+                            <div class="mt-4 text-sm">
+                                <p class="font-bold">{{ enr.course.title }}</p>
+                                <p>Total {{ enr.course.currency }} {{ enr.total_fee }} · Recovered {{ enr.commission_recovered }} · Remaining {{ enr.amount_remaining }}</p>
+                                <p>Recovery rate {{ enr.commission_percentage }}% of eligible earnings · {{ enr.status }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <!-- Course Card 1 -->
-                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:border-primary/20 transition-all flex flex-col">
-                            <div class="h-48 relative overflow-hidden">
-                                <img src="https://lodgingmagazine.com/wp-content/uploads/2025/01/BoH-Winter_Housekeeping1.jpg" alt="Housekeeping" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary border border-secondary/10">Advanced</div>
+                        {% for course in courses %}
+                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm flex flex-col">
+                            <div class="h-32 bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-5xl text-primary">school</span>
                             </div>
-                            <div class="p-6 space-y-4 flex-grow flex flex-col">
-                                <div class="space-y-2">
-                                    <h4 class="text-xl font-bold text-primary group-hover:text-secondary transition-colors font-headline">Advanced Housekeeping</h4>
-                                    <p class="text-xs text-on-surface-variant font-medium line-clamp-2">Master luxury home management and delicate fabric care protocols.</p>
-                                </div>
-                                <div class="flex items-center gap-4 pt-2 mt-auto">
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">schedule</span>
-                                        2 Weeks
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">menu_book</span>
-                                        12 Lessons
-                                    </div>
-                                </div>
-                                <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs shadow-lg shadow-primary/10 hover:shadow-primary/30 active:scale-95 transition-all">Enroll Now</button>
+                            <div class="p-6 space-y-3 flex-grow flex flex-col">
+                                <h4 class="text-xl font-bold text-primary font-headline">{{ course.title }}</h4>
+                                <p class="text-xs text-on-surface-variant">{{ course.description|truncatewords:18 }}</p>
+                                <p class="font-extrabold text-secondary">Fee: {{ course.currency }} {{ course.fee }}</p>
+                                <p class="text-[10px] uppercase tracking-widest text-outline">{{ course.duration_hours }} hours · {{ course.level }}</p>
+                                <form method="post" action="{% url 'course-enroll' course.pk %}">{% csrf_token %}
+                                    <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs">Enroll</button>
+                                </form>
                             </div>
                         </div>
-
-                        <!-- Course Card 2 -->
-                         <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:border-primary/20 transition-all flex flex-col">
-                            <div class="h-48 relative overflow-hidden">
-                                <img src="https://thebesanamail.com/wp-content/uploads/2025/03/Kenya.Lucy-plays-with-child.Kate-Holt.2016.cropped.jpg" alt="Childcare" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary border border-secondary/10">Expert</div>
-                            </div>
-                            <div class="p-6 space-y-4 flex-grow flex flex-col">
-                                <div class="space-y-2">
-                                    <h4 class="text-xl font-bold text-primary group-hover:text-secondary transition-colors font-headline">Professional Childcare</h4>
-                                    <p class="text-xs text-on-surface-variant font-medium line-clamp-2">Specialized training in early childhood development and nutrition.</p>
-                                </div>
-                                <div class="flex items-center gap-4 pt-2 mt-auto">
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">schedule</span>
-                                        3 Weeks
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">menu_book</span>
-                                        18 Lessons
-                                    </div>
-                                </div>
-                                <button class="w-full py-4 bg-surface-container-high text-primary rounded-2xl font-bold text-xs hover:bg-surface-container-highest active:scale-95 transition-all">Resume Course</button>
-                            </div>
-                        </div>
-
-                        <!-- Course Card 3 -->
-                         <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:border-primary/20 transition-all flex flex-col">
-                            <div class="h-48 relative overflow-hidden">
-                                <img src="https://c8.alamy.com/comp/2GW8X7J/african-woman-cooking-traditional-food-at-street-2GW8X7J.jpg" alt="Culinary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary border border-secondary/10">Signature</div>
-                            </div>
-                            <div class="p-6 space-y-4 flex-grow flex flex-col">
-                                <div class="space-y-2">
-                                    <h4 class="text-xl font-bold text-primary group-hover:text-secondary transition-colors font-headline">International Culinary</h4>
-                                    <p class="text-xs text-on-surface-variant font-medium line-clamp-2">Prepare diverse global cuisines with professional flair.</p>
-                                </div>
-                                <div class="flex items-center gap-4 pt-2 mt-auto">
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">schedule</span>
-                                        4 Weeks
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">menu_book</span>
-                                        24 Lessons
-                                    </div>
-                                </div>
-                                <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs shadow-lg shadow-primary/10 hover:shadow-primary/30 active:scale-95 transition-all">Enroll Now</button>
-                            </div>
-                        </div>
-
-                        <!-- Course Card 4 -->
-                         <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:border-primary/20 transition-all flex flex-col">
-                            <div class="h-48 relative overflow-hidden">
-                                <img src="https://caromonthealth.org/media/j4gg5kbz/first-aid_gettyimages-1386276499_website-banner.jpg" alt="Safety" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase text-secondary border border-secondary/10">Essential</div>
-                            </div>
-                            <div class="p-6 space-y-4 flex-grow flex flex-col">
-                                <div class="space-y-2">
-                                    <h4 class="text-xl font-bold text-primary group-hover:text-secondary transition-colors font-headline">Home Safety & First Aid</h4>
-                                    <p class="text-xs text-on-surface-variant font-medium line-clamp-2">Handle emergencies and maintain safe residential environments.</p>
-                                </div>
-                                <div class="flex items-center gap-4 pt-2 mt-auto">
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">schedule</span>
-                                        1 Week
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-outline text-[10px] font-bold uppercase">
-                                        <span class="material-symbols-outlined text-sm">menu_book</span>
-                                        8 Lessons
-                                    </div>
-                                </div>
-                                <button class="w-full py-4 signature-gradient text-white rounded-2xl font-bold text-xs shadow-lg shadow-primary/10 hover:shadow-primary/30 active:scale-95 transition-all">Enroll Now</button>
-                            </div>
-                        </div>
+                        {% empty %}
+                        <p class="text-sm text-outline">No courses published yet.</p>
+                        {% endfor %}
                     </div>
+                    </div>
+
                 </section>
 
                 <!-- Secondary Banner -->

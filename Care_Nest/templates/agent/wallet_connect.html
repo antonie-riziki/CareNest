@@ -1,45 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Connect Stellar wallet | Care Nest{% endblock %}
+{% block title %}Connect wallet | Care Nest{% endblock %}
 
 {% block content %}
 {% if role == 'employer' %}{% include 'employer_sidebar.html' %}{% else %}{% include 'worker_sidebar.html' %}{% endif %}
-<div class="{% if role %}md:ml-64{% endif %} min-h-screen bg-surface p-6 md:p-10 max-w-3xl">
-    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Stellar wallet</h1>
-    <p class="text-sm text-outline mt-2">Only the public address is stored. CareNest never asks for a secret key, seed phrase or Freighter password.</p>
+<div class="{% if role %}md:ml-64{% endif %} min-h-screen bg-surface p-6 md:p-10 max-w-3xl space-y-6">
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Connect wallet</h1>
+    <p class="text-sm text-outline">Wallets are chain-specific. Freighter signs Stellar. MetaMask signs EVM. CareNest never asks for a seed phrase or private key.</p>
     <div class="mt-4">{% include 'agent/_chain_banner.html' %}</div>
+    {% if messages %}{% for message in messages %}<div class="bg-secondary-container px-5 py-3 rounded-2xl text-sm font-bold">{{ message }}</div>{% endfor %}{% endif %}
 
-    {% if messages %}
-        {% for message in messages %}
-        <div class="mt-6 bg-secondary-container px-5 py-3 rounded-2xl text-sm font-bold">{{ message }}</div>
+    {% if prices %}
+    <div class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-5 text-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Market conversion estimate</p>
+        {% for q in prices.quotes %}
+        <p>1 {{ q.base }} ≈ {{ q.rate }} {{ q.quote }} {% if q.stale %}· stale{% elif q.realtime %}· live{% endif %}</p>
         {% endfor %}
+        <p class="text-[11px] text-outline mt-2">{{ prices.disclaimer }} Source: {{ prices.source }} · {{ prices.last_updated|default:"unavailable" }}</p>
+    </div>
     {% endif %}
 
-    <div class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-6">
-        {% if wallet and wallet.is_connected %}
+    <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-6">
+        <p class="text-[10px] font-bold uppercase tracking-widest">Status: {{ wallet.connection_status|default:"disconnected" }} · {{ wallet.chain|default:"no chain" }}</p>
+        {% if wallet and wallet.stellar_connected %}
         <div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Connected</p>
-            <p class="font-mono text-lg text-primary mt-1">{{ wallet.stellar_address }}</p>
-            <p class="text-xs text-outline mt-1">{{ wallet.get_wallet_provider_display }} · {{ wallet.connected_at|date:"M j, Y H:i" }}</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Stellar</p>
+            <p class="font-mono text-sm">{{ wallet.stellar_address }}</p>
         </div>
+        {% endif %}
+        {% if wallet and wallet.evm_connected %}
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">EVM</p>
+            <p class="font-mono text-sm">{{ wallet.evm_address }}</p>
+            <p class="text-[11px] text-amber-800">MetaMask cannot sign Stellar (XLM) settlement transactions.</p>
+        </div>
+        {% endif %}
         <form method="post" action="{% url 'wallet-disconnect' %}">{% csrf_token %}
             <button class="text-xs font-bold uppercase tracking-widest text-error">Disconnect</button>
         </form>
-        {% else %}
-        <p class="text-sm">Connect Freighter for live testnet signing, or paste a G… public key.</p>
+
+        <h2 class="text-sm font-bold">Stellar wallets</h2>
         <button type="button" id="js-freighter" class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Connect Freighter</button>
         <form method="post" class="space-y-3" id="wallet-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
             <input type="hidden" name="provider" id="provider" value="manual">
-            <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Public key</label>
-            <input name="public_key" id="public_key" required placeholder="G..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm" value="{{ demo_key }}">
-            {% if demo_key %}
-            <p class="text-[11px] text-amber-800">A demo signer public key is pre-filled for the guided testnet demo. It is not a secret.</p>
-            {% endif %}
-            <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save address</button>
+            <input type="hidden" name="chain" id="chain" value="stellar">
+            <input type="hidden" name="network" id="network" value="testnet">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Stellar public key</label>
+            <input name="public_key" id="public_key" placeholder="G..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm" value="{{ demo_key }}">
+            <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save Stellar address</button>
         </form>
-        {% endif %}
+
+        <h2 class="text-sm font-bold pt-4">EVM wallets</h2>
+        <button type="button" id="js-metamask" class="bg-surface-container-high px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Connect MetaMask</button>
+        <p class="text-[11px] text-outline">WalletConnect-compatible EVM wallets can paste a 0x address below. EVM wallets never sign Stellar XDR.</p>
+        <form method="post" class="space-y-3" id="evm-form">
+            {% csrf_token %}
+            <input type="hidden" name="provider" id="evm-provider" value="metamask">
+            <input type="hidden" name="chain" value="evm">
+            <input type="hidden" name="network" id="evm-network" value="sepolia">
+            <input name="public_key" id="evm_address" placeholder="0x..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm">
+            <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save EVM address</button>
+        </form>
         {% if friendbot %}
         <p class="text-[11px] text-outline">Testnet accounts can be funded at friendbot.stellar.org. Never use a funded mainnet key here.</p>
         {% endif %}
@@ -54,9 +77,26 @@
                 const address = await window.carenestWallet.connectFreighter();
                 document.getElementById("public_key").value = address;
                 document.getElementById("provider").value = "freighter";
+                document.getElementById("chain").value = "stellar";
                 document.getElementById("wallet-form").submit();
             } catch (err) {
-                alert(err.message);
+                alert(err.message || "Freighter unavailable");
+            }
+        });
+    }
+    const mm = document.getElementById("js-metamask");
+    if (mm) {
+        mm.addEventListener("click", async () => {
+            try {
+                if (!window.ethereum) throw new Error("MetaMask is not installed");
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                document.getElementById("evm_address").value = accounts[0];
+                document.getElementById("evm-provider").value = "metamask";
+                const chainId = await window.ethereum.request({ method: "eth_chainId" });
+                document.getElementById("evm-network").value = chainId;
+                document.getElementById("evm-form").submit();
+            } catch (err) {
+                alert(err.message || "Unsupported wallet");
             }
         });
     }

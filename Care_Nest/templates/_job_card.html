@@ -1,0 +1,21 @@
+<article class="bg-white rounded-[1.5rem] border border-outline-variant/10 overflow-hidden">
+    <div class="h-40 relative">
+        {% if job.has_custom_image %}
+        <img src="{{ job.cover_image }}" alt="{{ job.title }}" class="w-full h-full object-cover">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, {{ job.category_key|default:'housekeeper' }});">
+            <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-100 to-teal-100">
+                <span class="material-symbols-outlined text-5xl text-primary">{{ job.category_icon }}</span>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline mt-2">{{ job.category_label }}</p>
+            </div>
+        </div>
+        {% endif %}
+        <span class="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-widest bg-white/90 px-3 py-1 rounded-full">{{ job.status }}</span>
+    </div>
+    <div class="p-5 space-y-2">
+        <h3 class="font-extrabold text-primary text-lg">{{ job.title }}</h3>
+        <p class="text-sm text-outline">{{ job.location }} · {{ job.schedule_label }}</p>
+        <p class="font-bold text-secondary">{{ job.currency }} {{ job.pay }} · {{ job.job_type }}</p>
+        {% if job.is_verified %}<p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Verified posting</p>{% endif %}
+    </div>
+</article>

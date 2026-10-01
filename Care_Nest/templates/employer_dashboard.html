@@ -115,6 +115,18 @@
             </a>
         </div>
 
+        {% if pending_engagements %}
+        <section class="space-y-3">
+            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Pending engagement approvals</h3>
+            {% for e in pending_engagements %}
+            <a href="{% url 'employer-engagement-review' e.pk %}" class="block bg-white p-5 rounded-2xl border border-secondary/30">
+                <p class="font-bold text-primary">{{ e.job.title }}</p>
+                <p class="text-xs text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.approval_status }} · Employer pays {{ e.currency }} {{ e.amount }}</p>
+            </a>
+            {% endfor %}
+        </section>
+        {% endif %}
+
         <!-- Dashboard Main Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Side: Active Contracts -->

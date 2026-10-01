@@ -54,18 +54,18 @@
                         <div class="flex items-center gap-4 mt-8">
                             <a href="{% url 'wallet-connect' %}" class="signature-gradient text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest">
                                 <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
-                                Connect Stellar wallet
+                                Connect wallet
                             </a>
                         </div>
                     </div>
                     <div class="mt-12 flex items-center gap-6 text-[10px] font-bold text-outline uppercase tracking-widest relative z-10">
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 rounded-full bg-secondary"></span>
-                            Verified via Safaricom M-Pesa
+                            Stellar: {% if wallet.stellar_connected %}{{ wallet.short_address }}{% else %}not connected{% endif %}
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 rounded-full bg-primary/20"></span>
-                            ID Contract Reference: CN-9821
+                            EVM: {% if wallet.evm_connected %}connected{% else %}optional{% endif %}
                         </div>
                     </div>
                     <!-- Abstract Design -->
@@ -96,87 +96,60 @@
 
             <!-- Transactional Intelligence -->
             <section class="space-y-8">
+                <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Payout methods</h3>
+                <div class="bg-white p-8 rounded-[2rem] border border-outline-variant/10 space-y-4">
+                    <p class="text-sm">Choose blockchain wallet or optional M-Pesa. M-Pesa is not required.</p>
+                    <form method="post" action="{% url 'wallet-mpesa' %}" class="flex flex-wrap gap-3 items-end">
+                        {% csrf_token %}
+                        <div>
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-outline">M-Pesa phone</label>
+                            <input name="phone" placeholder="07xxxxxxxx" class="rounded-xl border-outline-variant/30">
+                        </div>
+                        <label class="text-sm"><input type="checkbox" name="make_default"> Make default</label>
+                        <button class="bg-primary text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Save M-Pesa</button>
+                    </form>
+                    {% for m in payout_methods %}
+                    <p class="text-sm">{{ m.get_method_type_display }} · {{ m.masked_identifier }} · {{ m.status }}</p>
+                    {% empty %}
+                    <p class="text-xs text-outline">No M-Pesa method saved.</p>
+                    {% endfor %}
+                </div>
+                {% if enrollments %}
+                <div class="bg-white p-8 rounded-[2rem] border border-outline-variant/10">
+                    <h3 class="text-[10px] font-bold uppercase tracking-widest text-secondary">Upskilling balance</h3>
+                    {% for e in enrollments %}
+                    <div class="mt-4 text-sm">
+                        <p class="font-bold">{{ e.course.title }}</p>
+                        <p>Total {{ e.course.currency }} {{ e.total_fee }} · Recovered {{ e.commission_recovered }} · Remaining {{ e.amount_remaining }}</p>
+                        <p>Recovery 20% of eligible earnings until remaining is 0.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if prices %}
+                <p class="text-[11px] text-outline">{{ prices.disclaimer }} {% for q in prices.quotes %}1 {{ q.base }}≈{{ q.rate }} {{ q.quote }} {% endfor %}</p>
+                {% endif %}
                 <div class="flex items-center justify-between">
                     <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em] flex items-center gap-3">
                         <span class="w-4 h-[2px] bg-secondary"></span>
                         Transactional History
                     </h3>
-                    <div class="flex items-center gap-4">
-                        <button class="hidden sm:flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-widest bg-white px-4 py-2 rounded-xl border border-outline-variant/10 hover:bg-surface transition-all">
-                            <span class="material-symbols-outlined text-sm">filter_list</span>
-                            Filter Analysis
-                        </button>
-                    </div>
                 </div>
-
                 <div class="grid grid-cols-1 gap-4">
-                    <!-- Tx Item 1 -->
-                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-secondary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
-                        <div class="flex gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform shadow-inner">
-                                <span class="material-symbols-outlined text-3xl">arrow_downward</span>
-                            </div>
-                            <div class="space-y-1">
-                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">Service Completion #4521</h4>
-                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 24, 2026 • Executive Level Housekeeping</p>
-                            </div>
+                    {% for tx in transactions %}
+                    <div class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 flex justify-between gap-4">
+                        <div>
+                            <h4 class="font-extrabold text-primary">{{ tx.memo|default:tx.type }}</h4>
+                            <p class="text-xs text-outline uppercase tracking-widest">{{ tx.created_at|date:"M j, Y" }} · {{ tx.status }}</p>
+                            {% if tx.settlement %}
+                            <p class="text-xs mt-2">Employer {{ tx.currency }} {{ tx.gross_amount }} · Fee {{ tx.platform_fee_amount }} · Net {{ tx.worker_net_amount }}</p>
+                            {% endif %}
                         </div>
-                        <div class="flex flex-col items-start sm:items-end gap-2">
-                            <p class="text-2xl font-extrabold text-secondary tracking-tight">+KES 4,500.00</p>
-                            <span class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded-full border border-secondary/10">Settled & Verified</span>
-                        </div>
+                        <p class="text-xl font-extrabold text-secondary">{{ tx.currency }} {{ tx.amount }}</p>
                     </div>
-
-                    <!-- Tx Item 2 -->
-                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
-                        <div class="flex gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-105 transition-transform shadow-inner">
-                                <span class="material-symbols-outlined text-3xl">payments</span>
-                            </div>
-                            <div class="space-y-1">
-                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">M-Pesa Withdrawal Initiation</h4>
-                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 22, 2026 • Encrypted Transfer</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-start sm:items-end gap-2">
-                            <p class="text-2xl font-extrabold text-primary tracking-tight">-KES 2,000.00</p>
-                            <span class="text-[9px] font-black text-outline uppercase tracking-[0.2em] bg-surface-container-high px-3 py-1 rounded-full border border-outline-variant/10">Disbursed to +2547...321</span>
-                        </div>
-                    </div>
-
-                    <!-- Tx Item 3 -->
-                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-xl hover:border-secondary/20 transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer">
-                        <div class="flex gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform shadow-inner">
-                                <span class="material-symbols-outlined text-3xl">arrow_downward</span>
-                            </div>
-                            <div class="space-y-1">
-                                <h4 class="font-extrabold text-primary text-lg group-hover:text-secondary transition-colors font-headline">Service Completion #4490</h4>
-                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Oct 20, 2026 • Full Day Residential Mgmt</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-start sm:items-end gap-2">
-                            <p class="text-2xl font-extrabold text-secondary tracking-tight">+KES 8,000.00</p>
-                            <span class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] bg-secondary/5 px-3 py-1 rounded-full border border-secondary/10">Settled & Verified</span>
-                        </div>
-                    </div>
-
-                    <!-- Tx Item 4 (Escrow State) -->
-                    <div class="bg-surface-container-low p-8 lg:p-10 rounded-[2.5rem] border border-secondary/10 shadow-inner group flex flex-col sm:flex-row sm:items-center justify-between gap-6 cursor-pointer opacity-70 hover:opacity-100 transition-all">
-                        <div class="flex gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-amber-500 shadow-sm group-hover:scale-105 transition-transform">
-                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                            </div>
-                            <div class="space-y-1">
-                                <h4 class="font-extrabold text-primary text-lg font-headline">Upcoming Disbursement #4532</h4>
-                                <p class="text-xs text-outline font-bold uppercase tracking-widest">Processing Phase • Westlands Project</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-start sm:items-end gap-2">
-                            <p class="text-2xl font-extrabold text-amber-600 tracking-tight">KES 3,000.00</p>
-                            <span class="text-[9px] font-black text-amber-700 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-[0.2em]">In Escrow Custody</span>
-                        </div>
-                    </div>
+                    {% empty %}
+                    <p class="text-sm text-outline">No ledger entries yet. Completed settlements appear here with the CareNest fee and training recovery.</p>
+                    {% endfor %}
                 </div>
             </section>
         </main>

@@ -43,7 +43,7 @@
                 </button>
                 <div>
                     <h2 class="text-xs font-bold text-outline uppercase tracking-[0.3em] mb-1">Opportunity Details</h2>
-                    <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">Housekeeping in Kilimani</h1>
+                    <h1 class="text-3xl font-extrabold text-primary tracking-tighter font-headline">{{ job.title|default:"Job" }}</h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -64,14 +64,15 @@
                     
                     <!-- Hero Visual -->
                     <section class="relative h-72 lg:h-[450px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/5 border border-outline-variant/10">
-                        <img alt="Interior" class="w-full h-full object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMg8mZPxa8cC2tNDMmmM_wI7RqtJwpToxG8sCRguOV22iTLAZQ-_utHCjI09oR2cSJMmpPG0n0FxvFaYxl_XMaJIzb9vmPhblp5uUdKGpu7KifQ6SUqONaVUjLsyfoHzGSH_QCAB4Um1jKq_Jk84c6rU1iRcqz-bp1BDeSFbWkMM_P-4LM5Y6wiTt2akbvgUQnDSMA-NdZQFtXlZJI9FnHDE14JH_k2S4E5m6UvrTIP6gzLOeWnyWeUHMUPFMeGYjuzbJofFPZgyWn" />
+                        {% if job %}
+                        <img alt="{{ job.title }}" class="w-full h-full object-cover" src="{{ job.cover_image }}" />
+                        {% endif %}
                         <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent flex flex-col justify-end p-8 lg:p-12">
                             <div class="flex flex-wrap items-center gap-3 mb-4">
-                                <span class="bg-secondary-container text-secondary text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest border border-secondary/20 backdrop-blur-md">Housekeeping</span>
+                                <span class="bg-secondary-container text-secondary text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest border border-secondary/20 backdrop-blur-md">{{ job.job_type|default:"Job" }}</span>
                                 <span class="bg-white/20 text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/20 backdrop-blur-md">Full-Time</span>
                             </div>
-                            <h2 class="font-headline font-extrabold text-3xl lg:text-5xl text-white tracking-tighter leading-tight max-w-2xl">Premium Residential Cleaning Opportunity</h2>
+                            <h2 class="font-headline font-extrabold text-3xl lg:text-5xl text-white tracking-tighter leading-tight max-w-2xl">{{ job.title|default:"Job" }}</h2>
                         </div>
                     </section>
 
@@ -190,6 +191,13 @@
 
                 </div>
             </div>
+                    {% if job and not applied %}
+            <form method="post" action="{% url 'job-apply' job.pk %}" class="mt-6">{% csrf_token %}
+                <button class="signature-gradient text-white px-8 py-4 rounded-xl font-bold">Apply for this job</button>
+            </form>
+            {% elif applied %}
+            <p class="mt-6 text-sm font-bold text-secondary">Application submitted. Engagement approval is a separate employer step.</p>
+            {% endif %}
         </main>
     </div>
 

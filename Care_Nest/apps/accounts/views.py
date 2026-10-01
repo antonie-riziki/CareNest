@@ -62,6 +62,12 @@ def worker_signup(request):
 
         # Create Worker Profile
         WorkerProfile.objects.create(user=user, skills="")
+        try:
+            from apps.core.supabase_client import sync_account
+
+            sync_account(user)
+        except Exception:
+            pass
 
         # Log in the user automatically
         login(request, user)
@@ -133,6 +139,12 @@ def employer_signup(request):
 
         # Create Employer Profile
         EmployerProfile.objects.create(user=user)
+        try:
+            from apps.core.supabase_client import sync_account
+
+            sync_account(user)
+        except Exception:
+            pass
 
         # Log in the user automatically
         login(request, user)
