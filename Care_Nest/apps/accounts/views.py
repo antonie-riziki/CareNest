@@ -19,6 +19,13 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+def _mask_phone(phone: str) -> str:
+    digits = "".join(ch for ch in (phone or "") if ch.isdigit())
+    if len(digits) < 4:
+        return ""
+    return f"+{digits[:4]}****{digits[-3:]}"
+
+
 # Create your views here.
 def worker_signup(request):
     if request.method == "POST":
@@ -60,8 +67,7 @@ def worker_signup(request):
 
         user.save()
 
-        # Create Worker Profile
-        WorkerProfile.objects.create(user=user, skills="")
+        WorkerProfile.objects.create(user=user, skills="", phone=formatted_phone, phone_masked=_mask_phone(formatted_phone))
         try:
             from apps.core.supabase_client import sync_account
 
@@ -137,8 +143,8 @@ def employer_signup(request):
 
         user.save()
 
-        # Create Employer Profile
-        EmployerProfile.objects.create(user=user)
+        formatted_phone = format_phone_number(phone) or ""
+        EmployerProfile.objects.create(user=user, phone=formatted_phone)
         try:
             from apps.core.supabase_client import sync_account
 

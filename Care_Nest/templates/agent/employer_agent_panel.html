@@ -31,9 +31,9 @@
                 </div>
                 <form method="post" enctype="multipart/form-data" class="space-y-4">
                     {% csrf_token %}
-                    <textarea name="requirement" rows="4" required placeholder="{{ example_requirement }}" class="w-full rounded-2xl border-outline-variant/30 bg-surface-container-low text-sm font-medium text-primary focus:ring-secondary focus:border-secondary">{% if proposal %}{{ proposal.requirement.raw_text }}{% endif %}</textarea>
+                    <textarea name="requirement" rows="4" required placeholder="{{ example_requirement }}" class="form-field w-full text-sm font-medium text-primary">{% if proposal %}{{ proposal.requirement.raw_text }}{% endif %}</textarea>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of hire</label>
-                    <textarea name="employer_terms" rows="4" class="w-full rounded-2xl border-outline-variant/30 bg-surface-container-low text-sm text-primary" placeholder="Hours, duties, house rules">{% if pending_job %}{{ pending_job.employer_terms }}{% endif %}</textarea>
+                    <textarea name="employer_terms" rows="4" class="form-field w-full text-sm text-primary" placeholder="Hours, duties, house rules">{% if pending_job %}{{ pending_job.employer_terms }}{% endif %}</textarea>
                     {% if pending_job %}
                     {% include '_image_dropzone.html' with input_id='agent-job-image' input_name='image' current_url=pending_job.image_url dropzone_label='Image for the job card' %}
                     {% else %}
@@ -64,7 +64,7 @@
                     <form method="post" action="{% url 'agent-publish-job' %}" enctype="multipart/form-data" class="space-y-3">
                         {% csrf_token %}
                         <input type="hidden" name="job_id" value="{{ pending_job.pk }}">
-                        <textarea name="employer_terms" rows="4" class="w-full rounded-2xl border-outline-variant/30 text-sm text-primary" placeholder="Confirm your terms before publishing">{{ pending_job.employer_terms }}</textarea>
+                        <textarea name="employer_terms" rows="4" class="form-field w-full text-sm text-primary" placeholder="Confirm your terms before publishing">{{ pending_job.employer_terms }}</textarea>
                         {% include '_image_dropzone.html' with input_id='agent-publish-image' input_name='image' current_url=pending_job.image_url dropzone_label='Confirm or replace the job card image' %}
                         <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Publish job offer</button>
                     </form>
@@ -123,7 +123,7 @@
                     <p class="text-sm text-on-surface-variant">Ask about an engagement after a reload. The agent answers from saved memory and on-chain events — never invented state.</p>
                     <form method="post" action="{% url 'agent-ask' %}" class="space-y-3">
                         {% csrf_token %}
-                        <input type="text" name="question" value="What is happening with Mary's contract?" class="w-full rounded-xl border-outline-variant/30 text-sm">
+                        <input type="text" name="question" value="What is happening with Mary's contract?" class="form-field w-full text-sm">
                         <button class="w-full py-3 rounded-xl bg-surface-container-high text-primary text-xs font-bold uppercase tracking-widest">Ask the agent</button>
                     </form>
                     {% if memory.summary %}

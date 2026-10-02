@@ -212,6 +212,7 @@ class MapTests(SimpleTestCase):
         self.assertEqual(cfg["provider"], "leaflet")
         self.assertEqual(cfg["google_maps_api_key"], "")
         self.assertEqual(cfg["fallback"], "leaflet")
+        self.assertGreaterEqual(len(cfg["tile_fallbacks"]), 2)
 
     @override_settings(GOOGLE_MAPS_API_KEY="browser-restricted-key", MAP_PROVIDER="google")
     def test_google_only_when_configured(self):

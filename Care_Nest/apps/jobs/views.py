@@ -9,9 +9,11 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.jobs.images import ImageUploadError, attach_primary_image, store_upload
-from apps.jobs.maps import public_config as map_config
+from apps.jobs.maps import haversine_km, public_config as map_config
+from apps.jobs.maps import approximate_coordinates
 from apps.jobs.models import Application, Job, JobImage
 from apps.jobs.scheduling import ScheduleError, refresh_job_status, refresh_queryset, validate_schedule
+from apps.profiles.models import EmployerProfile, WorkerProfile
 from apps.wallet.pricing import get_price_service
 
 
@@ -101,7 +103,18 @@ def _parse_job_form(request) -> dict:
 def worker_jobs(request):
     jobs = Job.objects.select_related("employer").order_by("-created_at")
     jobs = [j for j in refresh_queryset(jobs) if j.is_live]
-    payload = [_job_payload(j) for j in jobs]
+    profile = WorkerProfile.objects.filter(user=request.user).first()
+    worker_lat = profile.last_latitude if profile and profile.last_latitude else None
+    worker_lon = profile.last_longitude if profile and profile.last_longitude else None
+    payload = []
+    for job in jobs:
+        item = _job_payload(job)
+        if worker_lat is not None and worker_lon is not None:
+            item["distance"] = haversine_km(worker_lat, worker_lon, job.latitude, job.longitude)
+        payload.append(item)
+    if worker_lat is not None:
+        payload.sort(key=lambda item: item.get("distance") if item.get("distance") is not None else 9999)
+        jobs = sorted(jobs, key=lambda job: haversine_km(worker_lat, worker_lon, job.latitude, job.longitude))
     return render(
         request,
         "worker_jobs.html",
@@ -110,6 +123,8 @@ def worker_jobs(request):
             "jobs_json": json.dumps(payload),
             "map_config": map_config(),
             "map_config_json": json.dumps(map_config()),
+            "worker_lat": worker_lat,
+            "worker_lon": worker_lon,
         },
     )
 
@@ -129,7 +144,21 @@ def employer_job_form(request, pk=None):
     job = None
     if pk:
         job = get_object_or_404(Job, pk=pk, employer=request.user)
-    return render(request, "employer_job_form.html", {"job": job, "gallery": job.images.all() if job else []})
+    profile = EmployerProfile.objects.filter(user=request.user).first()
+    initial_lat = job.latitude if job else (profile.last_latitude if profile and profile.last_latitude else -1.2634)
+    initial_lon = job.longitude if job else (profile.last_longitude if profile and profile.last_longitude else 36.8036)
+    return render(
+        request,
+        "employer_job_form.html",
+        {
+            "job": job,
+            "gallery": job.images.all() if job else [],
+            "map_config": map_config(),
+            "map_config_json": json.dumps(map_config()),
+            "initial_lat": initial_lat,
+            "initial_lon": initial_lon,
+        },
+    )
 
 
 @login_required(login_url="employer-signin")
@@ -146,6 +175,15 @@ def save_employer_job(request, pk=None):
 
     lat = request.POST.get("latitude") or "-1.2634"
     lon = request.POST.get("longitude") or "36.8036"
+    try:
+        profile, _ = EmployerProfile.objects.get_or_create(user=request.user)
+        profile.last_latitude = float(lat)
+        profile.last_longitude = float(lon)
+        profile.location_label = request.POST.get("location") or profile.location_label
+        profile.location_updated_at = timezone.now()
+        profile.save(update_fields=["last_latitude", "last_longitude", "location_label", "location_updated_at"])
+    except (TypeError, ValueError):
+        pass
     fields = {
         "title": request.POST.get("title") or "Untitled role",
         "description": request.POST.get("description") or "",
@@ -272,3 +310,74 @@ def prices_api(request):
 
 def maps_config_api(request):
     return JsonResponse(map_config())
+
+
+def _read_coords(request):
+    if request.content_type and "application/json" in request.content_type:
+        data = json.loads(request.body or b"{}")
+    else:
+        data = request.POST
+    lat = float(data.get("latitude"))
+    lon = float(data.get("longitude"))
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise ValueError("Coordinates are out of range.")
+    return lat, lon, data
+
+
+@login_required(login_url="worker-signin")
+@require_POST
+def pin_worker_location(request):
+    if request.user.role != "worker":
+        return JsonResponse({"error": "Only workers can pin a worker location."}, status=403)
+    try:
+        lat, lon, _data = _read_coords(request)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return JsonResponse({"error": "Send a valid latitude and longitude."}, status=400)
+    profile, _ = WorkerProfile.objects.get_or_create(user=request.user)
+    approx_lat, approx_lon = approximate_coordinates(lat, lon, salt=f"worker-{request.user.pk}")
+    profile.last_latitude = lat
+    profile.last_longitude = lon
+    profile.approx_latitude = approx_lat
+    profile.approx_longitude = approx_lon
+    profile.location_updated_at = timezone.now()
+    profile.save(
+        update_fields=["last_latitude", "last_longitude", "approx_latitude", "approx_longitude", "location_updated_at"]
+    )
+    return JsonResponse(
+        {
+            "ok": True,
+            "latitude": lat,
+            "longitude": lon,
+            "approx_latitude": approx_lat,
+            "approx_longitude": approx_lon,
+            "updated_at": profile.location_updated_at.isoformat(),
+        }
+    )
+
+
+@login_required(login_url="employer-signin")
+@require_POST
+def pin_employer_location(request):
+    if request.user.role != "employer":
+        return JsonResponse({"error": "Only employers can pin an employer location."}, status=403)
+    try:
+        lat, lon, data = _read_coords(request)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return JsonResponse({"error": "Send a valid latitude and longitude."}, status=400)
+    label = (data.get("label") or data.get("location") or "").strip()
+    profile, _ = EmployerProfile.objects.get_or_create(user=request.user)
+    profile.last_latitude = lat
+    profile.last_longitude = lon
+    if label:
+        profile.location_label = label
+    profile.location_updated_at = timezone.now()
+    profile.save(update_fields=["last_latitude", "last_longitude", "location_label", "location_updated_at"])
+    return JsonResponse(
+        {
+            "ok": True,
+            "latitude": lat,
+            "longitude": lon,
+            "label": profile.location_label,
+            "updated_at": profile.location_updated_at.isoformat(),
+        }
+    )

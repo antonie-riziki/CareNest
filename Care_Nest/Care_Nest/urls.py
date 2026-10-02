@@ -67,6 +67,8 @@ urlpatterns = [
     path("api/dashboard/", include("apps.dashboard.urls")),
     path("api/prices/", prices_api, name="api-prices"),
     path("api/maps/config/", maps_config_api, name="api-maps-config"),
+    path("api/location/worker/", pin_worker_location, name="api-location-worker"),
+    path("api/location/employer/", pin_employer_location, name="api-location-employer"),
     path("ussd/callback/", ussd_callback, name="ussd_callback"),
     path("", include("apps.agentic_core.urls")),
 ]

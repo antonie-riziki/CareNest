@@ -23,6 +23,9 @@ WORKERS = [
         "last": "Wanjiku",
         "skills": "nanny, childcare, first aid, meal preparation, early learning",
         "rating": 4.9,
+        "phone": "+254722000001",
+        "lat": -1.2648,
+        "lon": 36.8049,
     },
     {
         "email": "jane@carenest.demo",
@@ -30,6 +33,9 @@ WORKERS = [
         "last": "Achieng",
         "skills": "housekeeper, cleaning, laundry, ironing, home organisation",
         "rating": 4.6,
+        "phone": "+254722000002",
+        "lat": -1.2912,
+        "lon": 36.7884,
     },
     {
         "email": "john@carenest.demo",
@@ -37,6 +43,9 @@ WORKERS = [
         "last": "Mutua",
         "skills": "gardener, landscaping, lawn care, pruning, irrigation",
         "rating": 4.4,
+        "phone": "+254722000003",
+        "lat": -1.2782,
+        "lon": 36.7671,
     },
 ]
 
@@ -100,7 +109,12 @@ class Command(BaseCommand):
         if created:
             employer.set_password(DEMO_PASSWORD)
             employer.save()
-        EmployerProfile.objects.get_or_create(user=employer, defaults={"rating": 4.8})
+        employer_profile, _ = EmployerProfile.objects.get_or_create(user=employer, defaults={"rating": 4.8})
+        employer_profile.phone = employer_profile.phone or "+254712000001"
+        employer_profile.last_latitude = employer_profile.last_latitude or -1.2634
+        employer_profile.last_longitude = employer_profile.last_longitude or 36.8036
+        employer_profile.location_label = employer_profile.location_label or "Westlands"
+        employer_profile.save()
         Wallet.objects.get_or_create(user=employer, defaults={"balance": 0})
         self.stdout.write(self.style.SUCCESS(f"Employer {employer.email} / {DEMO_PASSWORD}"))
 
@@ -118,12 +132,19 @@ class Command(BaseCommand):
             if created:
                 user.set_password(DEMO_PASSWORD)
                 user.save()
-            profile, _ = WorkerProfile.objects.get_or_create(user=user, defaults={"skills": spec["skills"], "rating": spec["rating"], "verified": True})
-            if not profile.skills:
-                profile.skills = spec["skills"]
-                profile.rating = spec["rating"]
-                profile.verified = True
-                profile.save()
+            profile, _ = WorkerProfile.objects.get_or_create(
+                user=user,
+                defaults={"skills": spec["skills"], "rating": spec["rating"], "verified": True, "phone": spec["phone"]},
+            )
+            profile.skills = spec["skills"]
+            profile.rating = spec["rating"]
+            profile.verified = True
+            profile.phone = spec["phone"]
+            profile.last_latitude = spec["lat"]
+            profile.last_longitude = spec["lon"]
+            profile.approx_latitude = spec["lat"]
+            profile.approx_longitude = spec["lon"]
+            profile.save()
             Wallet.objects.get_or_create(user=user, defaults={"balance": 0})
             workers.append(user)
             self.stdout.write(self.style.SUCCESS(f"Worker {user.email} / {DEMO_PASSWORD}"))

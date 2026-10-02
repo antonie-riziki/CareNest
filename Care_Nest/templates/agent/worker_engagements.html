@@ -21,7 +21,7 @@
         {% endif %}
         <form method="post" action="{% url 'agent-ask' %}" class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-5 flex flex-col md:flex-row gap-3">
             {% csrf_token %}
-            <input type="text" name="question" placeholder="Ask about your engagement" class="flex-1 rounded-xl border-outline-variant/30 text-sm">
+            <input type="text" name="question" placeholder="Ask about your engagement" class="form-field flex-1 text-sm">
             <button class="px-5 py-3 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest">Ask</button>
         </form>
         {% for card in cards %}

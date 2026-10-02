@@ -1,19 +1,15 @@
 """
 Map provider abstraction.
 
-The existing worker map already uses Leaflet + OpenStreetMap. Google Maps 403s
-in this app were coming from blocked googleusercontent images and would also
-appear if a restricted Maps JS key was used without billing/referrers.
-
-Default: Leaflet/OSM (no browser API key).
-Optional: Google Maps JS when GOOGLE_MAPS_API_KEY is configured.
-On tile/script failure the UI falls back to OSM and never stays blank.
+Primary: Leaflet + OpenStreetMap.
+Fallbacks (in order): Carto Voyager, Esri World Street Map, then Google Maps JS if a key is set.
 Worker coordinates are jittered so exact home location is not published.
 """
 
 from __future__ import annotations
 
 import hashlib
+import math
 from typing import Any
 
 from django.conf import settings
@@ -24,8 +20,15 @@ def approximate_coordinates(lat: float, lon: float, *, salt: str = "") -> tuple[
     digest = hashlib.sha256(f"{lat}:{lon}:{salt}".encode()).hexdigest()
     dx = (int(digest[:8], 16) / 0xFFFFFFFF) - 0.5
     dy = (int(digest[8:16], 16) / 0xFFFFFFFF) - 0.5
-    # ~0.003 degrees ≈ 330m at Nairobi latitudes
     return round(lat + dy * 0.006, 5), round(lon + dx * 0.006, 5)
+
+
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    radius = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    return round(2 * radius * math.asin(min(1.0, math.sqrt(a))), 1)
 
 
 def public_config() -> dict[str, Any]:
@@ -35,13 +38,23 @@ def public_config() -> dict[str, Any]:
         primary = "google"
     else:
         primary = "leaflet"
-        google_key = ""  # never send an unused/private key
+        google_key = ""
     return {
         "provider": primary,
         "fallback": "leaflet",
         "google_maps_api_key": google_key,
         "tile_url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         "tile_attribution": "© OpenStreetMap contributors",
+        "tile_fallbacks": [
+            {
+                "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+                "attribution": "© OpenStreetMap, © CARTO",
+            },
+            {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                "attribution": "Tiles © Esri",
+            },
+        ],
         "privacy": "Worker location is approximate. Exact residential coordinates are never shown publicly.",
-        "error_hint": "If a map provider returns 403, CareNest falls back to OpenStreetMap.",
+        "error_hint": "If OpenStreetMap tiles fail, CareNest switches to Carto, then Esri.",
     }

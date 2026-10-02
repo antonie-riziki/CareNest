@@ -25,9 +25,9 @@
     <form method="post" action="{% url 'job-submit-terms' engagement.job_id %}" class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
         {% csrf_token %}
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Revise your terms</label>
-        <textarea name="worker_terms" rows="5" required class="w-full rounded-xl border-outline-variant/30 text-sm text-primary">{{ engagement.worker_terms }}</textarea>
+        <textarea name="worker_terms" rows="5" required class="form-field w-full text-sm text-primary">{{ engagement.worker_terms }}</textarea>
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Hours / schedule you need reviewed</label>
-        <input name="hours_note" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" value="{{ engagement.worker_hours_note }}">
+        <input name="hours_note" class="form-field w-full text-sm text-primary" value="{{ engagement.worker_hours_note }}">
         <button class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Send to employer</button>
     </form>
     {% endif %}
