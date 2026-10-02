@@ -65,7 +65,7 @@
                     </div>
                     <div>
                         <p class="font-bold text-sm tracking-tight">{{ latest_engagement.job.title }}</p>
-                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ latest_engagement.chain_status }} · {{ latest_engagement.job.location }}</p>
+                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ latest_engagement.display_status }} · {{ latest_engagement.job.location }}</p>
                     </div>
                 </div>
                 <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
@@ -80,7 +80,7 @@
                     </div>
                     <div>
                         <p class="font-bold text-sm tracking-tight">{{ open_jobs.0.title }}</p>
-                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ open_jobs.0.location }} · KES {{ open_jobs.0.pay }}</p>
+                        <p class="text-[10px] opacity-80 font-medium uppercase tracking-widest mt-0.5">{{ open_jobs.0.location }} · {{ open_jobs.0.pay|money:open_jobs.0.currency }}</p>
                     </div>
                 </div>
                 <span class="material-symbols-outlined text-xl" data-icon="arrow_outward">arrow_outward</span>
@@ -99,7 +99,7 @@
                         <p
                             class="font-label text-[10px] uppercase font-bold tracking-[0.3em] text-primary-fixed/60 mb-4">
                             Confirmed earnings</p>
-                        <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES {{ earned|floatformat:0 }}
+                        <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">{{ earned|money }}
                         </h2>
                         <div class="flex items-center gap-4">
                             <a href="{% url 'worker-wallet' %}"
@@ -139,7 +139,7 @@
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
                         <span
-                            class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">{% if latest_engagement %}{{ latest_engagement.chain_status }}{% else %}Standby{% endif %}</span>
+                            class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">{% if latest_engagement %}{{ latest_engagement.display_status }}{% else %}Standby{% endif %}</span>
                     </div>
                     <div>
                         <h3 class="text-2xl font-extrabold text-primary tracking-tighter font-headline leading-tight">

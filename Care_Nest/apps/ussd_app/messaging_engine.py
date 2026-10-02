@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -6,7 +7,12 @@ load_dotenv()
 _AT_API_KEY = os.getenv("AT_API_KEY")
 sms = None
 
-if _AT_API_KEY:
+
+def _in_tests() -> bool:
+    return "test" in sys.argv or bool(os.getenv("PYTEST_CURRENT_TEST"))
+
+
+if _AT_API_KEY and not _in_tests():
     try:
         import africastalking
 
@@ -25,22 +31,12 @@ if sms is None:
 
 
 def send_message(phone_number, message_context):
-
+    if _in_tests() or not phone_number:
+        return
     recipients = [f"{str(phone_number)}"]
-
-    print(recipients)
-    print(phone_number)
-
-    # Set your message
     message = f"{message_context}"
-
-    # Set your shortCode or senderId
     sender = 20384
-
     try:
-        response = sms.send(message, recipients, sender)
-
-        print(response)
-
-    except Exception as e:
-        print(f"Houston, we have a problem: {e}")
+        sms.send(message, recipients, sender)
+    except Exception as exc:
+        print(f"Africa's Talking SMS skipped: {exc}")

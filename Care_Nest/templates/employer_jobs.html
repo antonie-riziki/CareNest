@@ -26,8 +26,8 @@
                 <p class="text-xs text-outline truncate">{{ job.location }} · {{ job.job_type }} · {{ job.schedule_label }}</p>
             </div>
             <div class="text-right shrink-0">
-                <p class="font-bold text-primary text-sm">{{ job.currency }} {{ job.pay }}</p>
-                <p class="text-[11px] text-outline">{{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</p>
+                <p class="font-bold text-primary text-sm">{{ job.pay|money:job.currency }}</p>
+                <p class="text-[11px] text-outline">{{ job.slots_remaining }}/{{ job.workers_needed }} open · {{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</p>
             </div>
         </a>
         {% empty %}

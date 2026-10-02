@@ -26,6 +26,10 @@
             <span class="material-icons-round text-2xl">people</span>
             <span class="font-bold text-sm">Engagements</span>
         </a>
+        <a href="{% url 'disputes' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'disputes' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
+            <span class="material-icons-round text-2xl">gavel</span>
+            <span class="font-bold text-sm">Disputes</span>
+        </a>
         <a href="{% url 'employer-wallet' %}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group {% if request.resolver_match.url_name == 'wallet-connect' or request.resolver_match.url_name == 'employer-wallet' %}bg-primary-container/10 text-primary{% else %}text-outline hover:text-primary hover:bg-surface-container-low{% endif %}">
             <span class="material-icons-round text-2xl">account_balance_wallet</span>
             <span class="font-bold text-sm">Wallet</span>

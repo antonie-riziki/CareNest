@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Disputes | Care Nest{% endblock %}
+{% block content %}
+{% include 'worker_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-8 pb-28">
+    {% include '_disputes_portal.html' %}
+</div>
+{% include 'worker_bottom_nav.html' %}
+{% endblock %}

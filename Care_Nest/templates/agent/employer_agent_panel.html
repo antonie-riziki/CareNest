@@ -34,6 +34,8 @@
                     <textarea name="requirement" rows="4" required placeholder="{{ example_requirement }}" class="form-field w-full text-sm font-medium text-primary">{% if proposal %}{{ proposal.requirement.raw_text }}{% endif %}</textarea>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of hire</label>
                     <textarea name="employer_terms" rows="4" class="form-field w-full text-sm text-primary" placeholder="Hours, duties, house rules">{% if pending_job %}{{ pending_job.employer_terms }}{% endif %}</textarea>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Workers needed</label>
+                    <input type="number" min="1" max="20" name="workers_needed" class="form-field w-32" value="{% if pending_job %}{{ pending_job.workers_needed }}{% else %}1{% endif %}">
                     {% if pending_job %}
                     {% include '_image_dropzone.html' with input_id='agent-job-image' input_name='image' current_url=pending_job.image_url dropzone_label='Image for the job card' %}
                     {% else %}
@@ -73,7 +75,7 @@
                     <dl class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Role</dt><dd class="font-bold text-primary">{{ proposal.requirement.job_type }}</dd></div>
                         <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Location</dt><dd class="font-bold text-primary">{{ proposal.requirement.location|default:"—" }}</dd></div>
-                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Pay</dt><dd class="font-bold text-primary">{{ proposal.requirement.pay_currency }} {{ proposal.requirement.pay_amount }} / {{ proposal.requirement.pay_period }}</dd></div>
+                        <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Pay</dt><dd class="font-bold text-primary">{{ proposal.requirement.pay_amount|money:proposal.requirement.pay_currency }} / {{ proposal.requirement.pay_period }}</dd></div>
                         <div><dt class="text-[10px] uppercase font-bold text-outline tracking-widest">Schedule</dt><dd class="font-bold text-primary">{{ proposal.requirement.schedule }}</dd></div>
                     </dl>
                 </div>
@@ -88,12 +90,15 @@
                         {% for c in proposal.candidates %}
                         <label class="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/20 hover:border-secondary/40 bg-white cursor-pointer">
                             <input type="radio" name="worker_id" value="{{ c.user_id }}" required class="mt-1 text-secondary focus:ring-secondary" {% if forloop.first %}checked{% endif %}>
-                            <div class="flex-1">
+                            <img src="{{ c.photo_url }}" alt="" class="w-14 h-14 rounded-2xl object-cover bg-surface-container-high">
+                            <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-3">
                                     <p class="font-extrabold text-primary">{{ c.display_name }}</p>
                                     <span class="text-[10px] font-bold uppercase tracking-widest text-secondary">Score {{ c.score }}</span>
                                 </div>
+                                <p class="text-xs text-outline mt-1">{% if c.location_label %}{{ c.location_label }} · {% endif %}Rating {{ c.rating|default:"—" }}{% if c.verified %} · verified{% endif %}</p>
                                 <p class="text-xs text-outline mt-1">{{ c.skills|join:", " }}</p>
+                                {% if c.bio %}<p class="text-sm text-primary mt-2">{{ c.bio }}</p>{% endif %}
                                 <p class="text-[11px] text-on-surface-variant mt-2">{{ c.reasons|join:" · " }}</p>
                             </div>
                         </label>
@@ -159,9 +164,9 @@
                 <a href="{% url 'agent-command-center' e.pk %}" class="bg-white p-6 rounded-[1.5rem] border border-outline-variant/10 hover:border-secondary/30">
                     <div class="flex items-center justify-between gap-3">
                         <p class="font-extrabold text-primary">{{ e.job.title }}</p>
-                        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full {% if e.is_demo %}bg-amber-100 text-amber-800{% else %}bg-secondary/10 text-secondary{% endif %}">{{ e.chain_status }}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full {% if e.is_demo %}bg-amber-100 text-amber-800{% else %}bg-secondary/10 text-secondary{% endif %}">{{ e.display_status }}</span>
                     </div>
-                    <p class="text-sm text-outline mt-2">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.currency }} {{ e.amount }}</p>
+                    <p class="text-sm text-outline mt-2">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.amount|money:e.currency }}</p>
                     {% if e.latest_tx_hash %}<p class="font-mono text-[11px] text-outline mt-2">tx {{ e.latest_tx_hash|slice:":12" }}…</p>{% endif %}
                 </a>
                 {% endfor %}

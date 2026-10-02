@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -11,8 +12,10 @@ from apps.contracts.agreement import (
     check_out,
     open_shift_for,
     submit_worker_terms,
+    verify_shift,
 )
-from apps.contracts.models import Contract, ServiceInvoice
+from apps.contracts.models import Contract, Dispute, Notification, ServiceInvoice, ShiftAttendance
+from apps.contracts.notify import notify
 from apps.jobs.models import Application, Job
 from apps.wallet.pricing import get_price_service
 from apps.wallet.settlement import compute_waterfall
@@ -21,7 +24,15 @@ from apps.wallet.settlement import compute_waterfall
 @login_required(login_url="worker-signin")
 def worker_contracts(request):
     engagements = Contract.objects.filter(worker=request.user).select_related("job", "employer").order_by("-updated_at")
-    cards = [{"engagement": c, "explanation": explain(c.chain_status), "active": c.chain_status not in EngagementStatus.TERMINAL} for c in engagements]
+    cards = [
+        {
+            "engagement": c,
+            "explanation": explain(c.chain_status),
+            "active": c.chain_status not in EngagementStatus.TERMINAL,
+            "status_label": c.display_status,
+        }
+        for c in engagements
+    ]
     return render(request, "worker_contracts.html", {"cards": cards})
 
 
@@ -161,7 +172,7 @@ def check_in_shift(request, pk):
     engagement = get_object_or_404(Contract, pk=pk, worker=request.user)
     try:
         check_in(contract=engagement, worker=request.user, note=request.POST.get("note") or "")
-        messages.success(request, "Checked in. Your shift is open.")
+        messages.success(request, "Checked in. Your employer was notified.")
     except AgreementError as exc:
         messages.error(request, str(exc))
     return redirect("worker-engagement-review", pk=pk)
@@ -172,9 +183,14 @@ def check_in_shift(request, pk):
 def check_out_shift(request, pk):
     engagement = get_object_or_404(Contract, pk=pk, worker=request.user)
     try:
-        shift = check_out(contract=engagement, worker=request.user, note=request.POST.get("note") or "")
+        shift = check_out(
+            contract=engagement,
+            worker=request.user,
+            note=request.POST.get("note") or "",
+            work_summary=request.POST.get("work_summary") or "",
+        )
         minutes = shift.duration_minutes or 0
-        messages.success(request, f"Checked out. Shift logged ({minutes} min).")
+        messages.success(request, f"Checked out. Work submitted for employer approval ({minutes} min).")
     except AgreementError as exc:
         messages.error(request, str(exc))
     return redirect("worker-engagement-review", pk=pk)
@@ -184,3 +200,108 @@ def check_out_shift(request, pk):
 def worker_service_invoice(request, pk):
     invoice = get_object_or_404(ServiceInvoice, pk=pk, worker=request.user)
     return render(request, "worker_service_invoice.html", {"invoice": invoice})
+
+
+@login_required(login_url="employer-signin")
+@require_POST
+def verify_shift_view(request, pk):
+    shift = get_object_or_404(ShiftAttendance, pk=pk, engagement__employer=request.user)
+    try:
+        verify_shift(shift=shift, employer=request.user, note=request.POST.get("note") or "")
+        messages.success(request, "Work recorded and approved.")
+    except AgreementError as exc:
+        messages.error(request, str(exc))
+    return redirect("employer-engagement-review", pk=shift.engagement_id)
+
+
+def _dispute_queryset(user):
+    return (
+        Dispute.objects.filter(Q(reporter=user) | Q(against=user) | Q(engagement__employer=user) | Q(engagement__worker=user))
+        .select_related("engagement", "job", "reporter", "against")
+        .distinct()
+    )
+
+
+@login_required
+def disputes_portal(request):
+    disputes = _dispute_queryset(request.user)
+    grouped = {
+        "ongoing": disputes.filter(status=Dispute.Status.ONGOING),
+        "unresolved": disputes.filter(status=Dispute.Status.UNRESOLVED),
+        "settled": disputes.filter(status=Dispute.Status.SETTLED),
+    }
+    engagements = Contract.objects.filter(Q(employer=request.user) | Q(worker=request.user), approval_status=Contract.ApprovalStatus.APPROVED)
+    template = "employer_disputes.html" if getattr(request.user, "role", "") == "employer" else "worker_disputes.html"
+    return render(
+        request,
+        template,
+        {"grouped": grouped, "engagements": engagements, "categories": Dispute.Category.choices},
+    )
+
+
+@login_required
+@require_POST
+def report_dispute(request):
+    engagement = get_object_or_404(
+        Contract,
+        pk=request.POST.get("engagement_id"),
+        approval_status=Contract.ApprovalStatus.APPROVED,
+    )
+    if request.user.pk not in {engagement.employer_id, engagement.worker_id}:
+        messages.error(request, "You can only report disputes on your own contracts.")
+        return redirect("disputes")
+    if engagement.employer_id == request.user.pk:
+        against = engagement.worker
+    else:
+        against = engagement.employer
+    title = (request.POST.get("title") or "").strip()
+    description = (request.POST.get("description") or "").strip()
+    if len(title) < 4 or len(description) < 12:
+        messages.error(request, "Add a short title and a description of the dispute.")
+        return redirect("disputes")
+    category = request.POST.get("category") or Dispute.Category.OTHER
+    if category not in Dispute.Category.values:
+        category = Dispute.Category.OTHER
+    dispute = Dispute.objects.create(
+        engagement=engagement,
+        job=engagement.job,
+        reporter=request.user,
+        against=against,
+        category=category,
+        title=title[:160],
+        description=description,
+    )
+    notify(
+        recipient=against,
+        actor=request.user,
+        engagement=engagement,
+        kind=Notification.Kind.DISPUTE,
+        title="A dispute was opened",
+        body=title,
+        url="/disputes/",
+    )
+    messages.success(request, f"Dispute #{dispute.pk} opened. Both parties can follow it in the dispute portal.")
+    return redirect("disputes")
+
+
+@login_required
+@require_POST
+def update_dispute(request, pk):
+    dispute = get_object_or_404(Dispute, pk=pk)
+    if request.user.pk not in {dispute.reporter_id, dispute.against_id, dispute.engagement.employer_id, dispute.engagement.worker_id}:
+        messages.error(request, "Not your dispute.")
+        return redirect("disputes")
+    action = request.POST.get("action")
+    if action == "unresolved":
+        dispute.status = Dispute.Status.UNRESOLVED
+        dispute.save(update_fields=["status", "updated_at"])
+        messages.info(request, "Dispute marked unresolved.")
+    elif action == "settle":
+        dispute.status = Dispute.Status.SETTLED
+        dispute.resolution = (request.POST.get("resolution") or "Settled by the parties.").strip()
+        from django.utils import timezone
+
+        dispute.resolved_at = timezone.now()
+        dispute.save(update_fields=["status", "resolution", "resolved_at", "updated_at"])
+        messages.success(request, "Dispute marked settled.")
+    return redirect("disputes")

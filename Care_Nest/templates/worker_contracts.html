@@ -61,11 +61,11 @@
                                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-8">
                                     <div class="space-y-1">
                                         <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Status</p>
-                                        <p class="font-bold text-primary text-lg">{{ card.engagement.chain_status }}</p>
+                                        <p class="font-bold text-primary text-lg">{{ card.engagement.display_status }}</p>
                                     </div>
                                     <div class="space-y-1">
                                         <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Pay</p>
-                                        <p class="font-bold text-primary text-lg">{{ card.engagement.currency }} {{ card.engagement.amount }}</p>
+                                        <p class="font-bold text-primary text-lg">{{ card.engagement.amount|money:card.engagement.currency }}</p>
                                     </div>
                                     <div class="space-y-1">
                                         <p class="text-[10px] uppercase font-bold text-outline tracking-widest">Employer</p>

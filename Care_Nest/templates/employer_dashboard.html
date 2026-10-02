@@ -96,9 +96,9 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-3xl font-extrabold text-primary mb-1 font-headline">KES {{ spent_this_month|floatformat:0 }}</h3>
+                    <h3 class="text-3xl font-extrabold text-primary mb-1 font-headline">{{ spent_this_month|money }}</h3>
                     <p class="text-xs font-bold text-outline uppercase tracking-widest">Spent This Month</p>
-                    <p class="text-[11px] text-outline mt-2">{{ live_jobs_count }} live · {{ applicant_count }} applicants · escrow KES {{ escrowed|floatformat:0 }}</p>
+                    <p class="text-[11px] text-outline mt-2">{{ live_jobs_count }} live · {{ applicant_count }} applicants · escrow {{ escrowed|money }}</p>
                 </div>
             </div>
 
@@ -122,7 +122,19 @@
             {% for e in pending_engagements %}
             <a href="{% url 'employer-engagement-review' e.pk %}" class="block bg-white p-5 rounded-2xl border border-secondary/30">
                 <p class="font-bold text-primary">{{ e.job.title }}</p>
-                <p class="text-xs text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.approval_status }} · Employer pays {{ e.currency }} {{ e.amount }}</p>
+                <p class="text-xs text-outline">{{ e.worker.get_full_name|default:e.worker.username }} · {{ e.display_status }} · Employer pays {{ e.amount|money:e.currency }}</p>
+            </a>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if notifications %}
+        <section class="space-y-3">
+            <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Attendance & contract notices</h3>
+            {% for n in notifications %}
+            <a href="{{ n.url|default:'#' }}" class="block bg-white p-4 rounded-2xl border border-outline-variant/10">
+                <p class="font-bold text-primary text-sm">{{ n.title }}</p>
+                <p class="text-xs text-outline mt-1">{{ n.body|truncatewords:28 }}</p>
             </a>
             {% endfor %}
         </section>
@@ -130,60 +142,59 @@
 
         <!-- Dashboard Main Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Side: Active Contracts -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Your Active Workers</h3>
-                    <a href="{% url 'employer-contracts' %}" class="text-[10px] font-bold text-secondary uppercase tracking-widest hover:underline">View All</a>
-                </div>
-
-                <div class="space-y-4">
-                    {% for e in active_engagements %}
-                    <a href="{% url 'agent-command-center' e.pk %}" class="bg-white p-6 rounded-[2rem] border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 group">
-                        <div class="flex items-center gap-5">
-                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface flex-shrink-0 relative">
-                                <img src="https://ui-avatars.com/api/?name={{ e.worker.get_full_name|default:e.worker.username }}&background=002045&color=fff" alt="" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <h4 class="font-extrabold text-lg text-primary tracking-tight">{{ e.worker.get_full_name|default:e.worker.username }}</h4>
-                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">{{ e.job.job_type }} • {{ e.chain_status }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4 w-full sm:w-auto">
-                            <span class="px-4 py-1.5 bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-widest rounded-full border border-secondary/20">{{ e.currency }} {{ e.amount }}</span>
-                        </div>
-                    </a>
-                    {% empty %}
-                    <p class="text-sm text-outline">No active engagements. Use the WorkOS agent to hire.</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Right Side: Recent Job Postings -->
-            <div class="space-y-6">
-                <div class="flex items-center justify-between">
                     <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Recent Postings</h3>
+                    <a href="{% url 'employer-jobs' %}" class="text-[10px] font-bold text-secondary uppercase tracking-widest hover:underline">View All</a>
                 </div>
-
+                <div class="space-y-4">
                 {% for job in recent_jobs %}
-                <div class="bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10 relative overflow-hidden group">
-                    <div class="relative z-10 space-y-4">
-                        <span class="bg-white text-primary px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm inline-block">{{ job.job_type }}</span>
-                        <h4 class="font-extrabold text-xl text-primary font-headline leading-tight">{{ job.title }}</h4>
-                        <p class="text-sm font-medium text-outline">{{ job.description|truncatewords:18 }}</p>
-                        <div class="pt-5 mt-4 border-t border-outline-variant/20 flex justify-between items-center">
-                            <span class="text-xs font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-lg">KES {{ job.pay }}</span>
-                            <a href="{% url 'employer-jobs' %}" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
-                                Review
-                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-                            </a>
+                <a href="/employer-job-details/?id={{ job.pk }}" class="block bg-white p-6 rounded-[2rem] border border-outline-variant/10 hover:border-secondary/30">
+                    <div class="flex gap-4">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden bg-surface-container-low shrink-0">
+                            <img src="{{ job.cover_image }}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-outline">{{ job.job_type }} · {{ job.status }}</span>
+                            <h4 class="font-extrabold text-xl text-primary font-headline leading-tight mt-1">{{ job.title }}</h4>
+                            <p class="text-sm text-outline mt-1">{{ job.location }} · {{ job.slots_remaining }}/{{ job.workers_needed }} openings</p>
+                            <p class="text-sm text-on-surface-variant mt-2">{{ job.description|truncatewords:18 }}</p>
+                            <p class="text-xs font-bold text-secondary mt-3">{{ job.pay|money:job.currency }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% empty %}
                 <p class="text-sm text-outline">No jobs posted yet.</p>
                 {% endfor %}
+                </div>
+            </div>
 
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-[0.3em]">Active Workers</h3>
+                    <a href="{% url 'employer-contracts' %}" class="text-[10px] font-bold text-secondary uppercase tracking-widest hover:underline">View All</a>
+                </div>
+                <div class="space-y-4">
+                    {% for e in active_engagements %}
+                    <a href="{% url 'employer-engagement-review' e.pk %}" class="bg-white p-5 rounded-[1.75rem] border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow block">
+                        <div class="flex items-center gap-4">
+                            <img src="https://ui-avatars.com/api/?name={{ e.worker.get_full_name|default:e.worker.username }}&background=002045&color=fff" alt="" class="w-14 h-14 rounded-full object-cover">
+                            <div class="min-w-0">
+                                <h4 class="font-extrabold text-primary tracking-tight truncate">{{ e.worker.get_full_name|default:e.worker.username }}</h4>
+                                <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">{{ e.display_status }}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-primary mt-3 font-medium">{{ e.job.title }}</p>
+                        <p class="text-xs text-outline mt-1">{{ e.job.location }} · {{ e.job.schedule_label }}</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-widest rounded-full">{{ e.amount|money:e.currency }}</span>
+                            <span class="px-3 py-1 bg-surface-container-high text-[10px] font-bold uppercase tracking-widest rounded-full">{{ e.job.job_type }}</span>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-sm text-outline">No bound workers yet. Approve terms to activate a contract.</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </main>

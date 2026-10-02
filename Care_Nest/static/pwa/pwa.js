@@ -1,6 +1,34 @@
 (function () {
   if (!("serviceWorker" in navigator)) return;
 
+  var host = location.hostname;
+  var isLocal =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host === "10.0.2.2" ||
+    host === "[::1]";
+
+  function clearWorker() {
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+      regs.forEach(function (reg) {
+        reg.unregister();
+      });
+    });
+    if (window.caches) {
+      caches.keys().then(function (keys) {
+        keys.forEach(function (key) {
+          caches.delete(key);
+        });
+      });
+    }
+  }
+
+  if (isLocal) {
+    clearWorker();
+    return;
+  }
+
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(function () {});
   });

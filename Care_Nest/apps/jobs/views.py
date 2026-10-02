@@ -13,6 +13,7 @@ from apps.jobs.maps import haversine_km, public_config as map_config
 from apps.jobs.maps import approximate_coordinates
 from apps.jobs.models import Application, Job, JobImage
 from apps.jobs.scheduling import ScheduleError, refresh_job_status, refresh_queryset, validate_schedule
+from apps.profiles.avatars import avatar_url
 from apps.profiles.models import EmployerProfile, WorkerProfile
 from apps.wallet.pricing import get_price_service
 
@@ -51,6 +52,9 @@ def _job_payload(job: Job) -> dict:
         "is_verified": job.is_verified,
         "locked": job.locked,
         "description": job.description,
+        "workers_needed": job.workers_needed,
+        "slots_remaining": job.slots_remaining,
+        "is_filled": job.is_filled,
         "directions_url": f"https://www.openstreetmap.org/directions?from=&to={lat}%2C{lon}",
     }
 
@@ -102,7 +106,7 @@ def _parse_job_form(request) -> dict:
 @login_required(login_url="worker-signin")
 def worker_jobs(request):
     jobs = Job.objects.select_related("employer").order_by("-created_at")
-    jobs = [j for j in refresh_queryset(jobs) if j.is_live]
+    jobs = [j for j in refresh_queryset(jobs) if j.is_listed]
     profile = WorkerProfile.objects.filter(user=request.user).first()
     worker_lat = profile.last_latitude if profile and profile.last_latitude else None
     worker_lon = profile.last_longitude if profile and profile.last_longitude else None
@@ -199,6 +203,10 @@ def save_employer_job(request, pk=None):
         "employer_terms": (request.POST.get("employer_terms") or "").strip(),
         **schedule,
     }
+    try:
+        fields["workers_needed"] = max(1, min(int(request.POST.get("workers_needed") or 1), 20))
+    except (TypeError, ValueError):
+        fields["workers_needed"] = 1
     if pk:
         job = get_object_or_404(Job, pk=pk, employer=request.user)
         for key, value in fields.items():
@@ -256,10 +264,20 @@ def worker_job_details(request):
             .exclude(approval_status=Contract.ApprovalStatus.REJECTED)
             .first()
         )
+    employer_profile = None
+    if job:
+        employer_profile, _ = EmployerProfile.objects.get_or_create(user=job.employer)
     return render(
         request,
         "worker_job_details.html",
-        {"job": job, "applied": applied, "fx": quote, "contract": contract},
+        {
+            "job": job,
+            "applied": applied,
+            "fx": quote,
+            "contract": contract,
+            "employer_profile": employer_profile,
+            "employer_photo": avatar_url(job.employer, employer_profile) if job else "",
+        },
     )
 
 
@@ -269,15 +287,20 @@ def employer_job_details(request):
     if job:
         refresh_job_status(job)
     applicants = Application.objects.filter(job=job).select_related("worker") if job else []
-    return render(request, "employer_job_details.html", {"job": job, "applicants": applicants})
+    gallery = list(job.images.all()) if job else []
+    return render(
+        request,
+        "employer_job_details.html",
+        {"job": job, "applicants": applicants, "gallery": gallery},
+    )
 
 
 @login_required(login_url="worker-signin")
 @require_POST
 def apply_to_job(request, pk):
-    job = get_object_or_404(Job, pk=pk, status=Job.Status.ACTIVE)
-    if job.locked:
-        messages.error(request, "This job is locked. A contract is already bound.")
+    job = get_object_or_404(Job, pk=pk)
+    if not job.is_live:
+        messages.error(request, "This job is no longer accepting applications.")
         return redirect(f"/worker-job-details/?id={job.pk}")
     Application.objects.get_or_create(worker=request.user, job=job, defaults={"status": Application.Status.SUBMITTED})
     messages.success(request, "Application sent. Add your terms on this page so the employer can review them.")

@@ -23,6 +23,7 @@ from django.utils import timezone
 
 from apps.contracts.models import Contract
 from apps.jobs.models import Job
+from apps.profiles.avatars import avatar_url
 from apps.profiles.models import EmployerProfile, WorkerProfile
 from apps.wallet.models import Wallet
 
@@ -149,6 +150,9 @@ def get_worker_profile(*, user_id: int) -> ToolResult:
             "verified": profile.verified,
             "verified_engagements": credentials,
             "wallet_address": _wallet_address(profile.user),
+            "photo_url": avatar_url(profile.user, profile),
+            "bio": (profile.bio or "")[:280],
+            "location_label": profile.location_label or "",
         },
     )
 
@@ -240,6 +244,10 @@ def search_workers(*, job_type: str, required_skills: list[str] | None = None, l
                 wallet_connected=wallet,
                 score=round(score, 1),
                 reasons=reasons,
+                photo_url=avatar_url(profile.user, profile),
+                bio=(profile.bio or "")[:220],
+                location_label=profile.location_label or "",
+                verified_engagements=creds,
             )
         )
     matches.sort(key=lambda m: m.score, reverse=True)
@@ -254,6 +262,10 @@ def create_job_draft(*, employer_id: int, requirement: dict[str, Any]) -> ToolRe
     parsed = ParsedRequirement(**{k: v for k, v in requirement.items() if k in ParsedRequirement.__dataclass_fields__})
     if isinstance(parsed.pay_amount, str):
         parsed.pay_amount = Decimal(parsed.pay_amount) if parsed.pay_amount not in ("", "None") else None
+    try:
+        needed = max(1, min(int(requirement.get("workers_needed") or getattr(parsed, "workers_needed", 1) or 1), 20))
+    except (TypeError, ValueError):
+        needed = 1
     job = Job.objects.create(
         employer=employer,
         title=parsed.title,
@@ -267,6 +279,7 @@ def create_job_draft(*, employer_id: int, requirement: dict[str, Any]) -> ToolRe
         timezone="Africa/Nairobi",
         employer_terms=requirement.get("employer_terms") or parsed.raw_text or parsed.title,
         image_url=requirement.get("image_url") or "",
+        workers_needed=needed,
     )
     return ToolResult(ok=True, data={"job_id": job.pk, "title": job.title, "job_type": job.job_type, "location": job.location, "pay": str(job.pay), "image_url": job.image_url})
 
@@ -282,7 +295,7 @@ def prepare_contract_terms(*, employer_id: int, worker_id: int, job_id: int, req
     if employer.pk == worker.pk:
         return ToolResult(ok=False, error="employer and worker must differ")
 
-    if job.locked:
+    if job.locked or job.is_filled:
         return ToolResult(ok=False, error="job is already locked")
     existing = (
         Contract.objects.filter(job=job, worker=worker)

@@ -78,6 +78,18 @@ def load_for_user(user) -> AgentMemory:
     return memory
 
 
+def clear_pending_intake(user) -> AgentMemory:
+    memory = load_for_user(user)
+    ctx = dict(memory.engagement_context or {})
+    for key in ("pending_requirement", "pending_job_id", "candidates"):
+        ctx.pop(key, None)
+    memory.engagement_context = ctx
+    memory.summary = ""
+    memory.version += 1
+    memory.save(update_fields=["engagement_context", "summary", "version", "updated_at"])
+    return memory
+
+
 def _stage_for_status(status: str) -> str:
     return {
         EngagementStatus.DRAFT: "terms_prepared",

@@ -10,6 +10,7 @@ from apps.ussd_app.db import (
     nearby_jobs,
     typical_pay,
     user_for_phone,
+    wallet_for,
     worker_active_contracts,
 )
 from .messaging_engine import send_message
@@ -24,9 +25,66 @@ def _end(lines):
 
 
 def handle_ussd_menu(text, phone_number=None, session_id=None):
+    return HttpResponse(ussd_text(text, phone_number, session_id), content_type="text/plain")
+
+
+def _agent_ussd(parts: list[str]) -> str:
+    from apps.agentic_core import memory as memory_mod
+    from apps.agentic_core.state import explain
+    from apps.contracts.models import Contract
+
+    if len(parts) == 1:
+        return _con(["WorkOS Agent", "Enter engagement number:", "(or 0 to exit)"])
+    if parts[1] == "0":
+        return _end(["Thank you for using Care Nest."])
+    if not parts[1].isdigit():
+        return _end(["Enter a numeric engagement id."])
+    contract = Contract.objects.filter(pk=int(parts[1])).select_related("job", "worker").first()
+    if not contract:
+        return _end(["Engagement not found."])
+    mem = memory_mod.load_for_engagement(contract)
+    exp = explain(contract.chain_status)
+    worker = contract.worker.get_full_name() or contract.worker.username
+    summary = mem.summary or exp.detail
+    if len(parts) == 2:
+        return _con(
+            [
+                f"{worker}'s {contract.job.title}",
+                exp.headline,
+                summary[:120],
+                "1. Next step",
+                "0. Exit",
+            ]
+        )
+    if parts[-1] == "1":
+        return _end([f"Next: {exp.next_step_employer}", f"Worker: {exp.next_step_worker}"])
+    return _end([summary[:150] or exp.detail])
+
+
+def _wallet_menu(user, phone_number=None) -> str:
+    if not user:
+        return _end(["Register in the CareNest app first, then dial again."])
+    wallet = wallet_for(user)
+    balance = wallet.balance if wallet else 0
+    address = (wallet.short_address if wallet else "") or "Not connected"
+    send_message(phone_number, f"CareNest wallet balance KES {balance}.")
+    return _end(
+        [
+            f"Wallet KES {balance}",
+            f"Stellar {address}",
+            "Withdraw or deposit in the CareNest app.",
+        ]
+    )
+
+
+def ussd_text(text, phone_number=None, session_id=None) -> str:
+    """Africa's Talking CON/END body, backed by the live CareNest database."""
     text = text or ""
     parts = [p for p in text.split("*") if p != ""] if text else []
     user = user_for_phone(phone_number)
+
+    if parts and parts[0] == "5":
+        return _agent_ussd(parts)
 
     if text == "":
         response = _con(
@@ -42,7 +100,12 @@ def handle_ussd_menu(text, phone_number=None, session_id=None):
         )
 
     elif text == "1":
-        response = _con(["Employer Menu", "1. Post Job", "2. View Applicants", "3. Confirm Completion", "0. Back"])
+        response = _con(
+            ["Employer Menu", "1. Post Job", "2. View Applicants", "3. Confirm Completion", "4. My Wallet", "0. Back"]
+        )
+
+    elif text == "1*4":
+        response = _wallet_menu(user, phone_number)
 
     elif text == "1*1":
         response = _con(["Select Job Type", "1. Nanny", "2. Housekeeper", "3. Caregiver"])
@@ -132,7 +195,12 @@ def handle_ussd_menu(text, phone_number=None, session_id=None):
                 )
 
     elif text == "2":
-        response = _con(["Worker Menu", "1. View Jobs Near Me", "2. My Active Jobs", "3. Confirm Completion", "0. Back"])
+        response = _con(
+            ["Worker Menu", "1. View Jobs Near Me", "2. My Active Jobs", "3. Confirm Completion", "4. My Wallet", "0. Back"]
+        )
+
+    elif text == "2*4":
+        response = _wallet_menu(user, phone_number)
 
     elif text == "2*1":
         worker = user if user and user.role == "worker" else None
@@ -266,4 +334,4 @@ def handle_ussd_menu(text, phone_number=None, session_id=None):
     else:
         response = _end(["Invalid Option. Try Again."])
 
-    return HttpResponse(response, content_type="text/plain")
+    return response

@@ -1,12 +1,16 @@
-<article class="bg-white rounded-[1.5rem] border border-outline-variant/10 overflow-hidden">
-    <div class="h-40 relative bg-surface-container-low">
+<article class="bg-white rounded-[1.5rem] border border-outline-variant/10 overflow-hidden h-full">
+    <div class="h-36 md:h-40 relative bg-surface-container-low">
         <img src="{{ job.cover_image }}" alt="{{ job.title }}" class="w-full h-full object-cover">
         <span class="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-widest bg-white/90 text-primary px-3 py-1 rounded-full">{% if job.is_filled %}Filled{% else %}{{ job.status }}{% endif %}</span>
+        {% if job.workers_needed %}
+        <span class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest bg-primary/90 text-white px-3 py-1 rounded-full">{{ job.slots_remaining }}/{{ job.workers_needed }} open</span>
+        {% endif %}
     </div>
     <div class="p-5 space-y-2">
-        <h3 class="font-extrabold text-primary text-lg">{{ job.title }}</h3>
+        <h3 class="font-extrabold text-primary text-lg leading-tight">{{ job.title }}</h3>
         <p class="text-sm text-outline">{{ job.location }} · {{ job.schedule_label }}</p>
-        <p class="font-bold text-secondary">{{ job.currency }} {{ job.pay }} · {{ job.job_type }}</p>
+        <p class="font-bold text-secondary">{{ job.pay|money:job.currency }} · {{ job.job_type }}</p>
+        {% if job.description %}<p class="text-xs text-on-surface-variant leading-relaxed">{{ job.description|truncatewords:18 }}</p>{% endif %}
         {% if job.is_verified %}<p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Verified posting</p>{% endif %}
     </div>
 </article>

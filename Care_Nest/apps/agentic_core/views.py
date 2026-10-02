@@ -64,6 +64,30 @@ def _employer_engagements(user):
     return Contract.objects.filter(employer=user).select_related("job", "worker").order_by("-updated_at")
 
 
+def _enrich_candidates(candidates: list) -> list[dict]:
+    from apps.profiles.avatars import avatar_url
+    from apps.profiles.models import WorkerProfile
+
+    rows = [dict(c) for c in candidates or [] if isinstance(c, dict)]
+    ids = [c.get("user_id") for c in rows if c.get("user_id")]
+    profiles = {
+        p.user_id: p for p in WorkerProfile.objects.filter(user_id__in=ids).select_related("user")
+    }
+    enriched = []
+    for row in rows:
+        row.pop("email", None)
+        row.pop("phone", None)
+        profile = profiles.get(row.get("user_id"))
+        if profile:
+            row["photo_url"] = row.get("photo_url") or avatar_url(profile.user, profile)
+            row["bio"] = row.get("bio") or (profile.bio or "")[:220]
+            row["location_label"] = row.get("location_label") or profile.location_label or ""
+            row["rating"] = row.get("rating") if row.get("rating") is not None else profile.rating
+            row["verified"] = row.get("verified", profile.verified)
+        enriched.append(row)
+    return enriched
+
+
 def _tx_payload(result: services.ExecutionResult) -> dict:
     return {
         "tx_hash": result.tx.tx_hash,
@@ -118,6 +142,14 @@ def employer_agent_panel(request):
                 proposal["job"]["image_url"] = job.image_url
                 proposal["job"]["cover_image"] = job.cover_image
                 proposal["job"]["employer_terms"] = job.employer_terms
+                try:
+                    needed = max(1, min(int(request.POST.get("workers_needed") or 1), 20))
+                except (TypeError, ValueError):
+                    needed = 1
+                if job.workers_needed != needed:
+                    job.workers_needed = needed
+                    job.save(update_fields=["workers_needed", "updated_at"])
+                proposal["job"]["workers_needed"] = job.workers_needed
         user_mem.refresh_from_db()
     elif user_mem.engagement_context.get("pending_requirement") and user_mem.engagement_context.get("candidates") is not None and not user_mem.engagement_context.get("active_engagement_pk"):
         proposal = {
@@ -138,11 +170,19 @@ def employer_agent_panel(request):
         from apps.jobs.models import Job
 
         pending_job = Job.objects.filter(pk=pending_job_id, employer=request.user).first()
-        if pending_job and proposal:
+        if pending_job and pending_job.status not in (Job.Status.DRAFT, Job.Status.SCHEDULED):
+            memory_mod.clear_pending_intake(request.user)
+            user_mem.refresh_from_db()
+            pending_job = None
+            proposal = None
+        elif pending_job and proposal:
             proposal.setdefault("job", {})
             proposal["job"]["cover_image"] = pending_job.cover_image
             proposal["job"]["image_url"] = pending_job.image_url
             proposal["job"]["employer_terms"] = pending_job.employer_terms
+            proposal["job"]["workers_needed"] = pending_job.workers_needed
+    if proposal and proposal.get("candidates") is not None:
+        proposal["candidates"] = _enrich_candidates(proposal.get("candidates") or [])
 
     engagements = _employer_engagements(request.user)
     pending = AgentApproval.objects.filter(requested_from=request.user, status=AgentApproval.Status.PENDING).select_related("engagement", "engagement__worker", "engagement__job")
@@ -241,6 +281,7 @@ def publish_job_offer(request):
     job.status = Job.Status.ACTIVE
     job.published_at = job.published_at or timezone.now()
     job.save(update_fields=["status", "published_at", "updated_at"])
+    memory_mod.clear_pending_intake(request.user)
     messages.success(request, "Job posted. Workers can review your terms, add theirs, and send them back for your approval.")
     return redirect(f"/employer-job-details/?id={job.pk}")
 
@@ -402,7 +443,7 @@ def worker_engagements(request):
                 "can_request_approval": c.chain_status == EngagementStatus.SUBMITTED and c.engagement_id is not None,
                 "can_dispute": c.chain_status in EngagementStatus.FUNDS_IN_ESCROW - {EngagementStatus.DISPUTED} and c.engagement_id is not None,
                 "credential": WorkCredential.objects.filter(engagement=c).first(),
-                "can_check_in": c.is_bound and c.job.locked and not c.shifts.filter(checked_out_at__isnull=True).exists(),
+                "can_check_in": c.is_bound and not c.shifts.filter(checked_out_at__isnull=True).exists(),
                 "can_check_out": c.shifts.filter(checked_out_at__isnull=True).exists(),
                 "open_shift": c.shifts.filter(checked_out_at__isnull=True).first(),
             }

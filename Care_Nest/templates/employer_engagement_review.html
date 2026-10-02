@@ -5,14 +5,14 @@
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-6">
     <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Bilateral terms — both parties must agree</p>
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ engagement.job.title }}</h1>
-    <p class="text-sm text-outline">Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.chain_status }}</p>
+    <p class="text-sm text-outline">Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.display_status }}</p>
     {% if messages %}{% for message in messages %}<div class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-xl text-sm font-medium">{{ message }}</div>{% endfor %}{% endif %}
 
     <div class="grid md:grid-cols-2 gap-6">
         <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
             <h2 class="text-lg font-extrabold text-primary">Your terms</h2>
             <pre class="whitespace-pre-wrap text-sm text-primary leading-relaxed font-sans">{{ engagement.employer_terms|default:"No employer terms yet." }}</pre>
-            <p class="text-sm text-primary"><strong>Pay:</strong> {{ engagement.currency }} {{ engagement.amount }}</p>
+            <p class="text-sm text-primary"><strong>Pay:</strong> {{ engagement.amount|money:engagement.currency }}</p>
             <p class="text-sm text-primary"><strong>Schedule:</strong> {{ engagement.job.schedule_label }}</p>
         </section>
         <section class="bg-white rounded-[1.5rem] border border-secondary/30 p-6 space-y-3">
@@ -29,11 +29,24 @@
     {% include '_settlement_breakdown.html' with audience='employer' %}
 
     {% if shifts %}
-    <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
-        <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-3">Attendance</h2>
+    <section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-4">
+        <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline">Attendance & work done</h2>
         {% for s in shifts %}
-        <p class="text-sm text-primary">In {{ s.checked_in_at|date:"M j, H:i" }} · {% if s.checked_out_at %}Out {{ s.checked_out_at|date:"M j, H:i" }} ({{ s.duration_minutes }} min){% else %}Open shift{% endif %}</p>
+        <div class="border-b border-outline-variant/10 pb-4 last:border-0">
+            <p class="text-sm text-primary">In {{ s.checked_in_at|date:"M j, H:i" }} · {% if s.checked_out_at %}Out {{ s.checked_out_at|date:"M j, H:i" }} ({{ s.duration_minutes }} min){% else %}Open shift{% endif %}</p>
+            {% if s.work_summary %}<p class="text-sm text-on-surface-variant mt-2">{{ s.work_summary }}</p>{% endif %}
+            {% if s.employer_verified %}
+            <p class="text-xs font-bold uppercase tracking-widest text-secondary mt-2">Approved {{ s.employer_verified_at|date:"M j, H:i" }}</p>
+            {% elif s.work_summary %}
+            <form method="post" action="{% url 'shift-verify' s.pk %}" class="mt-3 space-y-2">
+                {% csrf_token %}
+                <input name="note" class="form-field w-full text-sm" placeholder="Optional verification note">
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Approve work done</button>
+            </form>
+            {% endif %}
+        </div>
         {% endfor %}
+        <a href="{% url 'disputes' %}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Report a dispute</a>
     </section>
     {% endif %}
 

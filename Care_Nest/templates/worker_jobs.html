@@ -181,15 +181,17 @@
                     <p class="text-sm text-outline">No live jobs yet. Scheduled and draft postings stay hidden until they are active.</p>
                     {% endfor %}
                 </div>
-                <!-- Recommendations Section (Editorial Layout) -->
+                <!-- Nearby live jobs uses the same card rail as Explore Jobs -->
                 <section class="mt-4 pb-12 lg:pb-0">
-                    <h3 class="font-headline text-xl font-bold text-primary mb-6">Nearby live jobs</h3>
-                    <p class="text-[11px] text-outline mb-4">All live jobs are listed and plotted. Your pin ranks nearby work first. Distant jobs stay visible. Maps use Esri streets, then Carto or OSM if tiles fail.</p>
+                    <h3 class="font-headline text-xl font-bold text-primary mb-2">Nearby live jobs</h3>
+                    <p class="text-[11px] text-outline mb-4">Same cards as Explore Jobs, ranked by your pin. Filled roles stay visible but closed to new applications.</p>
+                    <div id="nearby-rail" class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
                     {% for job in jobs %}
-                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="block mb-4">{% include '_job_card.html' %}</a>
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-nearby-card data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="snap-center min-w-[280px] lg:min-w-0">{% include '_job_card.html' %}</a>
                     {% empty %}
-                    <p class="text-sm text-outline">No active jobs in range.</p>
+                    <p class="text-sm text-outline">No live jobs yet. Scheduled and draft postings stay hidden until they are active.</p>
                     {% endfor %}
+                    </div>
                 </section>
             </div>
         </main>
@@ -277,7 +279,11 @@
                 duration: job.duration || "as agreed",
                 rating: job.rating || "4.8",
                 total_reviews: job.total_reviews || 0,
-                is_verified: true,
+                description: job.description || "",
+                currency: job.currency || "KES",
+                location: job.location || "",
+                image: job.image || "",
+                filled: job.is_filled || job.locked,
                 distance: job.distance || null,
             }));
         }
@@ -312,7 +318,11 @@
                     Number(card.dataset.lat),
                     Number(card.dataset.lon)
                 );
-                card.dataset.nearby = km <= currentRadius ? "1" : "0";
+                const isNearby = km <= currentRadius;
+                card.dataset.nearby = isNearby ? "1" : "0";
+                if (card.hasAttribute("data-nearby-card")) {
+                    card.style.display = isNearby ? "" : "none";
+                }
             });
             document.getElementById("worker-count").textContent = jobs.length;
             document.getElementById("verified-count").textContent = nearby.length;
@@ -380,13 +390,16 @@
                     iconAnchor: [16, 16]
                 });
                 const distance = job.distance == null ? "—" : job.distance;
+                const desc = (job.description || "").replace(/</g, "&lt;").slice(0, 180);
+                const pay = Number(job.pay || 0).toLocaleString();
                 const marker = L.marker([job.lat, job.lon], { icon: jobIcon })
                     .addTo(map)
                     .bindPopup(`
-                        <div class="p-3 min-w-[200px]">
+                        <div class="p-3 min-w-[220px] max-w-[280px]">
                             <strong class="text-base text-primary">${job.title}</strong>
                             <p class="text-xs font-bold text-outline uppercase mt-2">${job.category}</p>
-                            <p class="font-bold text-secondary mt-2">KShs ${job.pay.toLocaleString()}</p>
+                            <p class="text-xs text-on-surface-variant mt-2">${desc || "No description yet."}</p>
+                            <p class="font-bold text-secondary mt-2">${job.currency || "KES"} ${pay}</p>
                             <button onclick="viewJobDetails(${job.id})" class="w-full mt-4 bg-primary text-white py-3 rounded-md text-sm font-bold">View Job Details</button>
                             <p class="mt-3 text-[10px] text-slate-400">${distance} km from your pin</p>
                         </div>

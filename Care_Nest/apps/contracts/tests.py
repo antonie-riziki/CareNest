@@ -43,17 +43,20 @@ class BilateralAgreementTests(TestCase):
             hours_note="08:00-16:00",
         )
         self.assertEqual(contract.approval_status, Contract.ApprovalStatus.PENDING_REVIEW)
-        self.assertFalse(self.job.locked)
+        self.job.refresh_from_db()
+        self.assertTrue(self.job.locked)
         bind_agreement(contract, employer=self.employer, action="approve")
         self.job.refresh_from_db()
         contract.refresh_from_db()
         self.assertTrue(self.job.locked)
         self.assertEqual(self.job.status, Job.Status.LOCKED)
         self.assertEqual(contract.approval_status, Contract.ApprovalStatus.APPROVED)
+        self.assertEqual(contract.status, "bound")
+        self.assertEqual(contract.display_status, "BOUND")
         self.assertTrue(contract.terms_hash)
         self.client.force_login(self.worker)
         listing = self.client.get("/worker-jobs/")
-        self.assertNotContains(listing, self.job.title)
+        self.assertContains(listing, self.job.title)
 
     def test_employer_review_hides_upskilling(self):
         Enrollment.objects.create(
@@ -93,8 +96,49 @@ class BilateralAgreementTests(TestCase):
         bind_agreement(contract, employer=self.employer, action="approve")
         shift = check_in(contract=contract, worker=self.worker)
         self.assertTrue(shift.is_open)
-        closed = check_out(contract=contract, worker=self.worker)
+        closed = check_out(contract=contract, worker=self.worker, work_summary="School run completed and lunch prepared.")
         self.assertFalse(closed.is_open)
+        self.assertEqual(closed.work_summary, "School run completed and lunch prepared.")
+        from apps.contracts.agreement import verify_shift
+        from apps.contracts.models import Notification
+
+        verified = verify_shift(shift=closed, employer=self.employer, note="Confirmed.")
+        self.assertTrue(verified.employer_verified)
+        self.assertTrue(Notification.objects.filter(recipient=self.employer, kind="check_in").exists())
+        self.assertTrue(Notification.objects.filter(recipient=self.employer, kind="check_out").exists())
+
+    def test_workers_needed_locks_when_slots_fill_but_stays_listed(self):
+        self.job.workers_needed = 2
+        self.job.save(update_fields=["workers_needed"])
+        second = User.objects.create_user(username="wrk2@test.com", password="x", role="worker")
+        first = submit_worker_terms(job=self.job, worker=self.worker, worker_terms="I can cover weekdays as posted hours.")
+        self.job.refresh_from_db()
+        self.assertFalse(self.job.is_filled)
+        submit_worker_terms(job=self.job, worker=second, worker_terms="I can cover the second slot this week.")
+        self.job.refresh_from_db()
+        self.assertTrue(self.job.is_filled)
+        self.assertEqual(self.job.status, Job.Status.LOCKED)
+        bind_agreement(first, employer=self.employer, action="approve")
+        first.refresh_from_db()
+        self.assertEqual(first.display_status, "BOUND")
+        self.client.force_login(self.worker)
+        listing = self.client.get("/worker-jobs/")
+        self.assertContains(listing, self.job.title)
+
+    def test_dispute_portal_opens_for_both_parties(self):
+        contract = submit_worker_terms(job=self.job, worker=self.worker, worker_terms="Agreed to weekday hours as posted.")
+        bind_agreement(contract, employer=self.employer, action="approve")
+        self.client.force_login(self.worker)
+        response = self.client.post(
+            "/disputes/report/",
+            {"engagement_id": contract.pk, "category": "payment", "title": "Late payment", "description": "Escrow was not funded after check-in."},
+        )
+        self.assertEqual(response.status_code, 302)
+        portal = self.client.get("/disputes/")
+        self.assertContains(portal, "Late payment")
+        self.client.force_login(self.employer)
+        employer_portal = self.client.get("/disputes/")
+        self.assertContains(employer_portal, "Late payment")
 
     def test_course_cards_keep_images_and_show_fee(self):
         Course.objects.create(
