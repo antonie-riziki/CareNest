@@ -70,6 +70,18 @@ for extra in ("carenest.vercel.app", "care-nest.vercel.app"):
     if origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(origin)
 
+if DEBUG:
+    if "*" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append("*")
+    for origin in (
+        "http://10.0.2.2:8000",
+        "http://10.0.3.2:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ):
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+
 if os.getenv("VERCEL"):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
@@ -266,6 +278,7 @@ CARENEST_UPSKILLING_RECOVERY_PERCENT = Decimal(os.getenv("CARENEST_UPSKILLING_RE
 
 # Maps — browser key only, never a secret. Empty => Leaflet/OSM.
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
+CARTO_API_KEY = os.getenv("CARTO_API_KEY", "")
 MAP_PROVIDER = os.getenv("MAP_PROVIDER", "leaflet")
 
 # Market prices

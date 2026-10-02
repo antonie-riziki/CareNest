@@ -30,6 +30,14 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return round(2 * radius * math.asin(min(1.0, math.sqrt(a))), 1)
 
 
+def _with_key(url: str, *, carto: bool = False) -> str:
+    key = (getattr(settings, "CARTO_API_KEY", "") or "").strip()
+    if carto and key:
+        sep = "&" if "?" in url else "?"
+        return f"{url}{sep}key={key}"
+    return url
+
+
 def public_config() -> dict[str, Any]:
     google_key = (getattr(settings, "GOOGLE_MAPS_API_KEY", "") or "").strip()
     provider = (getattr(settings, "MAP_PROVIDER", "") or "").strip().lower()
@@ -38,17 +46,32 @@ def public_config() -> dict[str, Any]:
     else:
         primary = "leaflet"
         google_key = ""
-    return {
-        "provider": primary,
-        "fallback": "leaflet",
-        "google_maps_api_key": google_key,
-        "tile_url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        "tile_attribution": "© OpenStreetMap, © CARTO",
-        "tile_fallbacks": [
-            {
-                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-                "attribution": "Tiles © Esri",
-            },
+    carto_key = bool((getattr(settings, "CARTO_API_KEY", "") or "").strip())
+    carto_layer = {
+        "url": _with_key(
+            "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+            carto=True,
+        ),
+        "attribution": "© OpenStreetMap, © CARTO",
+    }
+    esri_layer = {
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        "attribution": "Tiles © Esri",
+    }
+    # Platform JWTs do not unlock Carto raster CDN tiles (they render an
+    # "API KEY REQUIRED" watermark). Esri is the working primary; Carto is
+    # tried when the key is a Basemaps key from carto.com/basemaps/apikey.
+    use_carto_primary = carto_key and "." not in (getattr(settings, "CARTO_API_KEY", "") or "")
+    if use_carto_primary:
+        tile_url = carto_layer["url"]
+        tile_attribution = carto_layer["attribution"]
+        fallbacks = [esri_layer]
+    else:
+        tile_url = esri_layer["url"]
+        tile_attribution = esri_layer["attribution"]
+        fallbacks = [carto_layer] if carto_key else []
+    fallbacks.extend(
+        [
             {
                 "url": "https://tile.openstreetmap.de/{z}/{x}/{y}.png",
                 "attribution": "© OpenStreetMap contributors",
@@ -57,7 +80,16 @@ def public_config() -> dict[str, Any]:
                 "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 "attribution": "© OpenStreetMap contributors",
             },
-        ],
+        ]
+    )
+    return {
+        "provider": primary,
+        "fallback": "leaflet",
+        "google_maps_api_key": google_key,
+        "carto_authenticated": carto_key,
+        "tile_url": tile_url,
+        "tile_attribution": tile_attribution,
+        "tile_fallbacks": fallbacks,
         "privacy": "Worker location is approximate. Exact residential coordinates are never shown publicly.",
-        "error_hint": "CareNest loads Carto first. If those tiles fail it switches to Esri, then OSM Germany.",
+        "error_hint": "Maps load Esri streets first. Carto Voyager is used when a Basemaps API key is set, then OSM Germany.",
     }

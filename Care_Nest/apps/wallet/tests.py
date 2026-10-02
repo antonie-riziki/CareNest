@@ -220,6 +220,20 @@ class MapTests(SimpleTestCase):
         self.assertEqual(cfg["provider"], "google")
         self.assertEqual(cfg["fallback"], "leaflet")
 
+    @override_settings(CARTO_API_KEY="test-carto-key")
+    def test_carto_tile_url_appends_key(self):
+        cfg = public_config()
+        self.assertIn("basemaps.cartocdn.com", cfg["tile_url"])
+        self.assertIn("key=test-carto-key", cfg["tile_url"])
+        self.assertTrue(cfg["carto_authenticated"])
+
+    @override_settings(CARTO_API_KEY="aaa.bbb.ccc")
+    def test_platform_jwt_does_not_force_watermarked_carto(self):
+        cfg = public_config()
+        self.assertIn("arcgisonline.com", cfg["tile_url"])
+        carto = next(layer for layer in cfg["tile_fallbacks"] if "cartocdn.com" in layer["url"])
+        self.assertIn("key=aaa.bbb.ccc", carto["url"])
+
     def test_approx_location_is_offset(self):
         lat, lon = approximate_coordinates(-1.2921, 36.8219, salt="worker-1")
         self.assertNotAlmostEqual(lat, -1.2921, places=5)
