@@ -36,7 +36,10 @@ class Wallet(models.Model):
         CONFIRMED = "confirmed", "Transaction confirmed"
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    onchain_balance = models.DecimalField(max_digits=28, decimal_places=8, default=0)
+    onchain_symbol = models.CharField(max_length=12, blank=True, default="")
+    onchain_synced_at = models.DateTimeField(null=True, blank=True)
     # Stellar public key (G...). Only the public address is ever stored.
     stellar_address = models.CharField(max_length=56, blank=True, default="", db_index=True)
     evm_address = models.CharField(max_length=42, blank=True, default="", db_index=True)

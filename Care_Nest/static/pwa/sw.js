@@ -1,4 +1,4 @@
-const CACHE = "carenest-pwa-v3";
+const CACHE = "carenest-pwa-v4";
 const OFFLINE_URL = "/offline/";
 const PRECACHE = [
   "/",
@@ -29,6 +29,16 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
+  const host = self.location.hostname;
+  const isLocal =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host === "10.0.2.2" ||
+    host === "[::1]";
+  // Never hijack local/emulator traffic — a down runserver must not look like "offline".
+  if (isLocal) return;
+
   if (url.origin !== self.location.origin && !isCdn(url)) return;
 
   if (request.mode === "navigate") {

@@ -37,4 +37,5 @@ def pwa_service_worker(request):
         raise Http404("Service worker missing")
     response = FileResponse(path.open("rb"), content_type="application/javascript")
     response["Service-Worker-Allowed"] = "/"
+    response["Cache-Control"] = "no-store, max-age=0"
     return response

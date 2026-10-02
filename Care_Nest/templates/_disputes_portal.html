@@ -1,0 +1,57 @@
+{% if messages %}{% for message in messages %}<div class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-xl text-sm font-medium">{{ message }}</div>{% endfor %}{% endif %}
+<div>
+    <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Contract support</p>
+    <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter mt-1">Disputes</h1>
+    <p class="text-sm text-outline mt-2">Report issues during an active contract. Both the worker and the employer can open a case. Contact details stay off this page.</p>
+</div>
+
+<form method="post" action="{% url 'dispute-report' %}" class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-4">
+    {% csrf_token %}
+    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Contract</label>
+    <select name="engagement_id" required class="form-field w-full">
+        <option value="">Select a bound contract</option>
+        {% for e in engagements %}
+        <option value="{{ e.pk }}">#{{ e.pk }} · {{ e.job.title }}</option>
+        {% endfor %}
+    </select>
+    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Category</label>
+    <select name="category" class="form-field w-full">
+        {% for value, label in categories %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Title</label>
+    <input name="title" required class="form-field w-full" placeholder="Short summary">
+    <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">What happened</label>
+    <textarea name="description" rows="4" required class="form-field w-full" placeholder="Facts only. Do not include phone numbers or emails."></textarea>
+    <button class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Report dispute</button>
+</form>
+
+{% for key, label in grouped.items %}
+<section class="space-y-3">
+    <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline">{{ key }}</h2>
+    {% for d in label %}
+    <article class="bg-white rounded-2xl border border-outline-variant/10 p-5 space-y-2">
+        <div class="flex items-start justify-between gap-3">
+            <div>
+                <p class="font-extrabold text-primary">{{ d.title }}</p>
+                <p class="text-xs text-outline">{{ d.job.title }} · {{ d.get_category_display }} · {{ d.get_status_display }}</p>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-surface-container-high">#{{ d.pk }}</span>
+        </div>
+        <p class="text-sm text-primary leading-relaxed">{{ d.description }}</p>
+        {% if d.resolution %}<p class="text-sm text-secondary">Resolution: {{ d.resolution }}</p>{% endif %}
+        {% if d.status != 'settled' %}
+        <form method="post" action="{% url 'dispute-update' d.pk %}" class="flex flex-wrap gap-2">
+            {% csrf_token %}
+            <button name="action" value="unresolved" class="bg-surface-container-high px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Mark unresolved</button>
+            <input name="resolution" class="form-field flex-1 min-w-[160px]" placeholder="Settlement note">
+            <button name="action" value="settle" class="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Settle</button>
+        </form>
+        {% endif %}
+    </article>
+    {% empty %}
+    <p class="text-sm text-outline">None.</p>
+    {% endfor %}
+</section>
+{% endfor %}

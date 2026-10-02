@@ -167,6 +167,13 @@ def persist_connection(user, *, address: str, provider_name: str, chain: str | N
         wallet.address = session.address
         # Keep any existing Stellar address; do not pretend this EVM wallet is Stellar.
     wallet.save()
+    try:
+        from apps.wallet.chain_data import sync_wallet_ledger
+
+        sync_wallet_ledger(wallet)
+        wallet.refresh_from_db()
+    except Exception:
+        pass
     if session.chain == "stellar":
         from apps.contracts.models import Contract
         from apps.agentic_core.state import EngagementStatus

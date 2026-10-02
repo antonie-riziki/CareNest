@@ -53,6 +53,7 @@ class ParsedRequirement:
     confidence: float = 0.0
     parser: str = "deterministic"  # deterministic | omega:<model>
     notes: str = ""
+    workers_needed: int = 1
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -75,9 +76,16 @@ class WorkerMatch:
     wallet_connected: bool
     score: float
     reasons: list[str] = field(default_factory=list)
+    photo_url: str = ""
+    bio: str = ""
+    location_label: str = ""
+    verified_engagements: int = 0
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data.pop("email", None)
+        data.pop("phone", None)
+        return data
 
 
 @dataclass

@@ -32,7 +32,7 @@
                     <h2 class="text-2xl font-extrabold text-primary font-headline">{{ card.engagement.job.title }}</h2>
                     <p class="text-sm text-outline">{{ card.engagement.employer.get_full_name|default:card.engagement.employer.username }} · {{ card.engagement.currency }} {{ card.engagement.amount }}</p>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-surface-container-high">{{ card.engagement.chain_status }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full bg-surface-container-high">{{ card.engagement.display_status }}</span>
             </div>
             <p class="text-sm">{{ card.explanation.headline }} — {{ card.explanation.next_step_worker }}</p>
             <p class="text-[11px] text-outline">Memory: {{ card.memory.summary }}</p>

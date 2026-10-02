@@ -100,3 +100,19 @@ class UssdDatabaseMenuTests(TestCase):
         self.assertTrue(body.startswith("END "))
         self.assertIn(str(self.contract.pk), body)
         self.assertIn("Full-time nanny in Westlands", body)
+
+    def test_wallet_menu_reads_database_balance(self):
+        from apps.wallet.models import Wallet
+
+        Wallet.objects.create(user=self.worker, balance=Decimal("1850.00"))
+        response = self._ussd("2*4")
+        body = response.content.decode()
+        self.assertTrue(body.startswith("END "))
+        self.assertIn("1850", body)
+
+    def test_ussd_text_helper_is_plain_con_end(self):
+        from apps.ussd_app.services import ussd_text
+
+        body = ussd_text("2*1", "+254722000001")
+        self.assertTrue(body.startswith("CON "))
+        self.assertIn("Full-time nanny in Westlands", body)

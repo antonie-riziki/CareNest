@@ -135,6 +135,16 @@ class Contract(models.Model):
     def is_bound(self) -> bool:
         return self.approval_status == self.ApprovalStatus.APPROVED
 
+    @property
+    def display_status(self) -> str:
+        if self.approval_status == self.ApprovalStatus.APPROVED:
+            if self.chain_status in {"", "DRAFT"}:
+                return "BOUND"
+            return self.chain_status
+        if self.approval_status == self.ApprovalStatus.PENDING_REVIEW:
+            return "PENDING_REVIEW"
+        return self.approval_status or self.chain_status or "DRAFT"
+
     def latest_tx_hash(self) -> str:
         for field in (
             "credential_tx_hash",
@@ -156,6 +166,10 @@ class ShiftAttendance(models.Model):
     checked_out_at = models.DateTimeField(null=True, blank=True)
     check_in_note = models.CharField(max_length=255, blank=True, default="")
     check_out_note = models.CharField(max_length=255, blank=True, default="")
+    work_summary = models.TextField(blank=True, default="")
+    employer_verified = models.BooleanField(default=False)
+    employer_verified_at = models.DateTimeField(null=True, blank=True)
+    employer_verification_note = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["-checked_in_at"]
@@ -172,6 +186,74 @@ class ShiftAttendance(models.Model):
         if not self.checked_out_at:
             return None
         return int((self.checked_out_at - self.checked_in_at).total_seconds() // 60)
+
+    @property
+    def needs_employer_review(self) -> bool:
+        return bool(self.checked_out_at and self.work_summary and not self.employer_verified)
+
+
+class Notification(models.Model):
+    class Kind(models.TextChoices):
+        CHECK_IN = "check_in", "Check in"
+        CHECK_OUT = "check_out", "Check out"
+        WORK_SUBMITTED = "work_submitted", "Work submitted"
+        WORK_APPROVED = "work_approved", "Work approved"
+        DISPUTE = "dispute", "Dispute"
+        CONTRACT = "contract", "Contract"
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    actor = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="sent_notifications"
+    )
+    engagement = models.ForeignKey(
+        Contract, null=True, blank=True, on_delete=models.CASCADE, related_name="notifications"
+    )
+    kind = models.CharField(max_length=24, choices=Kind.choices, default=Kind.CONTRACT)
+    title = models.CharField(max_length=160)
+    body = models.TextField(blank=True, default="")
+    url = models.CharField(max_length=255, blank=True, default="")
+    read_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @property
+    def is_unread(self) -> bool:
+        return self.read_at is None
+
+
+class Dispute(models.Model):
+    class Status(models.TextChoices):
+        ONGOING = "ongoing", "Ongoing"
+        UNRESOLVED = "unresolved", "Unresolved"
+        SETTLED = "settled", "Settled"
+
+    class Category(models.TextChoices):
+        ATTENDANCE = "attendance", "Attendance"
+        PAYMENT = "payment", "Payment"
+        SCOPE = "scope", "Work scope"
+        CONDUCT = "conduct", "Conduct"
+        OTHER = "other", "Other"
+
+    engagement = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name="disputes")
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="disputes")
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reported_disputes")
+    against = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_disputes")
+    category = models.CharField(max_length=24, choices=Category.choices, default=Category.OTHER)
+    title = models.CharField(max_length=160)
+    description = models.TextField()
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.ONGOING, db_index=True)
+    resolution = models.TextField(blank=True, default="")
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Dispute #{self.pk} ({self.status})"
 
 
 class ServiceInvoice(models.Model):

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 
-from apps.contracts.models import Contract
+from apps.contracts.models import Contract, Notification
 from apps.jobs.models import Application, Job
 from apps.agentic_core.models import AgentApproval, WorkCredential
 from apps.agentic_core.state import EngagementStatus
@@ -28,11 +28,13 @@ def _chain():
 @login_required(login_url="worker-signin")
 def worker_dashboard(request):
     engagements = Contract.objects.filter(worker=request.user).select_related("job", "employer")
-    active = engagements.exclude(chain_status__in=EngagementStatus.TERMINAL | {EngagementStatus.DRAFT})
+    active = engagements.filter(approval_status=Contract.ApprovalStatus.APPROVED).exclude(
+        chain_status__in=EngagementStatus.TERMINAL
+    )
     credentials = WorkCredential.objects.filter(worker=request.user)
     earned = credentials.aggregate(total=Sum("amount"))["total"] or 0
     latest = active.order_by("-updated_at").first()
-    live_jobs = [job for job in refresh_queryset(Job.objects.order_by("-created_at")[:40]) if job.is_live]
+    live_jobs = [job for job in refresh_queryset(Job.objects.order_by("-created_at")[:40]) if job.is_listed]
     open_jobs = live_jobs[:5]
     enrollments = Enrollment.objects.filter(worker=request.user).select_related("course")
     training_remaining = sum((e.amount_remaining for e in enrollments), start=0)
@@ -57,6 +59,7 @@ def worker_dashboard(request):
             "wallet": wallet,
             "prices": get_price_service().dashboard(),
             "chain": _chain(),
+            "notifications": Notification.objects.filter(recipient=request.user)[:6],
         },
     )
 
@@ -64,8 +67,8 @@ def worker_dashboard(request):
 @login_required(login_url="employer-signin")
 def employer_dashboard(request):
     engagements = Contract.objects.filter(employer=request.user).select_related("job", "worker")
-    active = engagements.filter(
-        chain_status__in=EngagementStatus.FUNDS_IN_ESCROW | {EngagementStatus.CREATED, EngagementStatus.DRAFT}
+    active = engagements.filter(approval_status=Contract.ApprovalStatus.APPROVED).exclude(
+        chain_status__in=EngagementStatus.TERMINAL
     )
     pending = AgentApproval.objects.filter(requested_from=request.user, status=AgentApproval.Status.PENDING)
     pending_engagements = engagements.filter(approval_status=Contract.ApprovalStatus.PENDING_REVIEW)
@@ -86,7 +89,7 @@ def employer_dashboard(request):
         "employer_dashboard.html",
         {
             "active_engagements": active.order_by("-updated_at")[:8],
-            "active_count": active.exclude(chain_status=EngagementStatus.DRAFT).count(),
+            "active_count": active.count(),
             "pending_count": pending.count() + pending_engagements.count(),
             "pending_engagements": pending_engagements[:6],
             "spent_this_month": spent,
@@ -97,5 +100,6 @@ def employer_dashboard(request):
             "wallet": wallet,
             "prices": get_price_service().dashboard(),
             "chain": _chain(),
+            "notifications": Notification.objects.filter(recipient=request.user)[:8],
         },
     )

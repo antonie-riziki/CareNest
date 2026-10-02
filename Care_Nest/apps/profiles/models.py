@@ -15,6 +15,9 @@ class WorkerProfile(models.Model):
     approx_longitude = models.FloatField(null=True, blank=True)
     location_updated_at = models.DateTimeField(null=True, blank=True)
     preferred_payout = models.CharField(max_length=16, blank=True, default="")
+    photo_url = models.URLField(max_length=500, blank=True, default="")
+    bio = models.TextField(blank=True, default="")
+    location_label = models.CharField(max_length=255, blank=True, default="")
 
 
 class EmployerProfile(models.Model):
@@ -26,3 +29,5 @@ class EmployerProfile(models.Model):
     last_longitude = models.FloatField(null=True, blank=True)
     location_label = models.CharField(max_length=255, blank=True, default="")
     location_updated_at = models.DateTimeField(null=True, blank=True)
+    photo_url = models.URLField(max_length=500, blank=True, default="")
+    bio = models.TextField(blank=True, default="")

@@ -71,9 +71,34 @@
         return first;
     }
 
+    async function carenestGetMetaMask() {
+        const announced = await new Promise((resolve) => {
+            const found = [];
+            const onAnnounce = (event) => found.push(event.detail);
+            window.addEventListener("eip6963:announceProvider", onAnnounce);
+            window.dispatchEvent(new Event("eip6963:requestProvider"));
+            setTimeout(() => {
+                window.removeEventListener("eip6963:announceProvider", onAnnounce);
+                resolve(found);
+            }, 120);
+        });
+        const announcedMm = announced.find((detail) => {
+            const name = (detail.info && detail.info.name) || "";
+            return /metamask/i.test(name) || (detail.provider && detail.provider.isMetaMask);
+        });
+        if (announcedMm && announcedMm.provider) return announcedMm.provider;
+        const eth = window.ethereum;
+        if (!eth) return null;
+        if (Array.isArray(eth.providers)) {
+            return eth.providers.find((p) => p.isMetaMask) || eth.providers[0] || null;
+        }
+        return eth;
+    }
+
     window.carenestWallet = {
         csrf: carenestCsrf,
         connectFreighter: carenestConnectFreighter,
+        getMetaMask: carenestGetMetaMask,
         signXdr: carenestSignXdr,
         postJson: carenestPostJson,
         postForm: carenestPostForm,

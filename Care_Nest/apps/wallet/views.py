@@ -9,7 +9,7 @@ from apps.agentic_core.models import WorkCredential
 from apps.agentic_core.state import EngagementStatus
 from apps.contracts.models import Contract
 from apps.courses.models import Enrollment
-from apps.wallet.chain_data import fetch_stellar_snapshot
+from apps.wallet.chain_data import fetch_evm_snapshot, fetch_stellar_snapshot, sync_wallet_ledger
 from apps.wallet.models import PayoutMethod, Settlement, Transaction, Wallet
 from apps.wallet.payouts import PayoutError, preferred_payout_method, save_mpesa_method
 from apps.wallet.pricing import get_price_service
@@ -32,13 +32,25 @@ def worker_wallet(request):
     from apps.contracts.models import ServiceInvoice
 
     invoices = ServiceInvoice.objects.filter(worker=request.user).select_related("engagement", "engagement__job")[:8]
-    chain = fetch_stellar_snapshot(wallet.stellar_address) if wallet.stellar_connected else None
+    chain = None
     xlm_kes = None
-    if chain and chain.get("native_balance") is not None:
+    eth_kes = None
+    if wallet.is_connected:
         try:
-            xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+            chain = sync_wallet_ledger(wallet)
+            wallet.refresh_from_db()
         except Exception:
-            xlm_kes = None
+            chain = None
+        if wallet.stellar_connected:
+            chain = chain or fetch_stellar_snapshot(wallet.stellar_address)
+            if chain and chain.get("native_balance") is not None:
+                try:
+                    xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+                except Exception:
+                    xlm_kes = None
+        elif wallet.evm_connected:
+            chain = chain or fetch_evm_snapshot(wallet.evm_address, wallet.network or "sepolia")
+            eth_kes = (chain or {}).get("kes")
     return render(
         request,
         "workers_wallet.html",
@@ -55,6 +67,7 @@ def worker_wallet(request):
             "invoices": invoices,
             "chain": chain,
             "xlm_kes": xlm_kes,
+            "eth_kes": eth_kes,
         },
     )
 
@@ -75,13 +88,25 @@ def employer_wallet(request):
     settlements = Settlement.objects.filter(employer=request.user).select_related("engagement", "engagement__job").order_by("-created_at")[:12]
     txs = Transaction.objects.filter(wallet=wallet).select_related("settlement").order_by("-created_at")[:12]
     prices = get_price_service().dashboard()
-    chain = fetch_stellar_snapshot(wallet.stellar_address) if wallet.stellar_connected else None
+    chain = None
     xlm_kes = None
-    if chain and chain.get("native_balance") is not None:
+    eth_kes = None
+    if wallet.is_connected:
         try:
-            xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+            chain = sync_wallet_ledger(wallet)
+            wallet.refresh_from_db()
         except Exception:
-            xlm_kes = None
+            chain = None
+        if wallet.stellar_connected:
+            chain = chain or fetch_stellar_snapshot(wallet.stellar_address)
+            if chain and chain.get("native_balance") is not None:
+                try:
+                    xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+                except Exception:
+                    xlm_kes = None
+        elif wallet.evm_connected:
+            chain = chain or fetch_evm_snapshot(wallet.evm_address, wallet.network or "sepolia")
+            eth_kes = (chain or {}).get("kes")
     return render(
         request,
         "employer_wallet.html",
@@ -95,6 +120,7 @@ def employer_wallet(request):
             "prices": prices,
             "chain": chain,
             "xlm_kes": xlm_kes,
+            "eth_kes": eth_kes,
         },
     )
 

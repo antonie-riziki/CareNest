@@ -21,7 +21,15 @@
     {% endif %}
 
     <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-6">
-        <p class="text-[10px] font-bold uppercase tracking-widest">Status: {{ wallet.connection_status|default:"disconnected" }} · {{ wallet.chain|default:"no chain" }}</p>
+        {% if wallet and wallet.is_connected %}
+        <div class="bg-secondary/10 rounded-2xl p-4">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Wallet balance</p>
+            <p class="text-2xl font-extrabold text-primary mt-1">{{ wallet.balance|money }}</p>
+            {% if wallet.onchain_balance %}
+            <p class="text-xs text-outline mt-1">{{ wallet.onchain_balance }} {{ wallet.onchain_symbol }} on-chain</p>
+            {% endif %}
+        </div>
+        {% endif %}
         {% if wallet and wallet.stellar_connected %}
         <div>
             <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Stellar</p>
@@ -57,6 +65,7 @@
         <p class="text-[11px] text-outline">WalletConnect-compatible EVM wallets can paste a 0x address below. EVM wallets never sign Stellar XDR.</p>
         <form method="post" class="space-y-3" id="evm-form">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
             <input type="hidden" name="provider" id="evm-provider" value="metamask">
             <input type="hidden" name="chain" value="evm">
             <input type="hidden" name="network" id="evm-network" value="sepolia">
@@ -88,12 +97,14 @@
     if (mm) {
         mm.addEventListener("click", async () => {
             try {
-                if (!window.ethereum) throw new Error("MetaMask is not installed");
-                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                const provider = await window.carenestWallet.getMetaMask();
+                if (!provider) throw new Error("MetaMask is not installed. Open this page in a browser with the MetaMask extension.");
+                const accounts = await provider.request({ method: "eth_requestAccounts" });
+                if (!accounts || !accounts[0]) throw new Error("No MetaMask account was selected.");
                 document.getElementById("evm_address").value = accounts[0];
                 document.getElementById("evm-provider").value = "metamask";
-                const chainId = await window.ethereum.request({ method: "eth_chainId" });
-                document.getElementById("evm-network").value = chainId;
+                const chainId = await provider.request({ method: "eth_chainId" });
+                document.getElementById("evm-network").value = chainId === "0x1" ? "mainnet" : "sepolia";
                 document.getElementById("evm-form").submit();
             } catch (err) {
                 alert(err.message || "Unsupported wallet");

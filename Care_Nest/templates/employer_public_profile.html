@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ host.get_full_name|default:host.username }} | Care Nest{% endblock %}
+{% block content %}
+{% include 'worker_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-4xl space-y-8">
+    <section class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 flex items-start gap-6">
+        <img src="{{ photo }}" alt="" class="w-24 h-24 rounded-3xl object-cover border border-outline-variant/10">
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Employer</p>
+            <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ host.get_full_name|default:host.username }}</h1>
+            <p class="text-sm text-outline mt-1">{{ profile.organisation|default:"Household" }} · {{ profile.location_label|default:"Kenya" }}</p>
+            <p class="text-sm text-primary mt-4 leading-relaxed">{{ profile.bio|default:"This host hires through CareNest. Contact details stay private until a contract is bound." }}</p>
+            <p class="text-[11px] text-outline mt-3">Rating {{ profile.rating|default:"New" }} · phone and email are hidden</p>
+        </div>
+    </section>
+    <section>
+        <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-4">Recent postings</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            {% for job in jobs %}
+            <a href="{% url 'worker-job-details' %}?id={{ job.pk }}">{% include '_job_card.html' %}</a>
+            {% empty %}
+            <p class="text-sm text-outline">No public postings yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% include 'worker_bottom_nav.html' %}
+{% endblock %}

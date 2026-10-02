@@ -52,6 +52,11 @@ urlpatterns = [
     path("worker-engagements/<int:pk>/", worker_engagement_review, name="worker-engagement-review"),
     path("engagements/<int:pk>/check-in/", check_in_shift, name="engagement-check-in"),
     path("engagements/<int:pk>/check-out/", check_out_shift, name="engagement-check-out"),
+    path("shifts/<int:pk>/verify/", verify_shift_view, name="shift-verify"),
+    path("disputes/", disputes_portal, name="disputes"),
+    path("disputes/report/", report_dispute, name="dispute-report"),
+    path("disputes/<int:pk>/update/", update_dispute, name="dispute-update"),
+    path("hosts/<int:pk>/", employer_public_profile, name="employer-public-profile"),
     path("worker-invoices/<int:pk>/", worker_service_invoice, name="worker-service-invoice"),
     path("applications/<int:application_id>/engage/", start_engagement_from_application, name="application-engage"),
     path("worker-wallet/", worker_wallet, name="worker-wallet"),
@@ -72,6 +77,8 @@ urlpatterns = [
     path("api/location/worker/", pin_worker_location, name="api-location-worker"),
     path("api/location/employer/", pin_employer_location, name="api-location-employer"),
     path("ussd/callback/", ussd_callback, name="ussd_callback"),
+    path("ussd/", ussd_callback, name="ussd"),
+    path("ussd", ussd_callback, name="ussd-plain"),
     path("", include("apps.agentic_core.urls")),
 ]
 

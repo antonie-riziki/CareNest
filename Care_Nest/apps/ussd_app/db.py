@@ -104,3 +104,11 @@ def employer_open_contracts(employer, limit: int = 5):
         .select_related("job", "worker")
         .order_by("-created_at")[:limit]
     )
+
+
+def wallet_for(user):
+    if not user:
+        return None
+    from apps.wallet.models import Wallet
+
+    return Wallet.objects.filter(user=user).first()

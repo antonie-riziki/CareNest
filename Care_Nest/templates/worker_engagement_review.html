@@ -5,7 +5,7 @@
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-6 pb-32">
     <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">Your terms and attendance</p>
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{{ engagement.job.title }}</h1>
-    <p class="text-sm text-outline">{{ engagement.employer.get_full_name|default:engagement.employer.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.chain_status }}</p>
+    <p class="text-sm text-outline">{{ engagement.employer.get_full_name|default:engagement.employer.username }} · {{ engagement.get_approval_status_display }} · {{ engagement.display_status }}</p>
     {% if messages %}{% for message in messages %}<div class="bg-secondary-container text-on-secondary-container px-4 py-3 rounded-xl text-sm font-medium">{{ message }}</div>{% endfor %}{% endif %}
 
     <div class="grid md:grid-cols-2 gap-6">
@@ -37,7 +37,7 @@
     {% for inv in invoices %}
     <a href="{% url 'worker-service-invoice' inv.pk %}" class="block bg-white rounded-[1.5rem] border border-primary/20 p-5">
         <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">CareNest service invoice</p>
-        <p class="font-extrabold text-primary">{{ inv.invoice_number }} · {{ inv.currency }} {{ inv.recovery_amount }}</p>
+        <p class="font-extrabold text-primary">{{ inv.invoice_number }} · {{ inv.recovery_amount|money:inv.currency }}</p>
         <p class="text-sm text-outline">{{ inv.get_status_display }} — not visible to the employer</p>
     </a>
     {% endfor %}
@@ -47,8 +47,11 @@
         <h2 class="text-lg font-extrabold text-primary">Check in / check out</h2>
         {% if open_shift %}
         <p class="text-sm text-primary">Checked in at {{ open_shift.checked_in_at|date:"M j, H:i" }}</p>
-        <form method="post" action="{% url 'engagement-check-out' engagement.pk %}">{% csrf_token %}
-            <button class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Check out</button>
+        <form method="post" action="{% url 'engagement-check-out' engagement.pk %}" class="space-y-3">
+            {% csrf_token %}
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Work completed</label>
+            <textarea name="work_summary" rows="4" required class="form-field w-full text-sm" placeholder="What did you complete this shift?"></textarea>
+            <button class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Check out and submit work</button>
         </form>
         {% else %}
         <form method="post" action="{% url 'engagement-check-in' engagement.pk %}">{% csrf_token %}
@@ -56,8 +59,12 @@
         </form>
         {% endif %}
         {% for s in shifts %}
-        <p class="text-sm text-outline">{{ s.checked_in_at|date:"M j, H:i" }}{% if s.checked_out_at %} → {{ s.checked_out_at|date:"H:i" }} ({{ s.duration_minutes }} min){% else %} · open{% endif %}</p>
+        <div class="border-t border-outline-variant/10 pt-3">
+            <p class="text-sm text-outline">{{ s.checked_in_at|date:"M j, H:i" }}{% if s.checked_out_at %} → {{ s.checked_out_at|date:"H:i" }} ({{ s.duration_minutes }} min){% else %} · open{% endif %}{% if s.employer_verified %} · approved{% elif s.work_summary %} · awaiting employer{% endif %}</p>
+            {% if s.work_summary %}<p class="text-sm text-primary mt-1">{{ s.work_summary }}</p>{% endif %}
+        </div>
         {% endfor %}
+        <a href="{% url 'disputes' %}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Open a dispute</a>
     </section>
     {% endif %}
     <a href="{% url 'worker-engagements' %}" class="inline-block bg-secondary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">WorkOS engagements</a>

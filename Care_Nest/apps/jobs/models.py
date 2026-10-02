@@ -52,6 +52,8 @@ class Job(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    workers_needed = models.PositiveSmallIntegerField(default=1)
+    slots_filled = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -94,12 +96,20 @@ class Job(models.Model):
         return schedule_summary(self)
 
     @property
+    def slots_remaining(self) -> int:
+        return max(0, int(self.workers_needed or 1) - int(self.slots_filled or 0))
+
+    @property
     def is_live(self) -> bool:
-        return self.status == self.Status.ACTIVE and not self.locked
+        return self.status == self.Status.ACTIVE and not self.is_filled
+
+    @property
+    def is_listed(self) -> bool:
+        return self.status in {self.Status.ACTIVE, self.Status.LOCKED}
 
     @property
     def is_filled(self) -> bool:
-        return self.locked or self.status == self.Status.LOCKED
+        return self.locked or self.status == self.Status.LOCKED or self.slots_remaining <= 0
 
     def public_point(self) -> tuple[float, float]:
         from apps.jobs.maps import approximate_coordinates
