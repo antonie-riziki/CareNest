@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Settings | Care Nest{% endblock %}
+{% block title %}Find Jobs | Care Nest{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -53,14 +53,9 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 </style>
-<style>
-    body {
-        min-height: max(884px, 100dvh);
-    }
-</style>
-</head>
+{% endblock %}
 
-<body class="bg-surface font-body text-on-surface">
+{% block content %}
     {% include 'worker_sidebar.html' %}
     <div class="md:ml-64 lg:h-screen lg:flex lg:flex-col lg:overflow-hidden relative">
         <!-- TopAppBar -->
@@ -189,7 +184,7 @@
                 <!-- Recommendations Section (Editorial Layout) -->
                 <section class="mt-4 pb-12 lg:pb-0">
                     <h3 class="font-headline text-xl font-bold text-primary mb-6">Nearby live jobs</h3>
-                    <p class="text-[11px] text-outline mb-4">All live jobs are listed and plotted. Your pin ranks nearby work first. Distant jobs stay visible. Maps use Carto, then Esri if tiles fail.</p>
+                    <p class="text-[11px] text-outline mb-4">All live jobs are listed and plotted. Your pin ranks nearby work first. Distant jobs stay visible. Maps use Esri streets, then Carto or OSM if tiles fail.</p>
                     {% for job in jobs %}
                     <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="block mb-4">{% include '_job_card.html' %}</a>
                     {% empty %}
@@ -247,10 +242,10 @@
 
         <!-- BottomNavBar -->
         {% include 'worker_bottom_nav.html' %}
-    </div> <!-- End lg wrapper -->
+    </div>
+{% endblock %}
 
-
-
+{% block extra_body %}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/static/js/carenest-maps.js"></script>
     <script>
@@ -330,7 +325,9 @@
                 if (userMarker) userMarker.setLatLng([lat, lon]);
                 if (radiusCircle) radiusCircle.setLatLng([lat, lon]);
                 refreshJobLayer();
-                document.getElementById("loading-overlay").style.display = "none";
+                const overlay = document.getElementById("loading-overlay");
+                if (overlay) overlay.style.display = "none";
+                setTimeout(function () { if (map) map.invalidateSize(); }, 250);
                 return;
             }
             map = L.map("map").setView([lat, lon], 13);
@@ -361,7 +358,9 @@
             }).addTo(map);
 
             refreshJobLayer();
-            document.getElementById("loading-overlay").style.display = "none";
+            const overlay = document.getElementById("loading-overlay");
+            if (overlay) overlay.style.display = "none";
+            setTimeout(function () { if (map) map.invalidateSize(); }, 250);
         }
 
         function refreshJobLayer() {
@@ -437,21 +436,13 @@
         }
 
         function startLivePin(watch) {
-            const status = document.getElementById("location-status");
-            if (!("geolocation" in navigator)) {
-                const lat = SAVED_LAT || -1.2864;
-                const lon = SAVED_LON || 36.8172;
-                applyLocation(lat, lon, "Saved or Nairobi default");
-                return;
-            }
+            const lat = SAVED_LAT || -1.2864;
+            const lon = SAVED_LON || 36.8172;
+            applyLocation(lat, lon, SAVED_LAT ? "Last pinned location" : "Nairobi — pin live when ready");
+            if (!("geolocation" in navigator)) return;
             const ok = (position) => applyLocation(position.coords.latitude, position.coords.longitude, "Live location pinned");
-            const fail = () => {
-                const lat = SAVED_LAT || -1.2864;
-                const lon = SAVED_LON || 36.8172;
-                applyLocation(lat, lon, SAVED_LAT ? "Using last pinned location" : "Using Nairobi default");
-            };
-            const options = { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 };
-            navigator.geolocation.getCurrentPosition(ok, fail, options);
+            const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 };
+            navigator.geolocation.getCurrentPosition(ok, function () {}, options);
             if (watch && watchId == null) {
                 watchId = navigator.geolocation.watchPosition(ok, function () {}, options);
             }
@@ -460,14 +451,14 @@
         document.getElementById("pin-live-location").addEventListener("click", function () {
             startLivePin(true);
         });
-        window.addEventListener("load", function () {
-            startLivePin(true);
+        startLivePin(true);
+        window.addEventListener("resize", function () {
+            if (map) map.invalidateSize();
         });
+        setTimeout(function () {
+            const overlay = document.getElementById("loading-overlay");
+            if (overlay) overlay.style.display = "none";
+            if (map) map.invalidateSize();
+        }, 1500);
     </script>
-
-</body>
-
-</html>
-
-
-{% endblock %}
+{% endblock extra_body %}

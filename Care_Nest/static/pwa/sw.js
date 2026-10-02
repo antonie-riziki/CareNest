@@ -1,4 +1,4 @@
-const CACHE = "carenest-pwa-v1";
+const CACHE = "carenest-pwa-v3";
 const OFFLINE_URL = "/offline/";
 const PRECACHE = [
   "/",
