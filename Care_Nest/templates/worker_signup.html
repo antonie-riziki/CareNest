@@ -59,6 +59,8 @@
                         <p class="text-outline font-medium">Create your professional profile and start finding work.</p>
                     </div>
 
+                    {% include '_auth_alerts.html' %}
+
                     <form action="{% url 'worker-signup' %}" method="POST" class="space-y-5">
                         {% csrf_token %}
                         
@@ -70,7 +72,7 @@
                                     <span class="material-symbols-outlined text-xl">badge</span>
                                 </span>
                                 <input class="form-field block w-full pl-14 pr-6 py-4 bg-white text-sm font-medium text-primary placeholder:text-outline/40"
-                                    id="full_name" name="full_name" placeholder="John Doe" type="text" />
+                                    id="full_name" name="full_name" placeholder="John Doe" type="text" required />
                             </div>
                         </div>
 
@@ -94,7 +96,7 @@
                                     <span class="material-symbols-outlined text-xl">mail</span>
                                 </span>
                                 <input class="form-field block w-full pl-14 pr-6 py-4 bg-white text-sm font-medium text-primary placeholder:text-outline/40"
-                                    id="email" name="email" placeholder="name@example.com" type="email" />
+                                    id="email" name="email" placeholder="name@example.com" type="email" required />
                             </div>
                         </div>
 
@@ -106,7 +108,7 @@
                                     <span class="material-symbols-outlined text-xl">lock</span>
                                 </span>
                                 <input class="form-field block w-full pl-14 pr-6 py-4 bg-white text-sm font-medium text-primary placeholder:text-outline/40"
-                                    id="password" name="password" placeholder="Min. 8 characters" type="password" />
+                                    id="password" name="password" placeholder="Min. 8 characters" type="password" required minlength="8" />
                             </div>
                         </div>
 
@@ -118,7 +120,7 @@
                                     <span class="material-symbols-outlined text-xl">lock</span>
                                 </span>
                                 <input class="form-field block w-full pl-14 pr-6 py-4 bg-white text-sm font-medium text-primary placeholder:text-outline/40"
-                                    id="confirm_password" name="confirm_password" placeholder="Confirm your password" type="password" />
+                                    id="confirm_password" name="confirm_password" placeholder="Confirm your password" type="password" required minlength="8" />
                             </div>
                         </div>
 
@@ -138,10 +140,7 @@
                         </div>
                     </div>
 
-                    <button class="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors text-primary font-bold text-xs border border-transparent hover:border-outline-variant/20">
-                        <img alt="Google" class="w-5 h-5" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" />
-                        Sign up with Google
-                    </button>
+                    {% include '_google_auth_button.html' with role='worker' %}
 
                     <p class="mt-10 text-center text-outline font-medium">
                         Already have an account? 

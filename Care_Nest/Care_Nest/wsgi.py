@@ -14,22 +14,25 @@ _BOOT_FLAG = Path("/tmp/carenest-migrated")
 
 
 def _ensure_schema():
-    if not os.getenv("VERCEL") or _BOOT_FLAG.exists():
+    hosted = os.getenv("VERCEL") or os.getenv("RENDER")
+    if not hosted:
         return
-    from django.core.management import call_command
     from django.contrib.auth import get_user_model
+    from django.core.management import call_command
 
-    call_command("migrate", interactive=False, run_syncdb=True)
+    if os.getenv("VERCEL") and not _BOOT_FLAG.exists():
+        call_command("migrate", interactive=False, run_syncdb=True)
     User = get_user_model()
-    if not User.objects.exists():
+    if not User.objects.filter(username="sarah@carenest.demo").exists():
         try:
             call_command("seed_workos")
         except Exception:
             pass
-    try:
-        _BOOT_FLAG.write_text("ok")
-    except OSError:
-        pass
+    if os.getenv("VERCEL"):
+        try:
+            _BOOT_FLAG.write_text("ok")
+        except OSError:
+            pass
 
 
 _ensure_schema()

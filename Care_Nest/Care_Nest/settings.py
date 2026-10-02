@@ -97,9 +97,16 @@ if DEBUG:
 
 if os.getenv("VERCEL") or os.getenv("RENDER"):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
     SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+    CSRF_FAILURE_VIEW = "apps.accounts.views.csrf_failure"
 
 
 # Application definition
@@ -304,6 +311,9 @@ CARENEST_UPSKILLING_RECOVERY_PERCENT = Decimal(os.getenv("CARENEST_UPSKILLING_RE
 
 # Maps — browser key only, never a secret. Empty => Leaflet/OSM.
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI", "")
 CARTO_API_KEY = os.getenv("CARTO_API_KEY", "")
 MAP_PROVIDER = os.getenv("MAP_PROVIDER", "leaflet")
 
