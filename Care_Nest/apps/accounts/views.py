@@ -255,15 +255,15 @@ def google_oauth_callback(request):
         user = _create_account(
             role=role,
             email=email,
-            password=None,
+            password="",
             full_name=profile.get("full_name") or f"{profile.get('first_name')} {profile.get('last_name')}".strip(),
             photo_url=profile.get("picture") or "",
         )
     except ValueError as exc:
         messages.error(request, str(exc))
         return redirect(signup_name)
-        messages.success(request, "Google account connected. You're in.")
-        return _complete_login(request, user)
+    messages.success(request, "Google account connected. You're in.")
+    return _complete_login(request, user)
 
 
 def worker_logout(request):

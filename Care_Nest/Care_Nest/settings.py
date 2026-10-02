@@ -191,8 +191,12 @@ if _database_url:
     sslmode = os.getenv("POSTGRES_SSLMODE") or (query.get("sslmode") or [None])[0]
     host = url.hostname or ""
     if not sslmode:
-        internal_render = bool(os.getenv("RENDER")) and "render.com" in host and "-a." not in host
-        sslmode = "disable" if internal_render else "require"
+        looks_external = "postgres.render.com" in host or host.endswith(".render.com") or "supabase.co" in host or "pooler.supabase.com" in host
+        sslmode = "require" if looks_external or not os.getenv("RENDER") else "disable"
+    db_options = {"sslmode": sslmode}
+    search_path = (os.getenv("POSTGRES_SEARCH_PATH") or (query.get("search_path") or [None])[0] or "").strip()
+    if search_path:
+        db_options["options"] = f"-c search_path={search_path}"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -202,7 +206,7 @@ if _database_url:
             "HOST": url.hostname,
             "PORT": str(url.port or "5432"),
             "CONN_MAX_AGE": 60 if os.getenv("RENDER") else 0,
-            "OPTIONS": {"sslmode": sslmode},
+            "OPTIONS": db_options,
         }
     }
 
