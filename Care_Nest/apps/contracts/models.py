@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -136,7 +138,32 @@ class Contract(models.Model):
         return self.approval_status == self.ApprovalStatus.APPROVED
 
     @property
+    def invoices_cleared(self) -> bool:
+        return not self.service_invoices.exclude(
+            status__in=[ServiceInvoice.Status.SETTLED, ServiceInvoice.Status.VOID]
+        ).exists()
+
+    @property
+    def funds_cleared(self) -> bool:
+        from apps.agentic_core.state import EngagementStatus
+        from apps.wallet.models import Settlement
+
+        if self.chain_status == EngagementStatus.RELEASED:
+            return True
+        try:
+            settlement = self.settlement
+        except Exception:
+            return False
+        return settlement.status in {Settlement.Status.SETTLED, Settlement.Status.FEE_CAPTURED}
+
+    @property
+    def is_complete(self) -> bool:
+        return self.is_bound and self.invoices_cleared and self.funds_cleared
+
+    @property
     def display_status(self) -> str:
+        if self.is_complete:
+            return "COMPLETED"
         if self.approval_status == self.ApprovalStatus.APPROVED:
             if self.chain_status in {"", "DRAFT"}:
                 return "BOUND"
@@ -170,6 +197,7 @@ class ShiftAttendance(models.Model):
     employer_verified = models.BooleanField(default=False)
     employer_verified_at = models.DateTimeField(null=True, blank=True)
     employer_verification_note = models.TextField(blank=True, default="")
+    employer_rating = models.PositiveSmallIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["-checked_in_at"]
@@ -254,6 +282,45 @@ class Dispute(models.Model):
 
     def __str__(self):
         return f"Dispute #{self.pk} ({self.status})"
+
+
+class DisputeEvidence(models.Model):
+    class Kind(models.TextChoices):
+        IMAGE = "image", "Image"
+        DOCUMENT = "document", "Document"
+        VIDEO = "video", "Video"
+
+    dispute = models.ForeignKey(Dispute, on_delete=models.CASCADE, related_name="evidence")
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="dispute_evidence")
+    kind = models.CharField(max_length=16, choices=Kind.choices)
+    file_url = models.CharField(max_length=500)
+    file_name = models.CharField(max_length=255, blank=True, default="")
+    content_type = models.CharField(max_length=80, blank=True, default="")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return self.file_name or f"Evidence #{self.pk}"
+
+
+class CompletionReport(models.Model):
+    engagement = models.OneToOneField(Contract, on_delete=models.CASCADE, related_name="completion_report")
+    share_token = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
+    snapshot = models.JSONField(default=dict, blank=True)
+    generated_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-generated_at"]
+
+    def __str__(self):
+        return f"Report {self.share_token}"
+
+    @property
+    def share_path(self) -> str:
+        return f"/reports/{self.share_token}/"
 
 
 class ServiceInvoice(models.Model):

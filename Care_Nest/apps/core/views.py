@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
@@ -10,6 +10,11 @@ BASE_STATIC = Path(__file__).resolve().parents[2] / "static" / "pwa"
 
 def index(request):
     return render(request, "index.html")
+
+
+@require_GET
+def healthz(request):
+    return HttpResponse("ok", content_type="text/plain")
 
 
 def role_selection(request):

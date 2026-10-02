@@ -211,6 +211,9 @@ def capture_settled_commission(contract, *, reference: str = "") -> None:
 
     settlement, breakdown = ensure_settlement(contract)
     if settlement.status in (Settlement.Status.SETTLED, Settlement.Status.FEE_CAPTURED):
+        from apps.contracts.reports import ensure_completion_report
+
+        ensure_completion_report(contract)
         return settlement
     if settlement.status == Settlement.Status.FAILED:
         raise ValueError("cannot capture commission on a failed settlement")
@@ -270,6 +273,9 @@ def capture_settled_commission(contract, *, reference: str = "") -> None:
         worker_net_amount=breakdown.worker_net_amount,
         currency=breakdown.currency,
     )
+    from apps.contracts.reports import ensure_completion_report
+
+    ensure_completion_report(contract)
     return settlement
 
 

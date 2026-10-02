@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Completion report #{{ snapshot.engagement_id }} | Care Nest{% endblock %}
+{% block extra_head %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { background: #fff; }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-surface p-6 md:p-10">
+    <article class="max-w-3xl mx-auto bg-white rounded-[2rem] border border-outline-variant/10 p-8 md:p-12 space-y-8">
+        <header class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-secondary">CareNest completion report</p>
+                <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter mt-1">{{ snapshot.job.title }}</h1>
+                <p class="text-sm text-outline mt-1">Contract #{{ snapshot.engagement_id }} · {{ snapshot.status }}</p>
+            </div>
+            <div class="no-print flex flex-wrap gap-2">
+                <a href="{{ pdf_url }}" class="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Download PDF</a>
+                <button type="button" onclick="navigator.clipboard.writeText('{{ share_url }}')" class="bg-surface-container-high px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Copy share link</button>
+            </div>
+        </header>
+
+        <section class="grid sm:grid-cols-2 gap-4">
+            <div class="bg-surface-container-low rounded-2xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Employer</p>
+                <p class="font-extrabold text-primary">{{ snapshot.parties.employer }}</p>
+            </div>
+            <div class="bg-surface-container-low rounded-2xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Worker</p>
+                <p class="font-extrabold text-primary">{{ snapshot.parties.worker }}</p>
+            </div>
+            <div class="bg-surface-container-low rounded-2xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Pay</p>
+                <p class="font-extrabold text-primary">{{ snapshot.pay.display }}</p>
+                <p class="text-xs text-outline mt-1">Worker receives {{ snapshot.pay.worker_receives }}</p>
+            </div>
+            <div class="bg-surface-container-low rounded-2xl p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Employer rating of work</p>
+                <p class="font-extrabold text-primary">{{ snapshot.rating.label }}</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Job</h2>
+            <p class="text-sm text-primary">{{ snapshot.job.location }} · {{ snapshot.job.schedule }} · {{ snapshot.job.type }}</p>
+            {% if snapshot.job.description %}<p class="text-sm text-on-surface-variant mt-2">{{ snapshot.job.description }}</p>{% endif %}
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Employer terms</h2>
+                <pre class="whitespace-pre-wrap text-sm text-primary font-sans">{{ snapshot.terms.employer|default:"None recorded." }}</pre>
+            </div>
+            <div>
+                <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Worker terms</h2>
+                <pre class="whitespace-pre-wrap text-sm text-primary font-sans">{{ snapshot.terms.worker|default:"None recorded." }}</pre>
+                {% if snapshot.terms.hours %}<p class="text-sm text-outline mt-2">Hours: {{ snapshot.terms.hours }}</p>{% endif %}
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-3">Check-ins and check-outs</h2>
+            <p class="text-sm text-outline mb-4">Total logged time: {{ snapshot.total_minutes }} minutes</p>
+            <div class="space-y-3">
+                {% for shift in snapshot.shifts %}
+                <div class="border border-outline-variant/10 rounded-2xl p-4">
+                    <p class="text-sm font-bold text-primary">In {{ shift.checked_in_at }} · Out {{ shift.checked_out_at|default:"open" }} · {{ shift.minutes }} min</p>
+                    {% if shift.work_summary %}<p class="text-sm text-primary mt-2">{{ shift.work_summary }}</p>{% endif %}
+                    {% if shift.employer_verified %}<p class="text-xs text-secondary mt-1">Verified{% if shift.employer_rating %} · {{ shift.employer_rating }}/5{% endif %}{% if shift.employer_note %} · {{ shift.employer_note }}{% endif %}</p>{% endif %}
+                </div>
+                {% empty %}
+                <p class="text-sm text-outline">No attendance recorded.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if snapshot.activities %}
+        <section>
+            <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Activities done</h2>
+            <ul class="list-disc pl-5 space-y-1 text-sm text-primary">
+                {% for item in snapshot.activities %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <section>
+            <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Settlement</h2>
+            <p class="text-sm text-primary">{{ snapshot.settlement.status }}{% if snapshot.settlement.reference %} · {{ snapshot.settlement.reference }}{% endif %}</p>
+            {% for inv in snapshot.invoices %}
+            <p class="text-sm text-outline mt-1">{{ inv.number }} · {{ inv.status }} · {{ inv.amount|money:inv.currency }}</p>
+            {% endfor %}
+        </section>
+        <p class="text-[11px] text-outline">Share this report with {{ share_url }}. Phone numbers and emails are not included.</p>
+    </article>
+</div>
+{% endblock %}

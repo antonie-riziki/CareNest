@@ -64,7 +64,17 @@
             {% if s.work_summary %}<p class="text-sm text-primary mt-1">{{ s.work_summary }}</p>{% endif %}
         </div>
         {% endfor %}
-        <a href="{% url 'disputes' %}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Open a dispute</a>
+        <a href="{% url 'disputes' %}?engagement={{ engagement.pk }}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Open a dispute on this contract</a>
+    </section>
+    {% endif %}
+    {% if report %}
+    <section class="bg-white rounded-[1.5rem] border border-secondary/30 p-6 space-y-3">
+        <h2 class="text-lg font-extrabold text-primary">Completion report</h2>
+        <p class="text-sm text-outline">Job done and invoices cleared. Download or share the contract summary.</p>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'completion-report' report.share_token %}" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">View report</a>
+            <a href="{% url 'completion-report-pdf' report.share_token %}" class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Download PDF</a>
+        </div>
     </section>
     {% endif %}
     <a href="{% url 'worker-engagements' %}" class="inline-block bg-secondary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">WorkOS engagements</a>

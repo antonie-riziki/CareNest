@@ -102,8 +102,9 @@ class BilateralAgreementTests(TestCase):
         from apps.contracts.agreement import verify_shift
         from apps.contracts.models import Notification
 
-        verified = verify_shift(shift=closed, employer=self.employer, note="Confirmed.")
+        verified = verify_shift(shift=closed, employer=self.employer, note="Confirmed.", rating=5)
         self.assertTrue(verified.employer_verified)
+        self.assertEqual(verified.employer_rating, 5)
         self.assertTrue(Notification.objects.filter(recipient=self.employer, kind="check_in").exists())
         self.assertTrue(Notification.objects.filter(recipient=self.employer, kind="check_out").exists())
 
@@ -128,17 +129,81 @@ class BilateralAgreementTests(TestCase):
     def test_dispute_portal_opens_for_both_parties(self):
         contract = submit_worker_terms(job=self.job, worker=self.worker, worker_terms="Agreed to weekday hours as posted.")
         bind_agreement(contract, employer=self.employer, action="approve")
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
         self.client.force_login(self.worker)
         response = self.client.post(
             "/disputes/report/",
-            {"engagement_id": contract.pk, "category": "payment", "title": "Late payment", "description": "Escrow was not funded after check-in."},
+            {
+                "engagement_id": contract.pk,
+                "category": "payment",
+                "title": "Late payment",
+                "description": "Escrow was not funded after check-in.",
+                "evidence": SimpleUploadedFile("late.pdf", b"%PDF-1.4 proof", content_type="application/pdf"),
+            },
         )
         self.assertEqual(response.status_code, 302)
-        portal = self.client.get("/disputes/")
-        self.assertContains(portal, "Late payment")
+        self.assertIn(f"/disputes/", response["Location"])
+        detail = self.client.get(response["Location"])
+        self.assertContains(detail, "Late payment")
+        self.assertContains(detail, f"#{contract.pk}")
+        search = self.client.get("/disputes/", {"q": "nanny", "engagement": contract.pk})
+        self.assertContains(search, self.job.title)
+        self.assertContains(search, f'value="{contract.pk}"')
         self.client.force_login(self.employer)
         employer_portal = self.client.get("/disputes/")
         self.assertContains(employer_portal, "Late payment")
+
+    def test_dispute_requires_contract_and_stores_proof(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        from apps.contracts.models import DisputeEvidence
+
+        contract = submit_worker_terms(job=self.job, worker=self.worker, worker_terms="Agreed to weekday hours as posted.")
+        bind_agreement(contract, employer=self.employer, action="approve")
+        self.client.force_login(self.worker)
+        proof = SimpleUploadedFile("photo.jpg", b"\xff\xd8\xff\xdbfakejpeg", content_type="image/jpeg")
+        response = self.client.post(
+            "/disputes/report/",
+            {
+                "engagement_id": contract.pk,
+                "category": "attendance",
+                "title": "Missed hours",
+                "description": "The recorded check-in does not match the agreed weekday hours.",
+                "evidence": proof,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(DisputeEvidence.objects.filter(dispute__engagement=contract).exists())
+        linked = self.client.get(f"/disputes/?engagement={contract.pk}")
+        self.assertContains(linked, f"#{contract.pk}")
+
+    def test_completion_report_pdf_and_share_link_after_clearance(self):
+        from apps.agentic_core.state import EngagementStatus
+        from apps.contracts.reports import ensure_completion_report
+        from apps.wallet.settlement import capture_settled_commission
+
+        contract = submit_worker_terms(job=self.job, worker=self.worker, worker_terms="Agreed to weekday hours as posted.")
+        bind_agreement(contract, employer=self.employer, action="approve")
+        check_in(contract=contract, worker=self.worker)
+        closed = check_out(contract=contract, worker=self.worker, work_summary="School run completed and lunch prepared.")
+        from apps.contracts.agreement import verify_shift
+
+        verify_shift(shift=closed, employer=self.employer, note="On time.", rating=4)
+        capture_settled_commission(contract, reference="test-clear")
+        contract.chain_status = EngagementStatus.RELEASED
+        contract.save(update_fields=["chain_status", "updated_at"])
+        contract.refresh_from_db()
+        report = ensure_completion_report(contract)
+        self.assertIsNotNone(report)
+        self.assertEqual(report.snapshot["rating"]["average"], 4.0)
+        page = self.client.get(f"/reports/{report.share_token}/")
+        self.assertContains(page, self.job.title)
+        self.assertContains(page, "School run completed")
+        pdf = self.client.get(f"/reports/{report.share_token}/pdf/")
+        self.assertEqual(pdf.status_code, 200)
+        self.assertEqual(pdf["Content-Type"], "application/pdf")
+        self.assertTrue(pdf.content.startswith(b"%PDF"))
 
     def test_course_cards_keep_images_and_show_fee(self):
         Course.objects.create(

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Dispute #{{ dispute.pk }} | Care Nest{% endblock %}
+{% block content %}
+{% include 'employer_sidebar.html' %}
+<div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-5xl space-y-6">
+    {% if messages %}{% for message in messages %}<div class="bg-secondary-container px-4 py-3 rounded-xl text-sm">{{ message }}</div>{% endfor %}{% endif %}
+    <a href="{% url 'disputes' %}" class="text-xs font-bold uppercase tracking-widest text-secondary">Back to disputes</a>
+    {% include '_dispute_detail.html' %}
+</div>
+{% endblock %}

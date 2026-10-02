@@ -345,17 +345,32 @@ def check_out(*, contract: Contract, worker, note: str = "", work_summary: str =
 
 
 @transaction.atomic
-def verify_shift(*, shift: ShiftAttendance, employer, note: str = "") -> ShiftAttendance:
+def verify_shift(*, shift: ShiftAttendance, employer, note: str = "", rating: int | None = None) -> ShiftAttendance:
     if shift.engagement.employer_id != employer.pk:
         raise AgreementError("Not your engagement.")
     if not shift.checked_out_at:
         raise AgreementError("The worker must check out before you can approve the work.")
     if not (shift.work_summary or "").strip():
         raise AgreementError("No work summary has been submitted yet.")
+    if rating is not None:
+        try:
+            rating = int(rating)
+        except (TypeError, ValueError) as exc:
+            raise AgreementError("Rate the work from 1 to 5.") from exc
+        if rating < 1 or rating > 5:
+            raise AgreementError("Rate the work from 1 to 5.")
+        shift.employer_rating = rating
     shift.employer_verified = True
     shift.employer_verified_at = timezone.now()
     shift.employer_verification_note = (note or "").strip()
-    shift.save(update_fields=["employer_verified", "employer_verified_at", "employer_verification_note"])
+    shift.save(
+        update_fields=[
+            "employer_verified",
+            "employer_verified_at",
+            "employer_verification_note",
+            "employer_rating",
+        ]
+    )
     notify(
         recipient=shift.worker,
         actor=employer,
