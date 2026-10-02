@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -14,8 +15,10 @@ from apps.contracts.agreement import (
     submit_worker_terms,
     verify_shift,
 )
-from apps.contracts.models import Contract, Dispute, Notification, ServiceInvoice, ShiftAttendance
+from apps.contracts.models import CompletionReport, Contract, Dispute, DisputeEvidence, Notification, ServiceInvoice, ShiftAttendance
 from apps.contracts.notify import notify
+from apps.contracts.reports import ensure_completion_report
+from apps.contracts.uploads import EvidenceUploadError, store_evidence
 from apps.jobs.models import Application, Job
 from apps.wallet.pricing import get_price_service
 from apps.wallet.settlement import compute_waterfall
@@ -59,6 +62,7 @@ def employer_engagement_review(request, pk):
         "worker_net_amount": engagement.worker_net_amount,
     }
     shifts = engagement.shifts.all()[:12]
+    report = ensure_completion_report(engagement)
     return render(
         request,
         "employer_engagement_review.html",
@@ -68,6 +72,7 @@ def employer_engagement_review(request, pk):
             "fx": fx,
             "shifts": shifts,
             "audience": "employer",
+            "report": report,
         },
     )
 
@@ -162,6 +167,7 @@ def worker_engagement_review(request, pk):
             "open_shift": open_shift,
             "shifts": engagement.shifts.all()[:12],
             "explanation": explain(engagement.chain_status),
+            "report": ensure_completion_report(engagement),
         },
     )
 
@@ -207,7 +213,12 @@ def worker_service_invoice(request, pk):
 def verify_shift_view(request, pk):
     shift = get_object_or_404(ShiftAttendance, pk=pk, engagement__employer=request.user)
     try:
-        verify_shift(shift=shift, employer=request.user, note=request.POST.get("note") or "")
+        verify_shift(
+            shift=shift,
+            employer=request.user,
+            note=request.POST.get("note") or "",
+            rating=request.POST.get("rating") or None,
+        )
         messages.success(request, "Work recorded and approved.")
     except AgreementError as exc:
         messages.error(request, str(exc))
@@ -215,27 +226,95 @@ def verify_shift_view(request, pk):
 
 
 def _dispute_queryset(user):
-    return (
-        Dispute.objects.filter(Q(reporter=user) | Q(against=user) | Q(engagement__employer=user) | Q(engagement__worker=user))
-        .select_related("engagement", "job", "reporter", "against")
-        .distinct()
-    )
+    return Dispute.objects.filter(
+        Q(reporter=user) | Q(against=user) | Q(engagement__employer=user) | Q(engagement__worker=user)
+    ).distinct()
+
+
+def _party_contracts(user, *, query: str = ""):
+    qs = Contract.objects.filter(
+        Q(employer=user) | Q(worker=user),
+        approval_status=Contract.ApprovalStatus.APPROVED,
+    ).select_related("job", "employer", "worker")
+    query = (query or "").strip()
+    if query:
+        filters = (
+            Q(job__title__icontains=query)
+            | Q(job__location__icontains=query)
+            | Q(employer__first_name__icontains=query)
+            | Q(employer__last_name__icontains=query)
+            | Q(employer__username__icontains=query)
+            | Q(worker__first_name__icontains=query)
+            | Q(worker__last_name__icontains=query)
+            | Q(worker__username__icontains=query)
+        )
+        raw_id = query.lstrip("#")
+        if raw_id.isdigit():
+            filters |= Q(pk=int(raw_id))
+        qs = qs.filter(filters)
+    return qs.order_by("-updated_at")
+
+
+def _user_can_see_dispute(user, dispute: Dispute) -> bool:
+    return user.pk in {
+        dispute.reporter_id,
+        dispute.against_id,
+        dispute.engagement.employer_id,
+        dispute.engagement.worker_id,
+    }
+
+
+def _save_evidence(request, dispute: Dispute) -> int:
+    saved = 0
+    uploads = request.FILES.getlist("evidence") if hasattr(request.FILES, "getlist") else []
+    single = request.FILES.get("evidence")
+    if single and single not in uploads:
+        uploads.append(single)
+    for uploaded in uploads:
+        url, kind, filename = store_evidence(uploaded)
+        DisputeEvidence.objects.create(
+            dispute=dispute,
+            uploaded_by=request.user,
+            kind=kind,
+            file_url=url,
+            file_name=filename[:255],
+            content_type=getattr(uploaded, "content_type", "") or "",
+        )
+        saved += 1
+    return saved
 
 
 @login_required
 def disputes_portal(request):
-    disputes = _dispute_queryset(request.user)
+    query = request.GET.get("q") or ""
+    selected_id = request.GET.get("engagement") or ""
+    engagements = _party_contracts(request.user, query=query)
+    selected = None
+    if selected_id:
+        selected = _party_contracts(request.user).filter(pk=selected_id).first()
+        if selected and not engagements.filter(pk=selected.pk).exists():
+            engagements = [selected, *list(engagements)]
+    disputes = (
+        _dispute_queryset(request.user)
+        .select_related("engagement", "job", "reporter", "against")
+        .prefetch_related("evidence")
+    )
     grouped = {
         "ongoing": disputes.filter(status=Dispute.Status.ONGOING),
         "unresolved": disputes.filter(status=Dispute.Status.UNRESOLVED),
         "settled": disputes.filter(status=Dispute.Status.SETTLED),
     }
-    engagements = Contract.objects.filter(Q(employer=request.user) | Q(worker=request.user), approval_status=Contract.ApprovalStatus.APPROVED)
     template = "employer_disputes.html" if getattr(request.user, "role", "") == "employer" else "worker_disputes.html"
     return render(
         request,
         template,
-        {"grouped": grouped, "engagements": engagements, "categories": Dispute.Category.choices},
+        {
+            "grouped": grouped,
+            "engagements": engagements,
+            "selected": selected,
+            "query": query,
+            "categories": Dispute.Category.choices,
+        },
     )
 
 
@@ -250,18 +329,19 @@ def report_dispute(request):
     if request.user.pk not in {engagement.employer_id, engagement.worker_id}:
         messages.error(request, "You can only report disputes on your own contracts.")
         return redirect("disputes")
-    if engagement.employer_id == request.user.pk:
-        against = engagement.worker
-    else:
-        against = engagement.employer
+    against = engagement.worker if engagement.employer_id == request.user.pk else engagement.employer
     title = (request.POST.get("title") or "").strip()
     description = (request.POST.get("description") or "").strip()
     if len(title) < 4 or len(description) < 12:
         messages.error(request, "Add a short title and a description of the dispute.")
-        return redirect("disputes")
+        return redirect(f"/disputes/?engagement={engagement.pk}")
     category = request.POST.get("category") or Dispute.Category.OTHER
     if category not in Dispute.Category.values:
         category = Dispute.Category.OTHER
+    uploads = request.FILES.getlist("evidence")
+    if not uploads:
+        messages.error(request, "Upload at least one image, document, or video as proof.")
+        return redirect(f"/disputes/?engagement={engagement.pk}")
     dispute = Dispute.objects.create(
         engagement=engagement,
         job=engagement.job,
@@ -271,6 +351,11 @@ def report_dispute(request):
         title=title[:160],
         description=description,
     )
+    try:
+        _save_evidence(request, dispute)
+    except EvidenceUploadError as exc:
+        messages.error(request, str(exc))
+        return redirect("dispute-detail", pk=dispute.pk)
     notify(
         recipient=against,
         actor=request.user,
@@ -278,17 +363,47 @@ def report_dispute(request):
         kind=Notification.Kind.DISPUTE,
         title="A dispute was opened",
         body=title,
-        url="/disputes/",
+        url=f"/disputes/{dispute.pk}/",
     )
-    messages.success(request, f"Dispute #{dispute.pk} opened. Both parties can follow it in the dispute portal.")
-    return redirect("disputes")
+    messages.success(request, f"Dispute #{dispute.pk} opened on contract #{engagement.pk}.")
+    return redirect("dispute-detail", pk=dispute.pk)
+
+
+@login_required
+def dispute_detail(request, pk):
+    dispute = get_object_or_404(
+        Dispute.objects.select_related("engagement", "job", "reporter", "against").prefetch_related("evidence"),
+        pk=pk,
+    )
+    if not _user_can_see_dispute(request.user, dispute):
+        messages.error(request, "Not your dispute.")
+        return redirect("disputes")
+    template = "employer_dispute_detail.html" if getattr(request.user, "role", "") == "employer" else "worker_dispute_detail.html"
+    return render(request, template, {"dispute": dispute, "engagement": dispute.engagement})
+
+
+@login_required
+@require_POST
+def add_dispute_evidence(request, pk):
+    dispute = get_object_or_404(Dispute, pk=pk)
+    if not _user_can_see_dispute(request.user, dispute):
+        messages.error(request, "Not your dispute.")
+        return redirect("disputes")
+    try:
+        saved = _save_evidence(request, dispute)
+        if not saved:
+            raise EvidenceUploadError("Choose at least one image, document, or video.")
+        messages.success(request, "Proof uploaded to this contract dispute.")
+    except EvidenceUploadError as exc:
+        messages.error(request, str(exc))
+    return redirect("dispute-detail", pk=pk)
 
 
 @login_required
 @require_POST
 def update_dispute(request, pk):
     dispute = get_object_or_404(Dispute, pk=pk)
-    if request.user.pk not in {dispute.reporter_id, dispute.against_id, dispute.engagement.employer_id, dispute.engagement.worker_id}:
+    if not _user_can_see_dispute(request.user, dispute):
         messages.error(request, "Not your dispute.")
         return redirect("disputes")
     action = request.POST.get("action")
@@ -304,4 +419,45 @@ def update_dispute(request, pk):
         dispute.resolved_at = timezone.now()
         dispute.save(update_fields=["status", "resolution", "resolved_at", "updated_at"])
         messages.success(request, "Dispute marked settled.")
-    return redirect("disputes")
+    return redirect("dispute-detail", pk=pk)
+
+
+def _report_or_404(token):
+    return get_object_or_404(CompletionReport, share_token=token)
+
+
+def completion_report_share(request, token):
+    report = _report_or_404(token)
+    snapshot = report.snapshot or {}
+    share_url = request.build_absolute_uri(report.share_path)
+    return render(
+        request,
+        "completion_report.html",
+        {"report": report, "snapshot": snapshot, "share_url": share_url, "pdf_url": f"{report.share_path}pdf/"},
+    )
+
+
+def completion_report_pdf(request, token):
+    report = _report_or_404(token)
+    from apps.contracts.pdf import render_completion_pdf
+
+    share_url = request.build_absolute_uri(report.share_path)
+    payload = render_completion_pdf(report.snapshot or {}, share_url=share_url)
+    response = HttpResponse(payload, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="carenest-contract-{report.engagement_id}.pdf"'
+    return response
+
+
+@login_required
+def engagement_report(request, pk):
+    engagement = get_object_or_404(Contract, pk=pk)
+    if request.user.pk not in {engagement.employer_id, engagement.worker_id}:
+        messages.error(request, "Not your contract.")
+        return redirect("home")
+    report = ensure_completion_report(engagement)
+    if not report:
+        messages.info(request, "The completion report is available after the job is done and invoices are cleared.")
+        if getattr(request.user, "role", "") == "employer":
+            return redirect("employer-engagement-review", pk=pk)
+        return redirect("worker-engagement-review", pk=pk)
+    return redirect("completion-report", token=report.share_token)

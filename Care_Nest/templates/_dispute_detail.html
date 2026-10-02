@@ -1,0 +1,61 @@
+<section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-4">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Linked contract</p>
+            <h2 class="text-xl font-extrabold text-primary">#{{ engagement.pk }} · {{ engagement.job.title }}</h2>
+            <p class="text-sm text-outline">{{ engagement.job.location }} · {{ engagement.display_status }} · {{ engagement.amount|money:engagement.currency }}</p>
+        </div>
+        {% if request.user.role == 'employer' %}
+        <a href="{% url 'employer-engagement-review' engagement.pk %}" class="text-xs font-bold uppercase tracking-widest text-secondary">Open contract</a>
+        {% else %}
+        <a href="{% url 'worker-engagement-review' engagement.pk %}" class="text-xs font-bold uppercase tracking-widest text-secondary">Open contract</a>
+        {% endif %}
+    </div>
+    <p class="text-sm text-primary">Employer {{ engagement.employer.get_full_name|default:engagement.employer.username }} · Worker {{ engagement.worker.get_full_name|default:engagement.worker.username }}</p>
+</section>
+
+<section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-3">
+    <div class="flex items-start justify-between gap-3">
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-outline">{{ dispute.get_status_display }} · {{ dispute.get_category_display }}</p>
+            <h1 class="text-2xl font-extrabold text-primary font-headline">{{ dispute.title }}</h1>
+        </div>
+        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-surface-container-high">#{{ dispute.pk }}</span>
+    </div>
+    <p class="text-sm text-primary leading-relaxed">{{ dispute.description }}</p>
+    {% if dispute.resolution %}<p class="text-sm text-secondary">Resolution: {{ dispute.resolution }}</p>{% endif %}
+</section>
+
+<section class="bg-white rounded-[1.5rem] border border-outline-variant/10 p-6 space-y-4">
+    <h2 class="text-[10px] font-bold uppercase tracking-widest text-outline">Proof</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+        {% for item in dispute.evidence.all %}
+        <a href="{{ item.file_url }}" target="_blank" rel="noopener" class="block border border-outline-variant/10 rounded-2xl p-4">
+            {% if item.kind == 'image' %}
+            <img src="{{ item.file_url }}" alt="{{ item.file_name }}" class="w-full h-40 object-cover rounded-xl mb-3">
+            {% elif item.kind == 'video' %}
+            <video src="{{ item.file_url }}" controls class="w-full h-40 rounded-xl bg-black mb-3"></video>
+            {% else %}
+            <p class="text-sm font-bold text-primary mb-2">Document</p>
+            {% endif %}
+            <p class="text-xs text-outline truncate">{{ item.file_name|default:item.kind }}</p>
+        </a>
+        {% empty %}
+        <p class="text-sm text-outline">No proof uploaded yet.</p>
+        {% endfor %}
+    </div>
+    <form method="post" action="{% url 'dispute-evidence' dispute.pk %}" enctype="multipart/form-data" class="space-y-3">
+        {% csrf_token %}
+        <input type="file" name="evidence" multiple accept="image/*,.pdf,.doc,.docx,.txt,video/mp4,video/webm,video/quicktime">
+        <button class="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Add proof</button>
+    </form>
+</section>
+
+{% if dispute.status != 'settled' %}
+<form method="post" action="{% url 'dispute-update' dispute.pk %}" class="flex flex-wrap gap-2 bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
+    {% csrf_token %}
+    <button name="action" value="unresolved" class="bg-surface-container-high px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Mark unresolved</button>
+    <input name="resolution" class="form-field flex-1 min-w-[160px]" placeholder="Settlement note">
+    <button name="action" value="settle" class="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Settle</button>
+</form>
+{% endif %}

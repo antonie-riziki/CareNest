@@ -40,14 +40,24 @@
             {% elif s.work_summary %}
             <form method="post" action="{% url 'shift-verify' s.pk %}" class="mt-3 space-y-2">
                 {% csrf_token %}
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Rate work done (1-5)</label>
+                <select name="rating" required class="form-field w-full text-sm">
+                    <option value="5">5 — Excellent</option>
+                    <option value="4">4 — Good</option>
+                    <option value="3" selected>3 — Satisfactory</option>
+                    <option value="2">2 — Needs improvement</option>
+                    <option value="1">1 — Unsatisfactory</option>
+                </select>
                 <input name="note" class="form-field w-full text-sm" placeholder="Optional verification note">
                 <button class="bg-secondary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Approve work done</button>
             </form>
             {% endif %}
         </div>
         {% endfor %}
-        <a href="{% url 'disputes' %}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Report a dispute</a>
+        <a href="{% url 'disputes' %}?engagement={{ engagement.pk }}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Report a dispute on this contract</a>
     </section>
+    {% elif engagement.is_bound %}
+    <a href="{% url 'disputes' %}?engagement={{ engagement.pk }}" class="inline-block text-xs font-bold uppercase tracking-widest text-secondary">Report a dispute on this contract</a>
     {% endif %}
 
     {% if engagement.needs_employer_approval %}
@@ -62,7 +72,13 @@
         <p class="text-[11px] text-outline">Approving locks the job and stores the agreed terms. The WorkOS agent can then create the on-chain agreement — it cannot approve this for you.</p>
     </form>
     {% elif engagement.is_bound %}
-    <a href="{% url 'agent-command-center' engagement.pk %}" class="inline-block signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Open command center</a>
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'agent-command-center' engagement.pk %}" class="inline-block signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Open command center</a>
+        {% if report %}
+        <a href="{% url 'completion-report' report.share_token %}" class="inline-block bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Completion report</a>
+        <a href="{% url 'completion-report-pdf' report.share_token %}" class="inline-block bg-surface-container-high text-primary px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Download PDF</a>
+        {% endif %}
+    </div>
     {% else %}
     <p class="text-sm text-outline">Nothing to approve yet.</p>
     {% endif %}
