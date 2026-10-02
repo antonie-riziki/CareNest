@@ -21,6 +21,7 @@ from apps.ussd_app.views import ussd_callback
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name="home"),
+    path("healthz", healthz, name="healthz"),
     path("offline/", pwa_offline, name="pwa-offline"),
     path("manifest.webmanifest", pwa_manifest, name="pwa-manifest"),
     path("sw.js", pwa_service_worker, name="pwa-sw"),

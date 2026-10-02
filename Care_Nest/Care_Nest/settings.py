@@ -63,12 +63,25 @@ if vercel_host:
     origin = f"https://{vercel_host}"
     if origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(origin)
-for extra in ("carenest.vercel.app", "care-nest.vercel.app"):
+for extra in ("carenest.vercel.app", "care-nest.vercel.app", "carenest.onrender.com"):
     if extra not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(extra)
     origin = f"https://{extra}"
     if origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(origin)
+render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if render_host:
+    if render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_host)
+    origin = f"https://{render_host}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+if os.getenv("RENDER") and ".onrender.com" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(".onrender.com")
+if os.getenv("RENDER"):
+    wildcard = "https://*.onrender.com"
+    if wildcard not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(wildcard)
 
 if DEBUG:
     if "*" not in ALLOWED_HOSTS:
@@ -82,7 +95,7 @@ if DEBUG:
         if origin not in CSRF_TRUSTED_ORIGINS:
             CSRF_TRUSTED_ORIGINS.append(origin)
 
-if os.getenv("VERCEL"):
+if os.getenv("VERCEL") or os.getenv("RENDER"):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -123,6 +136,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -166,16 +180,22 @@ DATABASES = {
 _database_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("POSTGRES_PRISMA_URL")
 if _database_url:
     url = urllib.parse.urlparse(_database_url)
+    query = urllib.parse.parse_qs(url.query)
+    sslmode = os.getenv("POSTGRES_SSLMODE") or (query.get("sslmode") or [None])[0]
+    host = url.hostname or ""
+    if not sslmode:
+        internal_render = bool(os.getenv("RENDER")) and "render.com" in host and "-a." not in host
+        sslmode = "disable" if internal_render else "require"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": urllib.parse.unquote(url.path.lstrip("/")),
+            "NAME": urllib.parse.unquote(url.path.lstrip("/")).split("?")[0],
             "USER": urllib.parse.unquote(url.username or ""),
             "PASSWORD": urllib.parse.unquote(url.password or ""),
             "HOST": url.hostname,
             "PORT": str(url.port or "5432"),
-            "CONN_MAX_AGE": 0,
-            "OPTIONS": {"sslmode": os.getenv("POSTGRES_SSLMODE", "require")},
+            "CONN_MAX_AGE": 60 if os.getenv("RENDER") else 0,
+            "OPTIONS": {"sslmode": sslmode},
         }
     }
 
@@ -219,6 +239,10 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
