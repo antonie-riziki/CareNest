@@ -48,7 +48,7 @@
             <input type="hidden" name="chain" id="chain" value="stellar">
             <input type="hidden" name="network" id="network" value="testnet">
             <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Stellar public key</label>
-            <input name="public_key" id="public_key" placeholder="G..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm" value="{{ demo_key }}">
+            <input name="public_key" id="public_key" placeholder="G..." class="form-field w-full font-mono text-sm" value="{{ demo_key }}">
             <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save Stellar address</button>
         </form>
 
@@ -60,7 +60,7 @@
             <input type="hidden" name="provider" id="evm-provider" value="metamask">
             <input type="hidden" name="chain" value="evm">
             <input type="hidden" name="network" id="evm-network" value="sepolia">
-            <input name="public_key" id="evm_address" placeholder="0x..." class="w-full rounded-xl border-outline-variant/30 font-mono text-sm">
+            <input name="public_key" id="evm_address" placeholder="0x..." class="form-field w-full font-mono text-sm">
             <button class="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save EVM address</button>
         </form>
         {% if friendbot %}

@@ -204,9 +204,9 @@
                 <form method="post" action="{% url 'job-submit-terms' job.pk %}" class="space-y-3">
                     {% csrf_token %}
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of service</label>
-                    <textarea name="worker_terms" rows="5" required class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Agree, and add hours, duties, or conditions you need reviewed">{{ contract.worker_terms|default:'' }}</textarea>
+                    <textarea name="worker_terms" rows="5" required class="form-field w-full text-sm text-primary" placeholder="Agree, and add hours, duties, or conditions you need reviewed">{{ contract.worker_terms|default:'' }}</textarea>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Hours you need reviewed</label>
-                    <input name="hours_note" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="e.g. Weekdays 8:00–16:00, no Sundays" value="{{ contract.worker_hours_note|default:'' }}">
+                    <input name="hours_note" class="form-field w-full text-sm text-primary" placeholder="e.g. Weekdays 8:00–16:00, no Sundays" value="{{ contract.worker_hours_note|default:'' }}">
                     <button class="signature-gradient text-white px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest">Agree and send terms</button>
                 </form>
             </section>

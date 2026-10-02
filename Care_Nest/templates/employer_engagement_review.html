@@ -40,7 +40,7 @@
     {% if engagement.needs_employer_approval %}
     <form method="post" action="{% url 'employer-engagement-decide' engagement.pk %}" class="space-y-3 bg-white rounded-[1.5rem] border border-outline-variant/10 p-6">
         {% csrf_token %}
-        <textarea name="reason" rows="2" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Reason if you reject or ask for changes"></textarea>
+        <textarea name="reason" rows="2" class="form-field w-full text-sm text-primary" placeholder="Reason if you reject or ask for changes"></textarea>
         <div class="flex flex-wrap gap-3">
             <button name="action" value="approve" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Approve and bind contract</button>
             <button name="action" value="request_changes" class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Request changes</button>

@@ -1,17 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}{% if job %}Edit job{% else %}New job{% endif %} | Care Nest{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #employer-map { height: 280px; width: 100%; z-index: 1; border-radius: 6px; }
+</style>
+{% endblock %}
 {% block content %}
 {% include 'employer_sidebar.html' %}
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 max-w-3xl">
     <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">{% if job %}Edit job{% else %}New job posting{% endif %}</h1>
-    <p class="text-sm text-outline mt-2">Primary image appears on the job card. Add your terms of hire so workers can review them.</p>
-    {% if messages %}{% for message in messages %}<div class="mt-4 bg-secondary-container px-4 py-3 rounded-xl text-sm">{{ message }}</div>{% endfor %}{% endif %}
-    <form method="post" enctype="multipart/form-data" action="{% if job %}{% url 'employer-job-save' job.pk %}{% else %}{% url 'employer-jobs' %}{% endif %}" class="mt-8 bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-5">
+    <p class="text-sm text-outline mt-2">Capture the live work location so nearby workers can find this posting. Primary image appears on the job card.</p>
+    {% if messages %}{% for message in messages %}<div class="mt-4 bg-secondary-container px-4 py-3 rounded-md text-sm">{{ message }}</div>{% endfor %}{% endif %}
+    <form method="post" enctype="multipart/form-data" action="{% if job %}{% url 'employer-job-save' job.pk %}{% else %}{% url 'employer-jobs' %}{% endif %}" class="mt-8 bg-white rounded-lg border border-outline-variant/20 p-8 space-y-5">
         {% csrf_token %}
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Title</label>
-        <input name="title" required class="w-full rounded-xl border-outline-variant/30" value="{{ job.title|default:'' }}">
+        <input name="title" required class="form-field w-full" value="{{ job.title|default:'' }}">
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Category</label>
-        <select name="job_type" class="w-full rounded-xl border-outline-variant/30">
+        <select name="job_type" class="form-field w-full">
             <option value="nanny" {% if job.job_type == 'nanny' %}selected{% endif %}>Childcare / Nanny</option>
             <option value="caregiver" {% if job.job_type == 'caregiver' %}selected{% endif %}>Elder care</option>
             <option value="housekeeper" {% if job.job_type == 'housekeeper' %}selected{% endif %}>Housekeeping</option>
@@ -20,39 +26,50 @@
             <option value="companion" {% if job.job_type == 'companion' %}selected{% endif %}>Companion care</option>
         </select>
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Description</label>
-        <textarea name="description" rows="4" class="w-full rounded-xl border-outline-variant/30">{{ job.description|default:'' }}</textarea>
+        <textarea name="description" rows="4" class="form-field w-full">{{ job.description|default:'' }}</textarea>
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Location</label>
-                <input name="location" class="w-full rounded-xl border-outline-variant/30" value="{{ job.location|default:'Nairobi' }}">
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Location label</label>
+                <input id="location-label" name="location" class="form-field w-full" value="{{ job.location|default:'Nairobi' }}">
             </div>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Pay (KES)</label>
-                <input name="pay" type="number" step="0.01" class="w-full rounded-xl border-outline-variant/30" value="{{ job.pay|default:'' }}">
+                <input name="pay" type="number" step="0.01" class="form-field w-full" value="{{ job.pay|default:'' }}">
             </div>
         </div>
-        <input type="hidden" name="latitude" value="{{ job.latitude|default:'-1.2634' }}">
-        <input type="hidden" name="longitude" value="{{ job.longitude|default:'36.8036' }}">
+        <div class="space-y-3">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Live work location</p>
+                    <p id="location-status" class="text-xs text-primary mt-1">Open location on this device or drop a pin.</p>
+                </div>
+                <button type="button" id="use-live-location" class="bg-primary text-white px-4 py-2 rounded-md text-xs font-bold uppercase tracking-widest">Use my live location</button>
+            </div>
+            <div id="employer-map" class="border border-outline-variant"></div>
+            <p class="text-[11px] text-outline">Workers see this pin as the job site. If OpenStreetMap tiles fail, Carto then Esri load automatically.</p>
+        </div>
+        <input type="hidden" id="job-latitude" name="latitude" value="{{ initial_lat }}">
+        <input type="hidden" id="job-longitude" name="longitude" value="{{ initial_lon }}">
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Start date</label>
-                <input name="start_date" type="date" class="w-full rounded-xl border-outline-variant/30" value="{% if job.start_date %}{{ job.start_date|date:'Y-m-d' }}{% endif %}">
+                <input name="start_date" type="date" class="form-field w-full" value="{% if job.start_date %}{{ job.start_date|date:'Y-m-d' }}{% endif %}">
             </div>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Start time</label>
-                <input name="start_time" type="time" class="w-full rounded-xl border-outline-variant/30" value="{% if job.start_time %}{{ job.start_time|time:'H:i' }}{% endif %}">
+                <input name="start_time" type="time" class="form-field w-full" value="{% if job.start_time %}{{ job.start_time|time:'H:i' }}{% endif %}">
             </div>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">End date (optional)</label>
-                <input name="end_date" type="date" class="w-full rounded-xl border-outline-variant/30" value="{% if job.end_date %}{{ job.end_date|date:'Y-m-d' }}{% endif %}">
+                <input name="end_date" type="date" class="form-field w-full" value="{% if job.end_date %}{{ job.end_date|date:'Y-m-d' }}{% endif %}">
             </div>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">End time</label>
-                <input name="end_time" type="time" class="w-full rounded-xl border-outline-variant/30" value="{% if job.end_time %}{{ job.end_time|time:'H:i' }}{% endif %}">
+                <input name="end_time" type="time" class="form-field w-full" value="{% if job.end_time %}{{ job.end_time|time:'H:i' }}{% endif %}">
             </div>
         </div>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_recurring" {% if job.is_recurring %}checked{% endif %}> Recurring</label>
-        <select name="recurrence_frequency" class="w-full rounded-xl border-outline-variant/30">
+        <select name="recurrence_frequency" class="form-field w-full">
             <option value="">One-time</option>
             <option value="daily" {% if job.recurrence_frequency == 'daily' %}selected{% endif %}>Daily</option>
             <option value="weekly" {% if job.recurrence_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
@@ -68,11 +85,11 @@
             <label><input type="checkbox" name="recurrence_days" value="sun"> Sun</label>
         </div>
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Timezone</label>
-        <input name="timezone" class="w-full rounded-xl border-outline-variant/30" value="{{ job.timezone|default:'Africa/Nairobi' }}">
+        <input name="timezone" class="form-field w-full" value="{{ job.timezone|default:'Africa/Nairobi' }}">
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Application deadline</label>
-        <input name="application_deadline" type="datetime-local" class="w-full rounded-xl border-outline-variant/30">
+        <input name="application_deadline" type="datetime-local" class="form-field w-full">
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Status</label>
-        <select name="status" class="w-full rounded-xl border-outline-variant/30">
+        <select name="status" class="form-field w-full">
             <option value="DRAFT">Draft</option>
             <option value="SCHEDULED">Scheduled</option>
             <option value="ACTIVE">Publish now (Active)</option>
@@ -80,14 +97,77 @@
         </select>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="publish_now"> Publish immediately if start is today</label>
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Your terms of hire</label>
-        <textarea name="employer_terms" rows="5" class="w-full rounded-xl border-outline-variant/30 text-sm text-primary" placeholder="Hours, duties, house rules, what you expect from the worker">{{ job.employer_terms|default:'' }}</textarea>
+        <textarea name="employer_terms" rows="5" class="form-field w-full text-sm text-primary" placeholder="Hours, duties, house rules, what you expect from the worker">{{ job.employer_terms|default:'' }}</textarea>
         {% include '_image_dropzone.html' with input_id='job-image' input_name='image' current_url=job.image_url dropzone_label='Primary image (shown on the job card)' %}
         {% if job and job.has_custom_image %}
         <label class="flex items-center gap-2 text-sm text-primary"><input type="checkbox" name="remove_image"> Remove current image</label>
         {% endif %}
         <label class="block text-[10px] font-bold uppercase tracking-widest text-outline">Secondary images</label>
         <input name="gallery" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="w-full text-sm">
-        <button class="signature-gradient text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Save job</button>
+        <button class="signature-gradient text-white px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest">Save job</button>
     </form>
 </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/carenest-maps.js"></script>
+<script>
+    const CARENEST_MAP = {{ map_config_json|safe }};
+    const startLat = Number("{{ initial_lat }}");
+    const startLon = Number("{{ initial_lon }}");
+    const latInput = document.getElementById("job-latitude");
+    const lonInput = document.getElementById("job-longitude");
+    const statusEl = document.getElementById("location-status");
+    const labelInput = document.getElementById("location-label");
+    const map = L.map("employer-map").setView([startLat, startLon], 14);
+    CareNestMaps.addTilesWithFallback(map, CARENEST_MAP, statusEl);
+    const marker = L.marker([startLat, startLon], { draggable: true }).addTo(map);
+
+    function savePoint(lat, lon, source) {
+        latInput.value = lat.toFixed(6);
+        lonInput.value = lon.toFixed(6);
+        marker.setLatLng([lat, lon]);
+        map.setView([lat, lon], Math.max(map.getZoom(), 14));
+        statusEl.textContent = source + " · " + lat.toFixed(5) + ", " + lon.toFixed(5);
+        CareNestMaps.persistLocation("{% url 'api-location-employer' %}", {
+            latitude: lat,
+            longitude: lon,
+            label: labelInput.value
+        }).catch(function () {
+            statusEl.textContent = "Location captured on this form. Save the job to keep it.";
+        });
+    }
+
+    marker.on("dragend", function () {
+        const point = marker.getLatLng();
+        savePoint(point.lat, point.lng, "Pinned location");
+    });
+    map.on("click", function (event) {
+        savePoint(event.latlng.lat, event.latlng.lng, "Pinned location");
+    });
+
+    function captureLive(watch) {
+        if (!("geolocation" in navigator)) {
+            statusEl.textContent = "This device cannot share location. Drop a pin on the map.";
+            return;
+        }
+        const handler = function (position) {
+            savePoint(position.coords.latitude, position.coords.longitude, "Live location");
+        };
+        const fail = function () {
+            statusEl.textContent = "Could not read the device location. Drop a pin instead.";
+        };
+        const options = { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 };
+        if (watch) {
+            navigator.geolocation.watchPosition(handler, fail, options);
+        } else {
+            navigator.geolocation.getCurrentPosition(handler, fail, options);
+        }
+    }
+
+    document.getElementById("use-live-location").addEventListener("click", function () {
+        captureLive(true);
+    });
+    window.addEventListener("load", function () {
+        map.invalidateSize();
+    });
+</script>
 {% endblock %}

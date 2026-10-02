@@ -90,29 +90,27 @@
                             Identity</h3>
                     </div>
 
-                    <div class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-8 shadow-sm">
+                    <form method="post" class="bg-white rounded-[2rem] border border-outline-variant/10 p-8 space-y-8 shadow-sm">
+                        {% csrf_token %}
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div class="space-y-3">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Legal
-                                    Full Name</label>
-                                <div
-                                    class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
-                                    <span class="font-bold text-primary">Wanjiku Kamau</span>
-                                    <span
-                                        class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
-                                </div>
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">First name</label>
+                                <input name="first_name" class="form-field w-full" value="{{ request.user.first_name }}">
                             </div>
                             <div class="space-y-3">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Phone
-                                    Protocol</label>
-                                <div
-                                    class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
-                                    <span class="font-bold text-primary">+254 701 234 567</span>
-                                    <span
-                                        class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors text-lg">edit</span>
-                                </div>
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Last name</label>
+                                <input name="last_name" class="form-field w-full" value="{{ request.user.last_name }}">
+                            </div>
+                            <div class="space-y-3 sm:col-span-2">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Phone</label>
+                                <input name="phone" class="form-field w-full" value="{{ profile.phone }}" placeholder="+2547xxxxxxxx">
+                            </div>
+                            <div class="space-y-3 sm:col-span-2">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Skills</label>
+                                <textarea name="skills" rows="3" class="form-field w-full">{{ profile.skills }}</textarea>
                             </div>
                         </div>
+                        <button class="bg-primary text-white px-5 py-2.5 rounded-md text-xs font-bold uppercase tracking-widest">Save profile</button>
 
                         <div class="space-y-3 pt-6 border-t border-outline-variant/5">
                             <label class="text-[10px] font-bold text-outline uppercase tracking-[0.2em] ml-1">Geographic
@@ -121,14 +119,13 @@
                                 class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent hover:border-secondary/20 transition-all group cursor-pointer">
                                 <div class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-secondary text-xl">location_on</span>
-                                    <span class="font-bold text-primary">Kilimani, Nairobi, Kenya</span>
+                                    <span class="font-bold text-primary">{% if profile.location_updated_at %}Live pin saved{% else %}No live pin yet{% endif %}</span>
                                 </div>
-                                <button
-                                    class="bg-white text-secondary px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-outline-variant/10 hover:bg-secondary hover:text-white transition-all">Update
-                                    Map</button>
+                                <a href="{% url 'worker-jobs' %}"
+                                    class="bg-white text-secondary px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest border border-outline-variant/10">Open map</a>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </section>
 
                 <!-- Professional Profile Preferences -->
@@ -263,11 +260,11 @@
 
         <!-- Danger Zone -->
         <section class="pt-12 flex flex-col items-center gap-6">
-            <button
-                class="px-12 py-5 bg-error-container text-on-error-container font-extrabold rounded-2xl flex items-center gap-3 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest shadow-xl shadow-error/10">
+            <a href="{% url 'worker-logout' %}"
+                class="px-12 py-5 bg-error-container text-on-error-container font-extrabold rounded-md flex items-center gap-3 text-sm uppercase tracking-widest">
                 <span class="material-symbols-outlined">logout</span>
                 Logout
-            </button>
+            </a>
             <div class="text-center">
                 <p class="text-[10px] text-outline font-bold uppercase tracking-[0.3em]">Build Identifier: 1.4.0-COASTAL
                 </p>

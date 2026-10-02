@@ -97,6 +97,37 @@
         body {
             min-height: 100dvh;
         }
+        html body form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="image"]):not([type="range"]),
+        html body form select,
+        html body form textarea,
+        html body .form-field {
+            border-radius: 6px !important;
+            border: 1px solid #c4c6cf !important;
+            background-color: #ffffff;
+            color: #181c1e;
+            box-shadow: none;
+        }
+        html body form textarea,
+        html body textarea.form-field {
+            min-height: 6.5rem;
+            resize: vertical;
+            line-height: 1.5;
+            padding: 0.75rem 0.875rem !important;
+        }
+        html body form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="range"]),
+        html body form select,
+        html body input.form-field,
+        html body select.form-field {
+            min-height: 2.75rem;
+        }
+        html body form input:focus,
+        html body form select:focus,
+        html body form textarea:focus,
+        html body .form-field:focus {
+            outline: none;
+            border-color: #13696a !important;
+            box-shadow: 0 0 0 3px rgba(19, 105, 106, 0.12);
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>

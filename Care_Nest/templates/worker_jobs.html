@@ -93,11 +93,13 @@
 
                 <!-- Location Status Pill -->
                 <div
-                    class="absolute bottom-4 left-6 z-10 flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg border border-outline-variant/10">
+                    class="absolute bottom-4 left-6 z-10 flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-md shadow-lg border border-outline-variant/10">
                     <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                     <span id="location-status"
                         class="text-[10px] font-bold text-primary uppercase tracking-wider">Detecting
                         Location...</span>
+                    <button type="button" id="pin-live-location"
+                        class="text-[10px] font-bold uppercase tracking-wider text-secondary">Pin live</button>
                 </div>
 
                 <!-- Map Layer Toggle/Center FAB -->
@@ -166,7 +168,7 @@
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span id="verified-count" class="text-primary font-bold text-sm">0</span>
-                                <span class="text-[10px] text-outline uppercase font-medium">Verified Posters</span>
+                                <span class="text-[10px] text-outline uppercase font-medium">Nearby</span>
                             </div>
                         </div>
                     </div>
@@ -179,7 +181,7 @@
                 <div
                     class="flex lg:grid lg:grid-cols-1 xl:grid-cols-2 overflow-x-auto lg:overflow-x-visible gap-5 pb-8 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x lg:snap-none">
                     {% for job in jobs %}
-                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" class="snap-center min-w-[280px] lg:min-w-0">{% include '_job_card.html' %}</a>
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="snap-center min-w-[280px] lg:min-w-0">{% include '_job_card.html' %}</a>
                     {% empty %}
                     <p class="text-sm text-outline">No live jobs yet. Scheduled and draft postings stay hidden until they are active.</p>
                     {% endfor %}
@@ -187,9 +189,9 @@
                 <!-- Recommendations Section (Editorial Layout) -->
                 <section class="mt-4 pb-12 lg:pb-0">
                     <h3 class="font-headline text-xl font-bold text-primary mb-6">Nearby live jobs</h3>
-                    <p class="text-[11px] text-outline mb-4">Pins use approximate coordinates. Exact residential locations are never shown publicly. If a map tile returns 403, OpenStreetMap is used as fallback.</p>
+                    <p class="text-[11px] text-outline mb-4">All live jobs are listed and plotted. Your pin ranks nearby work first. Distant jobs stay visible. Maps use Carto, then Esri if tiles fail.</p>
                     {% for job in jobs %}
-                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" class="block mb-4">{% include '_job_card.html' %}</a>
+                    <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="block mb-4">{% include '_job_card.html' %}</a>
                     {% empty %}
                     <p class="text-sm text-outline">No active jobs in range.</p>
                     {% endfor %}
@@ -249,20 +251,22 @@
 
 
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <script src="/static/js/carenest-maps.js"></script>
     <script>
         let map;
         let userMarker;
         let radiusCircle;
         let jobMarkers = [];
         let userLocation = null;
-        let currentRadius = 5; // Default 5km
+        let currentRadius = 5;
+        let watchId = null;
+        let lastPersist = 0;
 
         const CARENEST_JOBS = {{ jobs_json|safe }};
         const CARENEST_MAP = {{ map_config_json|safe }};
-
+        const SAVED_LAT = {% if worker_lat %}{{ worker_lat }}{% else %}null{% endif %};
+        const SAVED_LON = {% if worker_lon %}{{ worker_lon }}{% else %}null{% endif %};
 
         function loadJobs() {
             return (CARENEST_JOBS || []).map((job) => ({
@@ -272,217 +276,193 @@
                 icon: job.icon || "work",
                 lat: job.lat,
                 lon: job.lon,
+                siteLat: job.lat,
+                siteLon: job.lon,
                 pay: job.pay,
                 duration: job.duration || "as agreed",
                 rating: job.rating || "4.8",
                 total_reviews: job.total_reviews || 0,
                 is_verified: true,
-                distance: job.distance || "—",
+                distance: job.distance || null,
             }));
         }
 
-        // Initialize map
+        function persistPin(lat, lon) {
+            const now = Date.now();
+            if (now - lastPersist < 8000) return;
+            lastPersist = now;
+            CareNestMaps.persistLocation("{% url 'api-location-worker' %}", {
+                latitude: lat,
+                longitude: lon
+            }).catch(function () { /* keep the local pin even if save is delayed */ });
+        }
+
+        function filterNearby() {
+            const jobs = loadJobs();
+            jobs.forEach((job) => {
+                if (userLocation) {
+                    job.distance = CareNestMaps.haversineKm(userLocation.lat, userLocation.lon, job.lat, job.lon);
+                    job.nearby = job.distance <= currentRadius;
+                } else {
+                    job.nearby = false;
+                }
+            });
+            const nearby = jobs.filter((job) => job.nearby);
+            document.querySelectorAll("[data-job-card]").forEach((card) => {
+                card.style.display = "";
+                if (!userLocation) return;
+                const km = CareNestMaps.haversineKm(
+                    userLocation.lat,
+                    userLocation.lon,
+                    Number(card.dataset.lat),
+                    Number(card.dataset.lon)
+                );
+                card.dataset.nearby = km <= currentRadius ? "1" : "0";
+            });
+            document.getElementById("worker-count").textContent = jobs.length;
+            document.getElementById("verified-count").textContent = nearby.length;
+            return jobs;
+        }
+
         function initMap(lat, lon) {
-            map = L.map('map').setView([lat, lon], 13);
+            if (map) {
+                map.setView([lat, lon], 13);
+                if (userMarker) userMarker.setLatLng([lat, lon]);
+                if (radiusCircle) radiusCircle.setLatLng([lat, lon]);
+                refreshJobLayer();
+                document.getElementById("loading-overlay").style.display = "none";
+                return;
+            }
+            map = L.map("map").setView([lat, lon], 13);
+            CareNestMaps.addTilesWithFallback(map, CARENEST_MAP, document.getElementById("location-status"));
 
-            // Add tile layer
-            const tiles = L.tileLayer((CARENEST_MAP && CARENEST_MAP.tile_url) || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: (CARENEST_MAP && CARENEST_MAP.tile_attribution) || '© OpenStreetMap contributors',
-                maxZoom: 19
-            });
-            tiles.on('tileerror', function () {
-                const status = document.getElementById('location-status');
-                if (status) status.textContent = 'Map tiles unavailable — retrying OpenStreetMap';
-            });
-            tiles.addTo(map);
-
-            // Add user location marker
             const userIcon = L.divIcon({
                 html: '<div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full border-4 border-white shadow-lg"><span class="material-symbols-outlined text-white text-sm">person_pin</span></div>',
-                className: 'user-marker',
+                className: "user-marker",
                 iconSize: [40, 40],
                 iconAnchor: [20, 20]
             });
 
-            userMarker = L.marker([lat, lon], { icon: userIcon })
+            userMarker = L.marker([lat, lon], { icon: userIcon, draggable: true })
                 .addTo(map)
-                .bindPopup('<div class="text-center p-2"><strong>You are here</strong></div>');
+                .bindPopup("<div class='text-center p-2'><strong>Your live pin</strong></div>");
+            userMarker.on("dragend", function () {
+                const point = userMarker.getLatLng();
+                applyLocation(point.lat, point.lng, "Pinned location");
+            });
 
-            // Add radius circle
             radiusCircle = L.circle([lat, lon], {
                 radius: currentRadius * 1000,
-                color: '#1193d4',
-                fillColor: '#1193d4',
+                color: "#1193d4",
+                fillColor: "#1193d4",
                 fillOpacity: 0.1,
                 weight: 2,
-                dashArray: '5, 5'
+                dashArray: "5, 5"
             }).addTo(map);
 
-            // Generate and add job markers
-            const jobs = loadJobs();
-            addJobMarkers(jobs);
-
-            // Update counts
-            document.getElementById('worker-count').textContent = jobs.length;
-            document.getElementById('verified-count').textContent = jobs.filter(j => j.is_verified).length;
-
-            // Hide loading overlay
-            document.getElementById('loading-overlay').style.display = 'none';
+            refreshJobLayer();
+            document.getElementById("loading-overlay").style.display = "none";
         }
 
-        // Add job markers to map
+        function refreshJobLayer() {
+            jobMarkers.forEach((marker) => map.removeLayer(marker));
+            jobMarkers = [];
+            addJobMarkers(filterNearby());
+        }
+
         function addJobMarkers(jobs) {
-            jobs.forEach(job => {
+            jobs.forEach((job) => {
                 const jobIcon = L.divIcon({
                     html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg bg-secondary border-2 border-white">
                         <span class="material-symbols-outlined text-white text-xs">${job.icon}</span>
                     </div>`,
-                    className: 'job-marker',
+                    className: "job-marker",
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
-
+                const distance = job.distance == null ? "—" : job.distance;
                 const marker = L.marker([job.lat, job.lon], { icon: jobIcon })
                     .addTo(map)
                     .bindPopup(`
                         <div class="p-3 min-w-[200px]">
-                            <div class="flex items-center gap-2 mb-2">
-                                <strong class="text-base text-primary">${job.title}</strong>
-                                ${job.is_verified ? '<span class="material-symbols-outlined text-secondary text-sm">verified</span>' : ''}
-                            </div>
-                            
-                            <div class="flex items-center gap-2 mb-3 px-2 py-1 bg-surface-container-low rounded-lg w-fit">
-                                <span class="material-symbols-outlined text-secondary text-sm">${job.icon}</span>
-                                <span class="text-xs font-bold text-outline uppercase">${job.category}</span>
-                            </div>
-                            
-                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                                <div>
-                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Pay Range</p>
-                                    <p class="font-bold text-secondary">KShs ${job.pay.toLocaleString()}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Duration</p>
-                                    <p class="font-semibold text-primary">${job.duration}</p>
-                                </div>
-                            </div>
-                            
-                            <button onclick="viewJobDetails(${job.id})" class="w-full mt-4 bg-primary text-white py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform shadow-md">
-                                View Job Details
-                            </button>
-                            
-                            <div class="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-medium">
-                                <span class="material-symbols-outlined text-[12px]">location_on</span>
-                                <span>${job.distance} km from your location</span>
-                            </div>
+                            <strong class="text-base text-primary">${job.title}</strong>
+                            <p class="text-xs font-bold text-outline uppercase mt-2">${job.category}</p>
+                            <p class="font-bold text-secondary mt-2">KShs ${job.pay.toLocaleString()}</p>
+                            <button onclick="viewJobDetails(${job.id})" class="w-full mt-4 bg-primary text-white py-3 rounded-md text-sm font-bold">View Job Details</button>
+                            <p class="mt-3 text-[10px] text-slate-400">${distance} km from your pin</p>
                         </div>
                     `);
-
                 jobMarkers.push(marker);
             });
         }
 
-        // Center map on user location
+        function applyLocation(lat, lon, label) {
+            userLocation = { lat, lon };
+            const status = document.getElementById("location-status");
+            if (status) status.textContent = label || "Live location pinned";
+            persistPin(lat, lon);
+            initMap(lat, lon);
+        }
+
         function centerOnLocation() {
-            if (userLocation && map) {
-                map.setView([userLocation.lat, userLocation.lon], 13);
-            }
+            if (userLocation && map) map.setView([userLocation.lat, userLocation.lon], 13);
         }
 
-        // Toggle to list view
-        function toggleView() {
-            window.location.href = '/workers/';
-        }
-
-        // Update radius circle
         function updateRadius(radius) {
             currentRadius = parseFloat(radius);
-            const valV = document.getElementById('radius-value-v');
+            const valV = document.getElementById("radius-value-v");
             if (valV) valV.textContent = currentRadius;
-
-            if (radiusCircle && userLocation) {
-                radiusCircle.setRadius(currentRadius * 1000);
-            }
+            if (radiusCircle) radiusCircle.setRadius(currentRadius * 1000);
+            if (map) refreshJobLayer();
         }
 
-        // Toggle radius slider panel
         function toggleRadiusSlider() {
-            const panel = document.getElementById('radius-panel');
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                setTimeout(() => {
-                    panel.classList.remove('translate-x-4', 'opacity-0');
-                }, 10);
+            const panel = document.getElementById("radius-panel");
+            if (panel.classList.contains("hidden")) {
+                panel.classList.remove("hidden");
+                setTimeout(() => panel.classList.remove("translate-x-4", "opacity-0"), 10);
             } else {
-                panel.classList.add('translate-x-4', 'opacity-0');
-                setTimeout(() => {
-                    panel.classList.add('hidden');
-                }, 300);
+                panel.classList.add("translate-x-4", "opacity-0");
+                setTimeout(() => panel.classList.add("hidden"), 300);
             }
         }
 
-        // View job details
         function viewJobDetails(jobId) {
             window.location.href = "{% url 'worker-job-details' %}?id=" + jobId;
         }
 
-        // Close job overlay
         function closeJobOverlay() {
-            const overlay = document.getElementById('job-overlay');
-            if (overlay) {
-                overlay.classList.add('hidden');
+            const overlay = document.getElementById("job-overlay");
+            if (overlay) overlay.classList.add("hidden");
+        }
+
+        function startLivePin(watch) {
+            const status = document.getElementById("location-status");
+            if (!("geolocation" in navigator)) {
+                const lat = SAVED_LAT || -1.2864;
+                const lon = SAVED_LON || 36.8172;
+                applyLocation(lat, lon, "Saved or Nairobi default");
+                return;
+            }
+            const ok = (position) => applyLocation(position.coords.latitude, position.coords.longitude, "Live location pinned");
+            const fail = () => {
+                const lat = SAVED_LAT || -1.2864;
+                const lon = SAVED_LON || 36.8172;
+                applyLocation(lat, lon, SAVED_LAT ? "Using last pinned location" : "Using Nairobi default");
+            };
+            const options = { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 };
+            navigator.geolocation.getCurrentPosition(ok, fail, options);
+            if (watch && watchId == null) {
+                watchId = navigator.geolocation.watchPosition(ok, function () {}, options);
             }
         }
 
-        // Get user's current location
-        function getCurrentLocation() {
-            const locationStatus = document.getElementById('location-status');
-
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-
-                        userLocation = { lat, lon };
-
-                        // Update location status
-                        locationStatus.textContent = 'Current location';
-
-                        // Initialize map
-                        initMap(lat, lon);
-                    },
-                    (error) => {
-                        console.error('Geolocation error:', error);
-                        locationStatus.textContent = 'Using default location (Nairobi)';
-
-                        // Fallback to Nairobi, Kenya coordinates
-                        const defaultLat = -1.2864;
-                        const defaultLon = 36.8172;
-                        userLocation = { lat: defaultLat, lon: defaultLon };
-
-                        initMap(defaultLat, defaultLon);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                locationStatus.textContent = 'Using default location';
-
-                // Fallback to Nairobi if geolocation not supported
-                const defaultLat = -1.2864;
-                const defaultLon = 36.8172;
-                userLocation = { lat: defaultLat, lon: defaultLon };
-
-                initMap(defaultLat, defaultLon);
-            }
-        }
-
-        // Initialize on page load
-        window.addEventListener('load', getCurrentLocation);
+        document.getElementById("pin-live-location").addEventListener("click", function () {
+            startLivePin(true);
+        });
+        window.addEventListener("load", function () {
+            startLivePin(true);
+        });
     </script>
 
 </body>

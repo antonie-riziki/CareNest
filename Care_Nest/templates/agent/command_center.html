@@ -166,7 +166,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="engagement_pk" value="{{ engagement.pk }}">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-outline">Ask about this engagement</p>
-                <input type="text" name="question" value="What is happening with this contract?" class="w-full rounded-xl border-outline-variant/30 text-sm">
+                <input type="text" name="question" value="What is happening with this contract?" class="form-field w-full text-sm">
                 <button class="w-full py-3 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest">Ask</button>
             </form>
         </section>
