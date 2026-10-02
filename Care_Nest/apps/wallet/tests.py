@@ -297,3 +297,26 @@ class EngagementAndRecoveryTests(TestCase):
         self.assertEqual(remaining_training_for(self.worker), Decimal("0.00"))
         b = compute_waterfall(Decimal("50000"), remaining_training_balance=remaining_training_for(self.worker))
         self.assertEqual(b.upskilling_recovery_amount, Decimal("0.00"))
+
+
+class WalletPageTests(TestCase):
+    def setUp(self):
+        self.employer = User.objects.create_user(username="wal-e@test.com", password="x", role="employer")
+        self.worker = User.objects.create_user(username="wal-w@test.com", password="x", role="worker")
+        EmployerProfile.objects.create(user=self.employer)
+        WorkerProfile.objects.create(user=self.worker)
+        Wallet.objects.create(user=self.employer, balance=0, stellar_address="G" + "A" * 55, connection_status="connected")
+        Wallet.objects.create(user=self.worker, balance=0)
+
+    def test_employer_wallet_page_renders(self):
+        self.client.force_login(self.employer)
+        response = self.client.get("/employer-wallet/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Household treasury")
+
+    def test_worker_wallet_shows_connect_cta(self):
+        self.client.force_login(self.worker)
+        response = self.client.get("/worker-wallet/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Connect wallet")
+        self.assertContains(response, "Passport earnings")

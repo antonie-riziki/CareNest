@@ -3,20 +3,36 @@
 {% block content %}
 {% include 'employer_sidebar.html' %}
 <div class="flex-1 md:ml-64 min-h-screen p-6 md:p-10 space-y-6">
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Job postings</h1>
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-primary font-headline tracking-tighter">Job postings</h1>
+            <p class="text-sm text-outline mt-1">{{ jobs|length }} posting{{ jobs|length|pluralize }}</p>
+        </div>
         <div class="flex gap-3">
-            <a href="{% url 'employer-job-new' %}" class="bg-primary text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">New job</a>
-            <a href="{% url 'agent-panel' %}" class="signature-gradient text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">New via Agent</a>
+            <a href="{% url 'employer-job-new' %}" class="bg-primary text-white px-4 py-2.5 rounded-md text-xs font-bold uppercase tracking-widest">New job</a>
+            <a href="{% url 'agent-panel' %}" class="signature-gradient text-white px-4 py-2.5 rounded-md text-xs font-bold uppercase tracking-widest">Via Agent</a>
         </div>
     </div>
-    {% if messages %}{% for message in messages %}<div class="bg-secondary-container px-4 py-3 rounded-xl text-sm">{{ message }}</div>{% endfor %}{% endif %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {% for job in jobs %}
-    <a href="{% url 'employer-job-details' %}?id={{ job.pk }}" class="block hover:opacity-95">{% include '_job_card.html' %}</a>
-    {% empty %}
-    <p class="text-sm text-outline">No jobs yet. Create one or describe a requirement in the WorkOS agent.</p>
-    {% endfor %}
+    {% if messages %}{% for message in messages %}<div class="bg-secondary-container px-4 py-3 rounded-md text-sm">{{ message }}</div>{% endfor %}{% endif %}
+    <div class="bg-white border border-outline-variant/20 rounded-lg overflow-hidden max-w-4xl">
+        {% for job in jobs %}
+        <a href="{% url 'employer-job-details' %}?id={{ job.pk }}" class="flex items-center gap-4 px-4 py-3 border-b border-outline-variant/10 last:border-0 hover:bg-surface-container-low">
+            <img src="{{ job.cover_image }}" alt="" class="w-14 h-14 object-cover rounded-md border border-outline-variant/20 shrink-0">
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-bold text-primary truncate">{{ job.title }}</h3>
+                    <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md {% if job.is_live %}bg-secondary/10 text-secondary{% elif job.is_filled %}bg-primary/10 text-primary{% else %}bg-surface-container-high text-outline{% endif %}">{% if job.is_filled %}Filled{% else %}{{ job.status }}{% endif %}</span>
+                </div>
+                <p class="text-xs text-outline truncate">{{ job.location }} · {{ job.job_type }} · {{ job.schedule_label }}</p>
+            </div>
+            <div class="text-right shrink-0">
+                <p class="font-bold text-primary text-sm">{{ job.currency }} {{ job.pay }}</p>
+                <p class="text-[11px] text-outline">{{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <p class="px-5 py-8 text-sm text-outline">No jobs yet. Create one or describe a requirement in the WorkOS agent.</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

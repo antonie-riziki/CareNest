@@ -136,6 +136,8 @@ def employer_jobs(request):
     jobs = Job.objects.filter(employer=request.user).order_by("-created_at")
     jobs = refresh_queryset(jobs)
     counts = {j.pk: Application.objects.filter(job=j).count() for j in jobs}
+    for job in jobs:
+        job.applicant_count = counts.get(job.pk, 0)
     return render(request, "employer_jobs.html", {"jobs": jobs, "applicant_counts": counts})
 
 

@@ -2,13 +2,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.agentic_core.models import WorkCredential
 from apps.agentic_core.state import EngagementStatus
 from apps.contracts.models import Contract
 from apps.courses.models import Enrollment
-from apps.wallet.models import PayoutMethod, Transaction, Wallet
+from apps.wallet.chain_data import fetch_stellar_snapshot
+from apps.wallet.models import PayoutMethod, Settlement, Transaction, Wallet
 from apps.wallet.payouts import PayoutError, preferred_payout_method, save_mpesa_method
 from apps.wallet.pricing import get_price_service
 from apps.wallet.providers import WalletError, disconnect_wallet, persist_connection
@@ -30,6 +32,13 @@ def worker_wallet(request):
     from apps.contracts.models import ServiceInvoice
 
     invoices = ServiceInvoice.objects.filter(worker=request.user).select_related("engagement", "engagement__job")[:8]
+    chain = fetch_stellar_snapshot(wallet.stellar_address) if wallet.stellar_connected else None
+    xlm_kes = None
+    if chain and chain.get("native_balance") is not None:
+        try:
+            xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+        except Exception:
+            xlm_kes = None
     return render(
         request,
         "workers_wallet.html",
@@ -44,13 +53,50 @@ def worker_wallet(request):
             "preferred_payout": preferred_payout_method(request.user),
             "prices": prices,
             "invoices": invoices,
+            "chain": chain,
+            "xlm_kes": xlm_kes,
         },
     )
 
 
 @login_required(login_url="employer-signin")
 def employer_wallet(request):
-    return redirect("wallet-connect")
+    wallet, _ = Wallet.objects.get_or_create(user=request.user, defaults={"balance": 0})
+    month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    engagements = Contract.objects.filter(employer=request.user)
+    escrowed = (
+        engagements.filter(chain_status__in=EngagementStatus.FUNDS_IN_ESCROW).aggregate(total=Sum("amount"))["total"] or 0
+    )
+    spent = (
+        engagements.filter(chain_status=EngagementStatus.RELEASED, updated_at__gte=month_start).aggregate(total=Sum("amount"))["total"]
+        or 0
+    )
+    lifetime = engagements.filter(chain_status=EngagementStatus.RELEASED).aggregate(total=Sum("amount"))["total"] or 0
+    settlements = Settlement.objects.filter(employer=request.user).select_related("engagement", "engagement__job").order_by("-created_at")[:12]
+    txs = Transaction.objects.filter(wallet=wallet).select_related("settlement").order_by("-created_at")[:12]
+    prices = get_price_service().dashboard()
+    chain = fetch_stellar_snapshot(wallet.stellar_address) if wallet.stellar_connected else None
+    xlm_kes = None
+    if chain and chain.get("native_balance") is not None:
+        try:
+            xlm_kes = get_price_service().convert(chain["native_balance"], "XLM", "KES")
+        except Exception:
+            xlm_kes = None
+    return render(
+        request,
+        "employer_wallet.html",
+        {
+            "wallet": wallet,
+            "escrowed": escrowed,
+            "spent_this_month": spent,
+            "lifetime_spent": lifetime,
+            "settlements": settlements,
+            "transactions": txs,
+            "prices": prices,
+            "chain": chain,
+            "xlm_kes": xlm_kes,
+        },
+    )
 
 
 @login_required

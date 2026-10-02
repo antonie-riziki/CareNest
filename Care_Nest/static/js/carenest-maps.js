@@ -38,10 +38,11 @@
       current = L.tileLayer(layers[i].url, {
         attribution: layers[i].attribution,
         maxZoom: 19,
+        crossOrigin: true,
       });
       current.on("tileerror", function () {
         failures += 1;
-        if (failures >= 3 && i + 1 < layers.length) {
+        if (failures >= 1 && i + 1 < layers.length) {
           if (statusEl) statusEl.textContent = "Switching map provider…";
           attach(i + 1);
         }

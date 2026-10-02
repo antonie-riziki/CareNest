@@ -98,7 +98,7 @@
                     <div>
                         <p
                             class="font-label text-[10px] uppercase font-bold tracking-[0.3em] text-primary-fixed/60 mb-4">
-                            Cumulative Revenue Today</p>
+                            Confirmed earnings</p>
                         <h2 class="text-5xl lg:text-6xl font-extrabold tracking-tighter mb-8 font-headline">KES {{ earned|floatformat:0 }}
                         </h2>
                         <div class="flex items-center gap-4">
@@ -110,8 +110,7 @@
                             <div
                                 class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/20 border border-secondary-container/20">
                                 <span
-                                    class="text-[10px] font-bold text-secondary-container uppercase tracking-widest">+12%
-                                    from yesterday</span>
+                                    class="text-[10px] font-bold text-secondary-container uppercase tracking-widest">{% if wallet.is_connected %}Wallet {{ wallet.short_address }}{% else %}Wallet not connected{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -140,29 +139,22 @@
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
                         <span
-                            class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">On
-                            Duty</span>
-                        <div
-                            class="flex items-center gap-2 text-primary font-bold text-sm bg-white px-3 py-1.5 rounded-xl shadow-sm">
-                            <span class="material-symbols-outlined text-lg animate-pulse" data-icon="schedule"
-                                style="font-variation-settings: 'FILL' 1;">schedule</span>
-                            02:45:12
-                        </div>
+                            class="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] border border-secondary/20">{% if latest_engagement %}{{ latest_engagement.chain_status }}{% else %}Standby{% endif %}</span>
                     </div>
                     <div>
                         <h3 class="text-2xl font-extrabold text-primary tracking-tighter font-headline leading-tight">
-                            Housekeeping in <br />Kilimani Area</h3>
+                            {% if latest_engagement %}{{ latest_engagement.job.title }}{% else %}No active engagement{% endif %}</h3>
                         <p
                             class="text-outline font-bold text-xs uppercase tracking-widest mt-3 flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-secondary"></span>
-                            Status: Arrived at location
+                            {% if latest_engagement %}{{ latest_engagement.job.location }} · {{ latest_engagement.currency }} {{ latest_engagement.amount }}{% else %}{{ live_jobs_count }} live jobs on the platform{% endif %}
                         </p>
                     </div>
                 </div>
-                <button
-                    class="w-full signature-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-8 text-sm uppercase tracking-widest">
-                    <a href="{% url 'worker-contracts' %}" class="block w-full h-full">System Check-In</a>
-                </button>
+                <a href="{% if latest_engagement %}{% url 'worker-engagement-review' latest_engagement.pk %}{% else %}{% url 'worker-jobs' %}{% endif %}"
+                    class="w-full signature-gradient text-white font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 text-sm uppercase tracking-widest text-center mt-8">
+                    {% if latest_engagement %}Open engagement{% else %}Browse jobs{% endif %}
+                </a>
             </div>
         </div>
 
@@ -185,8 +177,7 @@
                         </div>
                         <div>
                             <span class="font-extrabold text-primary block text-lg tracking-tight">Job Discovery</span>
-                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">12 New
-                                Matches</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">{{ live_jobs_count }} live jobs</span>
                         </div>
                     </a>
 
@@ -198,8 +189,7 @@
                         </div>
                         <div>
                             <span class="font-extrabold text-primary block text-lg tracking-tight">Active Duty</span>
-                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Check-in
-                                Status</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">{{ active_count }} active</span>
                         </div>
                     </a>
 
@@ -211,8 +201,7 @@
                         </div>
                         <div>
                             <span class="font-extrabold text-primary block text-lg tracking-tight">Upskilling</span>
-                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">New
-                                Curriculum</span>
+                            <span class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">{% if enrollments %}{{ enrollments|length }} enrolled{% else %}Browse courses{% endif %}</span>
                         </div>
                     </a>
 
@@ -252,10 +241,9 @@
                                 Course</p>
                             <h4
                                 class="font-extrabold text-2xl text-primary tracking-tighter leading-tight font-headline">
-                                Advanced Elder Care <br />Certification</h4>
+                                {% if featured_course %}{{ featured_course.title }}{% else %}No courses yet{% endif %}</h4>
                         </div>
-                        <p class="text-sm text-outline leading-relaxed font-medium">Boost your daily revenue potential
-                            by gaining specialized skills in geriatric care and support.</p>
+                        <p class="text-sm text-outline leading-relaxed font-medium">{% if featured_course %}{{ featured_course.description }}{% else %}Open upskilling when a course is published.{% endif %}</p>
                         <a href="{% url 'worker-courses' %}"
                             class="flex items-center justify-between group pt-6 border-t border-outline-variant/10">
                             <span

@@ -1,8 +1,8 @@
 """
 Map provider abstraction.
 
-Primary: Leaflet + OpenStreetMap.
-Fallbacks (in order): Carto Voyager, Esri World Street Map, then Google Maps JS if a key is set.
+Primary tiles are Carto (OSM-derived) so the map works when tile.openstreetmap.org
+returns 403. Fallbacks: Esri, OSM Germany, then OSM.org.
 Worker coordinates are jittered so exact home location is not published.
 """
 
@@ -16,7 +16,6 @@ from django.conf import settings
 
 
 def approximate_coordinates(lat: float, lon: float, *, salt: str = "") -> tuple[float, float]:
-    """Offset a point by ~250–400m using a stable hash so the same user stays consistent."""
     digest = hashlib.sha256(f"{lat}:{lon}:{salt}".encode()).hexdigest()
     dx = (int(digest[:8], 16) / 0xFFFFFFFF) - 0.5
     dy = (int(digest[8:16], 16) / 0xFFFFFFFF) - 0.5
@@ -43,18 +42,22 @@ def public_config() -> dict[str, Any]:
         "provider": primary,
         "fallback": "leaflet",
         "google_maps_api_key": google_key,
-        "tile_url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "tile_attribution": "© OpenStreetMap contributors",
+        "tile_url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        "tile_attribution": "© OpenStreetMap, © CARTO",
         "tile_fallbacks": [
-            {
-                "url": "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-                "attribution": "© OpenStreetMap, © CARTO",
-            },
             {
                 "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
                 "attribution": "Tiles © Esri",
             },
+            {
+                "url": "https://tile.openstreetmap.de/{z}/{x}/{y}.png",
+                "attribution": "© OpenStreetMap contributors",
+            },
+            {
+                "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "attribution": "© OpenStreetMap contributors",
+            },
         ],
         "privacy": "Worker location is approximate. Exact residential coordinates are never shown publicly.",
-        "error_hint": "If OpenStreetMap tiles fail, CareNest switches to Carto, then Esri.",
+        "error_hint": "CareNest loads Carto first. If those tiles fail it switches to Esri, then OSM Germany.",
     }

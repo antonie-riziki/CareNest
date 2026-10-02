@@ -168,7 +168,7 @@
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span id="verified-count" class="text-primary font-bold text-sm">0</span>
-                                <span class="text-[10px] text-outline uppercase font-medium">Verified Posters</span>
+                                <span class="text-[10px] text-outline uppercase font-medium">Nearby</span>
                             </div>
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                 <!-- Recommendations Section (Editorial Layout) -->
                 <section class="mt-4 pb-12 lg:pb-0">
                     <h3 class="font-headline text-xl font-bold text-primary mb-6">Nearby live jobs</h3>
-                    <p class="text-[11px] text-outline mb-4">Pin your live location to rank nearby posted jobs. Job pins stay approximate. If OpenStreetMap fails, Carto then Esri load automatically.</p>
+                    <p class="text-[11px] text-outline mb-4">All live jobs are listed and plotted. Your pin ranks nearby work first. Distant jobs stay visible. Maps use Carto, then Esri if tiles fail.</p>
                     {% for job in jobs %}
                     <a href="{% url 'worker-job-details' %}?id={{ job.pk }}" data-job-card data-lat="{{ job.latitude }}" data-lon="{{ job.longitude }}" class="block mb-4">{% include '_job_card.html' %}</a>
                     {% empty %}
@@ -299,30 +299,29 @@
 
         function filterNearby() {
             const jobs = loadJobs();
-            let nearby = jobs;
-            if (userLocation) {
-                nearby = jobs.filter((job) => {
-                    const km = CareNestMaps.haversineKm(userLocation.lat, userLocation.lon, job.lat, job.lon);
-                    job.distance = km;
-                    return km <= currentRadius;
-                });
-            }
-            document.querySelectorAll("[data-job-card]").forEach((card) => {
-                if (!userLocation) {
-                    card.style.display = "";
-                    return;
+            jobs.forEach((job) => {
+                if (userLocation) {
+                    job.distance = CareNestMaps.haversineKm(userLocation.lat, userLocation.lon, job.lat, job.lon);
+                    job.nearby = job.distance <= currentRadius;
+                } else {
+                    job.nearby = false;
                 }
+            });
+            const nearby = jobs.filter((job) => job.nearby);
+            document.querySelectorAll("[data-job-card]").forEach((card) => {
+                card.style.display = "";
+                if (!userLocation) return;
                 const km = CareNestMaps.haversineKm(
                     userLocation.lat,
                     userLocation.lon,
                     Number(card.dataset.lat),
                     Number(card.dataset.lon)
                 );
-                card.style.display = km <= currentRadius ? "" : "none";
+                card.dataset.nearby = km <= currentRadius ? "1" : "0";
             });
-            document.getElementById("worker-count").textContent = nearby.length;
-            document.getElementById("verified-count").textContent = nearby.filter((job) => job.is_verified).length;
-            return nearby;
+            document.getElementById("worker-count").textContent = jobs.length;
+            document.getElementById("verified-count").textContent = nearby.length;
+            return jobs;
         }
 
         function initMap(lat, lon) {

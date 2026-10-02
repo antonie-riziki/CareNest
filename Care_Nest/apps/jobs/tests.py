@@ -95,3 +95,54 @@ class LiveLocationTests(TestCase):
         self.assertContains(response, "employer-map")
         self.assertContains(response, "Use my live location")
         self.assertContains(response, "form-field")
+
+    def test_distant_jobs_still_listed_for_workers(self):
+        near = Job.objects.create(
+            employer=self.employer,
+            title="Nearby nanny",
+            description="d",
+            location="Westlands",
+            latitude=-1.26,
+            longitude=36.80,
+            pay=10000,
+            job_type="nanny",
+            status=Job.Status.ACTIVE,
+            published_at=timezone.now(),
+        )
+        far = Job.objects.create(
+            employer=self.employer,
+            title="Mombasa caregiver",
+            description="d",
+            location="Mombasa",
+            latitude=-4.04,
+            longitude=39.66,
+            pay=18000,
+            job_type="caregiver",
+            status=Job.Status.ACTIVE,
+            published_at=timezone.now(),
+        )
+        WorkerProfile.objects.filter(user=self.worker).update(last_latitude=-1.26, last_longitude=36.80)
+        self.client.force_login(self.worker)
+        response = self.client.get("/worker-jobs/")
+        self.assertContains(response, near.title)
+        self.assertContains(response, far.title)
+        self.assertContains(response, "All live jobs are listed")
+
+    def test_employer_jobs_use_compact_rows(self):
+        Job.objects.create(
+            employer=self.employer,
+            title="Compact row job",
+            description="d",
+            location="Nairobi",
+            latitude=-1.26,
+            longitude=36.80,
+            pay=12000,
+            job_type="nanny",
+            status=Job.Status.ACTIVE,
+            published_at=timezone.now(),
+        )
+        self.client.force_login(self.employer)
+        response = self.client.get("/employer-jobs/")
+        self.assertContains(response, "Compact row job")
+        self.assertContains(response, "applicant")
+        self.assertNotContains(response, "grid-cols-1 md:grid-cols-2")

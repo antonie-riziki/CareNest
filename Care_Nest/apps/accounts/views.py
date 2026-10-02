@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
@@ -185,3 +185,13 @@ def employer_signin(request):
             return redirect("employer-signin")
 
     return render(request, "employer_signin.html")
+
+
+def worker_logout(request):
+    logout(request)
+    return redirect("worker-signin")
+
+
+def employer_logout(request):
+    logout(request)
+    return redirect("employer-signin")
