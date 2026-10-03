@@ -12,7 +12,7 @@ services:
     region: oregon
     rootDir: Care_Nest
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate --noinput && gunicorn Care_Nest.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
+    startCommand: python manage.py migrate --noinput && python manage.py seed_workos && gunicorn Care_Nest.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
     healthCheckPath: /healthz
     autoDeployTrigger: commit
     envVars:
@@ -23,9 +23,9 @@ services:
       - key: DJANGO_DEBUG
         value: "false"
       - key: DJANGO_ALLOWED_HOSTS
-        value: carenest.onrender.com,.onrender.com
+        value: carenest.onrender.com,carenest-zcjq.onrender.com,.onrender.com
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        value: https://carenest.onrender.com,https://*.onrender.com
+        value: https://carenest.onrender.com,https://carenest-zcjq.onrender.com,https://*.onrender.com
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
@@ -98,3 +98,9 @@ services:
         sync: false
       - key: GOOGLE_MAPS_API_KEY
         sync: false
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        value: https://carenest-zcjq.onrender.com/auth/google/callback/

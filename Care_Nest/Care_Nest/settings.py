@@ -97,9 +97,16 @@ if DEBUG:
 
 if os.getenv("VERCEL") or os.getenv("RENDER"):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
     SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+    CSRF_FAILURE_VIEW = "apps.accounts.views.csrf_failure"
 
 
 # Application definition
@@ -184,8 +191,12 @@ if _database_url:
     sslmode = os.getenv("POSTGRES_SSLMODE") or (query.get("sslmode") or [None])[0]
     host = url.hostname or ""
     if not sslmode:
-        internal_render = bool(os.getenv("RENDER")) and "render.com" in host and "-a." not in host
-        sslmode = "disable" if internal_render else "require"
+        looks_external = "postgres.render.com" in host or host.endswith(".render.com") or "supabase.co" in host or "pooler.supabase.com" in host
+        sslmode = "require" if looks_external or not os.getenv("RENDER") else "disable"
+    db_options = {"sslmode": sslmode}
+    search_path = (os.getenv("POSTGRES_SEARCH_PATH") or (query.get("search_path") or [None])[0] or "").strip()
+    if search_path:
+        db_options["options"] = f"-c search_path={search_path}"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -195,7 +206,7 @@ if _database_url:
             "HOST": url.hostname,
             "PORT": str(url.port or "5432"),
             "CONN_MAX_AGE": 60 if os.getenv("RENDER") else 0,
-            "OPTIONS": {"sslmode": sslmode},
+            "OPTIONS": db_options,
         }
     }
 
@@ -304,6 +315,9 @@ CARENEST_UPSKILLING_RECOVERY_PERCENT = Decimal(os.getenv("CARENEST_UPSKILLING_RE
 
 # Maps — browser key only, never a secret. Empty => Leaflet/OSM.
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI", "")
 CARTO_API_KEY = os.getenv("CARTO_API_KEY", "")
 MAP_PROVIDER = os.getenv("MAP_PROVIDER", "leaflet")
 

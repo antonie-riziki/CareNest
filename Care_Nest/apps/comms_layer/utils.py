@@ -2,7 +2,11 @@ import re
 
 
 def format_phone_number(phone):
-    phone = phone.strip().replace(" ", "")
+    if phone is None:
+        return None
+    phone = str(phone).strip().replace(" ", "")
+    if not phone:
+        return None
 
     if phone.startswith("+254"):
         normalized = phone

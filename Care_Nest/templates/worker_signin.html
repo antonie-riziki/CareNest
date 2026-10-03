@@ -58,6 +58,8 @@
                         <p class="text-outline font-medium">Log in to your worker dashboard to view new requests.</p>
                     </div>
 
+                    {% include '_auth_alerts.html' %}
+
                     <form action="{% url 'worker-signin' %}" method="POST" class="space-y-6">
                         {% csrf_token %}
                         <!-- Identifier -->
@@ -106,15 +108,8 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <button class="flex items-center justify-center gap-3 py-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors text-primary font-bold text-xs border border-transparent hover:border-outline-variant/20">
-                            <img alt="Google" class="w-5 h-5" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" />
-                            Google
-                        </button>
-                        <button class="flex items-center justify-center gap-3 py-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors text-primary font-bold text-xs border border-transparent hover:border-outline-variant/20">
-                            <img alt="Facebook" class="w-5 h-5" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/960px-2021_Facebook_icon.svg.png" />
-                            Facebook
-                        </button>
+                    <div class="grid grid-cols-1 gap-4">
+                        {% include '_google_auth_button.html' with role='worker' %}
                     </div>
 
                     <p class="mt-12 text-center text-outline font-medium">
